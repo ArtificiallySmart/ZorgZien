@@ -1,0 +1,33 @@
+{
+  "name": "zorgplanner-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/zorgplanner-e2e/src",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/zorgplanner-e2e/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "zorgplanner:serve:development"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "zorgplanner:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "zorgplanner:serve-static"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/zorgplanner-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["zorgplanner"]
+}
