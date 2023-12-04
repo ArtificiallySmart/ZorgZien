@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../shared/services/http.service';
-import { Observable } from 'rxjs';
+import { HttpService } from '../../shared/services/http.service';
 
 import * as topojson from 'topojson';
 import * as d3 from 'd3';
@@ -32,7 +31,6 @@ export class ProjectService {
   }
 
   init() {
-    console.log(this.geoData);
     this.mapFeatures = topojson.feature(this.geoData, {
       type: 'GeometryCollection',
       geometries: this.geoData.objects.groningen.geometries,
@@ -51,8 +49,8 @@ export class ProjectService {
       .data(this.mapFeatures.features)
       .join('path')
       .attr('d', path)
-      .attr('fill', 'white')
-      .attr('stroke', 'black');
+      .attr('fill', 'grey')
+      .attr('stroke', 'grey');
 
     const zoom = d3.zoom().scaleExtent([-10, 8]).on('zoom', this.zoomed) as any;
 
@@ -107,4 +105,28 @@ export class ProjectService {
           `translate(${transform.apply(this.path.centroid(d))}) scale(1)`
       );
   };
+
+  addHours(data: Map<number, number>) {
+    const svg = this.svg;
+    const path = this.path;
+    const max = d3.max(Array.from(data.values()));
+    const min = d3.min(Array.from(data.values()));
+
+    const colorScale = d3.scaleLog().domain([min || 0, max || 0]);
+
+    svg
+      .append('g')
+      .selectAll('path')
+      .data(this.mapFeatures.features)
+      .join('path')
+      .attr('d', path)
+      .attr('fill', (d: any) => {
+        const postcode = d.properties.postcode4;
+        const value = data.get(+postcode);
+        if (value !== undefined) {
+          return d3.interpolateReds(colorScale(value));
+        }
+        return 'white';
+      });
+  }
 }

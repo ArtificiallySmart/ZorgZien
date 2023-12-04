@@ -1,4 +1,33 @@
 <div class="container">
-    <svg></svg>
-    <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
+        <li [ngbNavItem]="1">
+            <button ngbNavLink>Map</button>
+            <ng-template ngbNavContent>
+                <div class="svg-container">
+                    <svg></svg>
+                    <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
+                </div>
+
+            </ng-template>
+        </li>
+        <li [ngbNavItem]="2">
+
+            <button ngbNavLink>Two</button>
+            <ng-template ngbNavContent>
+                <zorgplanner-hour-input></zorgplanner-hour-input>
+
+            </ng-template>
+        </li>
+        <li [ngbNavItem]="3">
+            <button ngbNavLink>Three</button>
+            <ng-template ngbNavContent>
+
+            </ng-template>
+        </li>
+    </ul>
+
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+
+
 </div>
