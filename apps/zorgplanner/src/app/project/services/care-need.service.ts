@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject } from 'rxjs';
 import {
@@ -7,6 +7,7 @@ import {
   EditCareNeedList,
   RemoveCareNeedList,
 } from '../../shared/interfaces/care-need';
+import { StorageService } from '../../shared/services/storage.service';
 
 export interface CareNeedState {
   careNeedLists: CareNeedList[];
@@ -18,6 +19,8 @@ export interface CareNeedState {
   providedIn: 'root',
 })
 export class CareNeedService {
+  private storageService = inject(StorageService);
+
   //state
   private state = signal<CareNeedState>({
     careNeedLists: [],
@@ -31,11 +34,26 @@ export class CareNeedService {
   error = computed(() => this.state().error);
 
   //sources
+  private careNeedListsLoaded$ = this.storageService.loadCareNeedLists();
   add$ = new Subject<AddCareNeedList>();
   edit$ = new Subject<EditCareNeedList>();
   remove$ = new Subject<RemoveCareNeedList>();
 
   constructor() {
+    this.careNeedListsLoaded$.pipe(takeUntilDestroyed()).subscribe({
+      next: (careNeedLists) =>
+        this.state.update((state) => ({
+          ...state,
+          careNeedLists,
+          loaded: true,
+        })),
+      error: (error) =>
+        this.state.update((state) => ({
+          ...state,
+          error: error,
+        })),
+    });
+
     this.add$.pipe(takeUntilDestroyed()).subscribe((careNeedList) =>
       this.state.update((state) => ({
         ...state,

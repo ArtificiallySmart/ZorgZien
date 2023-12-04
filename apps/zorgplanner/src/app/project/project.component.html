@@ -7,14 +7,14 @@
                     <svg></svg>
                     <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
                 </div>
-
+                {{careNeedService.careNeed() | json}}
             </ng-template>
         </li>
         <li [ngbNavItem]="2">
 
             <button ngbNavLink>Two</button>
             <ng-template ngbNavContent>
-                <zorgplanner-hour-input></zorgplanner-hour-input>
+                <zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"></zorgplanner-hour-input>
 
             </ng-template>
         </li>

@@ -1,5 +1,3 @@
-import { type } from 'os';
-
 export interface CareNeedList {
   id: string;
   title: string;

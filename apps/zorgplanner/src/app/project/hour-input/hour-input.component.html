@@ -1,5 +1,19 @@
 <div class="input-container">
-    <label for="uren">Zorguren per postcode: </label>
-    <input type="text" [(ngModel)]="zorgUren">
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
+        <select class="form-control" id="exampleFormControlSelect1" disabled>
+            <option>U heeft nog geen zorgbehoefte lijsten opgeslagen</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="uren-lijst-titel">Titel van de zorgbehoefte lijst:</label>
+        <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="titel">
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
+    </div>
     <button (click)="addHours()"> submit</button>
+
 </div>
