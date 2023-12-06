@@ -1,30 +1,33 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from '../../shared/services/http.service';
 
-import * as topojson from 'topojson';
 import * as d3 from 'd3';
-import { FeatureCollection } from 'geojson';
+import { FeatureCollection, GeoJsonProperties } from 'geojson';
+import * as topojson from 'topojson';
+import { Objects } from 'topojson-specification';
+import { CareNeedList } from '../../shared/interfaces/care-need';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProjectService {
-  geoData: any;
+  geoData!: TopoJSON.Topology<Objects<GeoJsonProperties>>;
   private centerGroningen: [number, number] = [6.5, 53.259];
 
   mapFeatures!: FeatureCollection;
 
-  svg!: d3.Selection<d3.BaseType, unknown, HTMLElement, any>;
+  svg!: d3.Selection<SVGElement, unknown, HTMLElement, unknown>;
 
   projection = d3.geoMercator().scale(40000).center(this.centerGroningen);
 
   path = d3.geoPath(this.projection);
 
-  transform: any = null;
+  // transform: any = null;
+  transform: d3.ZoomTransform | null = null;
 
   constructor(private httpService: HttpService) {
     this.httpService.get().subscribe({
-      next: (data) => (this.geoData = data),
+      next: (data) => (this.geoData = data as TopoJSON.Topology),
       error: (e) => console.error(e),
       complete: () => this.init(),
     });
@@ -33,7 +36,9 @@ export class ProjectService {
   init() {
     this.mapFeatures = topojson.feature(this.geoData, {
       type: 'GeometryCollection',
-      geometries: this.geoData.objects.groningen.geometries,
+      geometries: (this.geoData.objects['groningen'] as GeoJsonProperties)![
+        'geometries'
+      ],
     });
     this.svg = d3.select('svg');
     this.draw();
@@ -52,7 +57,10 @@ export class ProjectService {
       .attr('fill', 'grey')
       .attr('stroke', 'grey');
 
-    const zoom = d3.zoom().scaleExtent([-10, 8]).on('zoom', this.zoomed) as any;
+    const zoom = d3
+      .zoom<SVGElement, unknown>()
+      .scaleExtent([-10, 8])
+      .on('zoom', this.zoomed);
 
     svg.call(zoom);
   }
@@ -66,20 +74,20 @@ export class ProjectService {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('transform', (d: any) => {
-        var centroid = this.path.centroid(d);
+      .attr('transform', (d) => {
+        const centroid = this.path.centroid(d);
         if (this.transform === null) {
           return `translate(${centroid})`;
         }
         return `translate(${this.transform.apply(centroid)})`;
       })
-      .text(function (d: any) {
-        return d.properties.postcode4;
+      .text(function (d) {
+        return d.properties!['postcode4'];
       });
   }
 
   removeLabels() {
-    this.svg.selectAll('.label-group').remove();
+    this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
   }
 
   togglePostcode(value: boolean) {
@@ -91,22 +99,25 @@ export class ProjectService {
     }
   }
 
-  zoomed = ({ transform }: { transform: any }) => {
+  zoomed = ({ transform }: { transform: d3.ZoomTransform }) => {
     this.transform = transform;
     this.svg
       .selectAll('path')
-      .attr('transform', transform)
+      .attr('transform', transform.toString())
       .attr('stroke-width', 1 / transform.k);
     this.svg
       .selectAll('.label')
-      .attr(
-        'transform',
-        (d: any) =>
-          `translate(${transform.apply(this.path.centroid(d))}) scale(1)`
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .attr('transform', (d: any) => {
+        const centroid = this.path.centroid(d);
+        return `translate(${transform.apply(centroid)}) scale(1)`;
+      });
   };
 
-  addHours(data: Map<number, number>) {
+  removeHours() {}
+
+  addHours(careList: CareNeedList) {
+    const data = careList.careNeed;
     const svg = this.svg;
     const path = this.path;
     const max = d3.max(Array.from(data.values()));
@@ -120,8 +131,8 @@ export class ProjectService {
       .data(this.mapFeatures.features)
       .join('path')
       .attr('d', path)
-      .attr('fill', (d: any) => {
-        const postcode = d.properties.postcode4;
+      .attr('fill', (d) => {
+        const postcode = d.properties!['postcode4'];
         const value = data.get(+postcode);
         if (value !== undefined) {
           return d3.interpolateReds(colorScale(value));

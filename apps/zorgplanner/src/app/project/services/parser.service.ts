@@ -6,12 +6,12 @@ import { Injectable } from '@angular/core';
 export class ParserService {
   constructor() {}
 
+  //todo: make this a bit more robust
   parse(data: string) {
-    console.log(data);
     const map = new Map<number, number>();
     const rows = data.split('\n');
 
-    for (let row of rows) {
+    for (const row of rows) {
       const [key, value] = row.split('\t').map((item) => item.trim());
       map.set(parseInt(key), parseFloat(value.replace(',', '.')));
     }

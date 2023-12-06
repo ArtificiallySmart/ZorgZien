@@ -17,5 +17,12 @@
     "baseUrl": ".",
     "paths": {}
   },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true,
+    "_enabledBlockTypes": ["if", "for", "switch", "defer"]
+  },
   "exclude": ["node_modules", "tmp"]
 }

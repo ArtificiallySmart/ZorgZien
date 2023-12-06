@@ -1,19 +1,43 @@
 <div class="input-container">
     <div class="form-group">
         <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-        <select class="form-control" id="exampleFormControlSelect1" disabled>
-            <option>U heeft nog geen zorgbehoefte lijsten opgeslagen</option>
+        <select class="form-control" id="exampleFormControlSelect1"
+            [disabled]="(careNeedLists.length === 0) ? true : false" (change)="selectList($event)">
+
+            <option value="test" *ngIf="careNeedLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
+                opgeslagen
+            </option>
+            <ng-template #lists>
+                <option>Selecteer een lijst</option>
+                <option [value]="list.id" *ngFor="let list of careNeedLists">{{list.title}}</option>
+            </ng-template>
+
         </select>
     </div>
 
     <div class="form-group">
         <label for="uren-lijst-titel">Titel van de zorgbehoefte lijst:</label>
-        <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="titel">
+        <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="title">
     </div>
     <div class="form-group">
         <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
     </div>
     <button (click)="addHours()"> submit</button>
+
+    <table class="table" *ngIf="selectedList">
+        <thead>
+            <th>Postcode</th>
+            <th>zorgbehoefte</th>
+        </thead>
+        <tbody>
+            @for (need of selectedList.careNeed; track need){
+            <tr>
+                <td>{{need[0]}}</td>
+                <td>{{need[1]}}</td>
+            </tr>
+            }
+        </tbody>
+    </table>
 
 </div>

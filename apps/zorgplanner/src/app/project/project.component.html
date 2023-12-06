@@ -1,3 +1,4 @@
+<!-- {{careNeedService.state() | json}}
 <div class="container">
     <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
         <li [ngbNavItem]="1">
@@ -7,14 +8,31 @@
                     <svg></svg>
                     <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
                 </div>
-                {{careNeedService.careNeed() | json}}
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
+                    <select class="form-control" id="exampleFormControlSelect1"
+                        [disabled]="(careNeed().length === 0) ? true : false" (change)="selectList($event)">
+
+                        <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
+                            zorgbehoefte lijsten
+                            opgeslagen
+                        </option>
+                        <ng-template #lists>
+                            <option>Selecteer een lijst</option>
+                            <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
+                        </ng-template>
+
+                    </select>
+                </div>
+
             </ng-template>
         </li>
         <li [ngbNavItem]="2">
 
-            <button ngbNavLink>Two</button>
+            <button ngbNavLink>Zorgbehoefte</button>
             <ng-template ngbNavContent>
-                <zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"></zorgplanner-hour-input>
+                <zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"
+                    [careNeedLists]="careNeed()"></zorgplanner-hour-input>
 
             </ng-template>
         </li>
@@ -28,6 +46,30 @@
 
     <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
+ -->
 
-
+<!-- </div> -->
+{{careNeedService.state() | json}}
+<div class="svg-container">
+    <svg></svg>
+    <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
 </div>
+<div class="form-group">
+    <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
+    <select class="form-control" id="exampleFormControlSelect1" [disabled]="(careNeed().length === 0) ? true : false"
+        (change)="selectList($event)">
+
+        <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
+            zorgbehoefte lijsten
+            opgeslagen
+        </option>
+        <ng-template #lists>
+            <option>Selecteer een lijst</option>
+            <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
+        </ng-template>
+
+    </select>
+</div>
+
+<zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"
+    [careNeedLists]="careNeed()"></zorgplanner-hour-input>

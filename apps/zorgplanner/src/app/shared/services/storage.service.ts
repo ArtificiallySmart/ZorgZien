@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { CareNeedList } from '../interfaces/care-need';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +9,6 @@ export class StorageService {
   constructor() {}
 
   loadCareNeedLists() {
-    return of([]);
+    return of([]) as Observable<CareNeedList[]>;
   }
 }

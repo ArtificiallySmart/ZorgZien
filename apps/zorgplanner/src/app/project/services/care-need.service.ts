@@ -1,5 +1,6 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { Subject } from 'rxjs';
 import {
   AddCareNeedList,
@@ -22,7 +23,7 @@ export class CareNeedService {
   private storageService = inject(StorageService);
 
   //state
-  private state = signal<CareNeedState>({
+  public state = signal<CareNeedState>({
     careNeedLists: [],
     loaded: false,
     error: null,
@@ -47,22 +48,22 @@ export class CareNeedService {
           careNeedLists,
           loaded: true,
         })),
-      error: (error) =>
+      error: (err) =>
         this.state.update((state) => ({
           ...state,
-          error: error,
+          error: err,
         })),
     });
 
-    this.add$.pipe(takeUntilDestroyed()).subscribe((careNeedList) =>
+    this.add$.pipe(takeUntilDestroyed()).subscribe((careNeedList) => {
       this.state.update((state) => ({
         ...state,
         careNeedLists: [
           ...state.careNeedLists,
           this.addIdToCareNeedList(careNeedList),
         ],
-      }))
-    );
+      }));
+    });
 
     this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
       this.state.update((state) => ({
@@ -83,6 +84,12 @@ export class CareNeedService {
         ),
       }))
     );
+
+    effect(() => {
+      if (this.loaded()) {
+        console.log('effect');
+      }
+    });
   }
 
   private addIdToCareNeedList(careNeedList: AddCareNeedList): CareNeedList {
