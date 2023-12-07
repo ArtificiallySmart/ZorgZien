@@ -10,7 +10,7 @@ export interface Project {
   careNeeds?: CareNeedList[];
 }
 
-export type AddProject = Omit<Project, 'id' | 'lastOpened'>;
+export type AddProject = Omit<Project, 'id' | 'startDate' | 'lastOpened'>;
 export type EditProject = {
   id: Project['id'];
   data: AddProject;
