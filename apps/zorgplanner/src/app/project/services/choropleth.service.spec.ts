@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ProjectService } from './project.service';
+import { ChoroplethService } from './choropleth.service';
 
-describe('ProjectService', () => {
-  let service: ProjectService;
+describe('choroplethService', () => {
+  let service: ChoroplethService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ProjectService);
+    service = TestBed.inject(ChoroplethService);
   });
 
   it('should be created', () => {

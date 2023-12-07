@@ -88,6 +88,7 @@ export class CareNeedService {
     effect(() => {
       if (this.loaded()) {
         console.log('effect');
+        console.log(this.careNeed());
       }
     });
   }

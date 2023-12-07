@@ -10,19 +10,13 @@ import { CareNeedList } from '../../shared/interfaces/care-need';
 @Injectable({
   providedIn: 'root',
 })
-export class ProjectService {
+export class ChoroplethService {
   geoData!: TopoJSON.Topology<Objects<GeoJsonProperties>>;
   private centerGroningen: [number, number] = [6.5, 53.259];
-
   mapFeatures!: FeatureCollection;
-
   svg!: d3.Selection<SVGElement, unknown, HTMLElement, unknown>;
-
   projection = d3.geoMercator().scale(40000).center(this.centerGroningen);
-
   path = d3.geoPath(this.projection);
-
-  // transform: any = null;
   transform: d3.ZoomTransform | null = null;
 
   constructor(private httpService: HttpService) {

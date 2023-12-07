@@ -1,4 +1,3 @@
-<!-- {{careNeedService.state() | json}}
 <div class="container">
     <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
         <li [ngbNavItem]="1">
@@ -6,24 +5,29 @@
             <ng-template ngbNavContent>
                 <div class="svg-container">
                     <svg></svg>
-                    <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
                 </div>
-                <div class="form-group">
-                    <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-                    <select class="form-control" id="exampleFormControlSelect1"
-                        [disabled]="(careNeed().length === 0) ? true : false" (change)="selectList($event)">
+                <div class="row">
+                    <div class="col"><input type="checkbox" (change)="onCheckboxChange($event)">Postcode</div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
+                            <select class="form-control" id="exampleFormControlSelect1"
+                                [disabled]="(careNeed().length === 0) ? true : false" (change)="selectList($event)">
 
-                        <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
-                            zorgbehoefte lijsten
-                            opgeslagen
-                        </option>
-                        <ng-template #lists>
-                            <option>Selecteer een lijst</option>
-                            <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
-                        </ng-template>
+                                <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
+                                    zorgbehoefte lijsten
+                                    opgeslagen
+                                </option>
+                                <ng-template #lists>
+                                    <option>Selecteer een lijst</option>
+                                    <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
+                                </ng-template>
 
-                    </select>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+
 
             </ng-template>
         </li>
@@ -46,30 +50,6 @@
 
     <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
- -->
 
-<!-- </div> -->
-{{careNeedService.state() | json}}
-<div class="svg-container">
-    <svg></svg>
-    <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
+
 </div>
-<div class="form-group">
-    <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-    <select class="form-control" id="exampleFormControlSelect1" [disabled]="(careNeed().length === 0) ? true : false"
-        (change)="selectList($event)">
-
-        <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
-            zorgbehoefte lijsten
-            opgeslagen
-        </option>
-        <ng-template #lists>
-            <option>Selecteer een lijst</option>
-            <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
-        </ng-template>
-
-    </select>
-</div>
-
-<zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"
-    [careNeedLists]="careNeed()"></zorgplanner-hour-input>

@@ -6,7 +6,7 @@ import { AddCareNeedList } from '../shared/interfaces/care-need';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareNeedService } from './services/care-need.service';
 import { ParserService } from './services/parser.service';
-import { ProjectService } from './services/project.service';
+import { ChoroplethService } from './services/choropleth.service';
 
 @Component({
   selector: 'zorgplanner-project',
@@ -16,7 +16,7 @@ import { ProjectService } from './services/project.service';
   styleUrl: './project.component.scss',
 })
 export class ProjectComponent {
-  projectService = inject(ProjectService);
+  choroplethService = inject(ChoroplethService);
   parserService = inject(ParserService);
   careNeedService = inject(CareNeedService);
   careNeed = this.careNeedService.careNeed;
@@ -27,7 +27,7 @@ export class ProjectComponent {
 
   onCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.projectService.togglePostcode(target.checked);
+    this.choroplethService.togglePostcode(target.checked);
   }
 
   addCareNeedList(event: AddCareNeedList) {
@@ -36,12 +36,12 @@ export class ProjectComponent {
 
   selectList(event: Event) {
     if (this.selectedList !== undefined) {
-      this.projectService.removeHours();
+      this.choroplethService.removeHours();
     }
     const target = event.target as HTMLSelectElement;
     this.selectedList = target.value;
     const list = this.careNeed().find((list) => list.id === target.value);
     if (!list) return;
-    this.projectService.addHours(list);
+    this.choroplethService.addHours(list);
   }
 }
