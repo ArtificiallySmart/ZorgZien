@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Subject } from 'rxjs';
@@ -85,12 +85,11 @@ export class CareNeedService {
       }))
     );
 
-    effect(() => {
-      if (this.loaded()) {
-        console.log('effect');
-        console.log(this.careNeed());
-      }
-    });
+    // effect(() => {
+    //   if (this.loaded()) {
+    //     console.log(this.careNeed());
+    //   }
+    // });
   }
 
   private addIdToCareNeedList(careNeedList: AddCareNeedList): CareNeedList {

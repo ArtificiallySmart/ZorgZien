@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
-import { HttpService } from '../../shared/services/http.service';
+import { Injectable, effect, inject } from '@angular/core';
 
 import * as d3 from 'd3';
 import { FeatureCollection, GeoJsonProperties } from 'geojson';
 import * as topojson from 'topojson';
-import { Objects } from 'topojson-specification';
+
 import { CareNeedList } from '../../shared/interfaces/care-need';
+import { GeodataService } from './geodata.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChoroplethService {
-  geoData!: TopoJSON.Topology<Objects<GeoJsonProperties>>;
+  private geoDataService = inject(GeodataService);
+  geoData = this.geoDataService.geoData;
   private centerGroningen: [number, number] = [6.5, 53.259];
   mapFeatures!: FeatureCollection;
   svg!: d3.Selection<SVGElement, unknown, HTMLElement, unknown>;
@@ -19,18 +20,19 @@ export class ChoroplethService {
   path = d3.geoPath(this.projection);
   transform: d3.ZoomTransform | null = null;
 
-  constructor(private httpService: HttpService) {
-    this.httpService.get().subscribe({
-      next: (data) => (this.geoData = data as TopoJSON.Topology),
-      error: (e) => console.error(e),
-      complete: () => this.init(),
+  constructor() {
+    effect(() => {
+      if (this.geoDataService.state().loaded) {
+        console.log('loaded');
+        this.init();
+      }
     });
   }
 
   init() {
-    this.mapFeatures = topojson.feature(this.geoData, {
+    this.mapFeatures = topojson.feature(this.geoData(), {
       type: 'GeometryCollection',
-      geometries: (this.geoData.objects['groningen'] as GeoJsonProperties)![
+      geometries: (this.geoData().objects['groningen'] as GeoJsonProperties)![
         'geometries'
       ],
     });
