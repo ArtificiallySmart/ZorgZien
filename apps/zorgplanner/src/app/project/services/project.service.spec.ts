@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GeodataService } from './geodata.service';
+import { ProjectService } from './project.service';
 
-describe('GeodataService', () => {
-  let service: GeodataService;
+describe('ProjectService', () => {
+  let service: ProjectService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(GeodataService);
+    service = TestBed.inject(ProjectService);
   });
 
   it('should be created', () => {

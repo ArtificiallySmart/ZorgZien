@@ -5,16 +5,18 @@
     <div class="row mb-3">
         <label for="projectTitle" class="col-sm-2 col-form-label">Titel</label>
         <div class="col-sm-10">
-            <input type="email" class="form-control" id="projectTitle">
+            <input type="text" class="form-control" id="projectTitle" [(ngModel)]="projectTitle">
         </div>
     </div>
     <div class="row mb-3">
         <label for="projectDescription" class="col-sm-2 col-form-label">Beschrijving</label>
         <div class="col-sm-10">
-            <textarea type="password" class="form-control" id="projectDescription"></textarea>
+            <textarea class="form-control" id="projectDescription" [(ngModel)]="projectDescription"></textarea>
         </div>
     </div>
 
     <button type="submit" class="btn btn-primary" (click)="initiateProject()">Maak project</button>
+    <br>
 
 </div>
+{{projectService.state() | json}}

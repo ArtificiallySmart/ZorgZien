@@ -17,6 +17,8 @@ export class ProjectsController {
 
   @Post()
   create(@Body() createProjectDto: CreateProjectDto) {
+    console.log('test');
+    console.log(createProjectDto);
     return this.projectsService.create(createProjectDto);
   }
 

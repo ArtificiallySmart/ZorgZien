@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareNeedList } from '../shared/interfaces/care-need';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareNeedService } from './services/care-need.service';
-import { ParserService } from './services/parser.service';
 import { ChoroplethService } from './services/choropleth.service';
+import { ParserService } from './services/parser.service';
+import { ProjectService } from './services/project.service';
 
 @Component({
   selector: 'zorgplanner-project',
@@ -15,15 +17,28 @@ import { ChoroplethService } from './services/choropleth.service';
   templateUrl: './project.component.html',
   styleUrl: './project.component.scss',
 })
-export class ProjectComponent {
+export class ProjectComponent implements OnDestroy {
   choroplethService = inject(ChoroplethService);
   parserService = inject(ParserService);
   careNeedService = inject(CareNeedService);
+  projectService = inject(ProjectService);
+
+  route = inject(ActivatedRoute);
+
   careNeed = this.careNeedService.careNeed;
   selectedList: string | undefined;
 
   active = 1;
   zorgUren = '';
+
+  constructor() {
+    this.choroplethService.init();
+    this.route.params.subscribe((params) => {
+      if (params['id']) {
+        this.projectService.loadProject(params['id']);
+      }
+    });
+  }
 
   onCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -43,5 +58,9 @@ export class ProjectComponent {
     const list = this.careNeed().find((list) => list.id === target.value);
     if (!list) return;
     this.choroplethService.addHours(list);
+  }
+
+  ngOnDestroy() {
+    this.projectService.clear$.next();
   }
 }

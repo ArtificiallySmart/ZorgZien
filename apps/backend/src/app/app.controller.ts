@@ -7,7 +7,7 @@ export class AppController {
   groningen = groningen;
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('geodata')
   getData() {
     return this.groningen;
   }

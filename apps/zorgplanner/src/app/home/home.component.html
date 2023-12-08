@@ -1,9 +1,19 @@
+{{projectService.state() | json}}
 <div class="container">
     <p>home works!</p>
     <a [routerLink]="['/project']"> to projects</a>
 
-    <h2>Verder in meest recente project</h2>
     <h2>open een eerder project</h2>
+    <select #select class="custom-select" (change)="onChange(select.value)">
+        <option selected disabled *ngIf="!(projectList$ | async)?.length; else projectlist">Geen projecten beschikbaar
+        </option>
+
+        <ng-template #projectlist>
+            <option [value]="item.id" *ngFor="let item of (projectList$ | async)">{{item.title}}</option>
+        </ng-template>
+    </select>
+
+
     <h2>Nieuw project</h2>
-    <a [routerLink]="['/project/new']"> new project</a>
+    <a [routerLink]="['/project']"> new project</a>
 </div>

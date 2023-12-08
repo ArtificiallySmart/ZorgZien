@@ -14,7 +14,7 @@ export class Project {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @CreateDateColumn()
@@ -23,7 +23,7 @@ export class Project {
   @UpdateDateColumn()
   lastOpened: Date;
 
-  @Column()
+  @Column({ nullable: true })
   provinces: string;
 
   @Column({ nullable: true })

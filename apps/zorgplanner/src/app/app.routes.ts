@@ -14,13 +14,13 @@ export const appRoutes: Route[] = [
   {
     path: 'project',
     loadComponent: () =>
-      import('./project/project.component').then((m) => m.ProjectComponent),
-  },
-  {
-    path: 'project/new',
-    loadComponent: () =>
       import('./project/new-project/new-project.component').then(
         (m) => m.NewProjectComponent
       ),
+  },
+  {
+    path: 'project/:id',
+    loadComponent: () =>
+      import('./project/project.component').then((m) => m.ProjectComponent),
   },
 ];

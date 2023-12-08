@@ -11,19 +11,24 @@ export class DataService {
   private httpService = inject(HttpService);
   constructor() {}
 
-  loadGeoData(provinces?: string[]) {
-    if (provinces) {
-      throw new Error('Method not implemented.');
-    }
+  loadGeoData() {
     return this.httpService.get<TopoJSON.Topology<Objects<GeoJsonProperties>>>(
-      '/api'
+      '/api/geodata'
     );
   }
 
   addProject(newProject: AddProject) {
     return this.httpService.post<Project, AddProject>(
-      '/api/project',
+      '/api/projects',
       newProject
     );
+  }
+
+  loadProjects() {
+    return this.httpService.get<Project[]>('/api/projects');
+  }
+
+  loadProject(id: string) {
+    return this.httpService.get<Project>(`/api/projects/${id}`);
   }
 }

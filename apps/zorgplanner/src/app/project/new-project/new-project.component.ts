@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AddProject } from '../../shared/interfaces/project';
+import { DataService } from '../services/data.service';
+import { ProjectService } from '../services/project.service';
 
 @Component({
   selector: 'zorgplanner-new-project',
@@ -11,18 +13,21 @@ import { AddProject } from '../../shared/interfaces/project';
   styleUrl: './new-project.component.scss',
 })
 export class NewProjectComponent {
+  dataService = inject(DataService);
+  projectService = inject(ProjectService);
   projectTitle = '';
   projectDescription = '';
-  projectStartDate = new Date();
   projectProvinces = ['groningen'];
+
+  constructor() {}
 
   initiateProject() {
     const project = {
       title: this.projectTitle,
       description: this.projectDescription,
-      startDate: this.projectStartDate,
       provinces: this.projectProvinces,
     } as AddProject;
-    console.log(project);
+    this.projectService.addProject(project);
+    this.projectTitle = this.projectDescription = '';
   }
 }
