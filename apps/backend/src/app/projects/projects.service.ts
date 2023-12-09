@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+// import { UpdateProjectDto } from './dto/update-project.dto';
 import { DataSource } from 'typeorm';
 import { Project } from './entities/project.entity';
 
@@ -25,9 +25,9 @@ export class ProjectsService {
     });
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
-  }
+  // update(id: number, updateProjectDto: UpdateProjectDto) {
+  //   return `This action updates a #${id} project`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} project`;
