@@ -21,8 +21,8 @@ export class CareDemandController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.careDemandService.findAll(+id);
+  findOne(@Param('id') projectId: string) {
+    return this.careDemandService.findAll(+projectId);
   }
 
   @Patch(':id')

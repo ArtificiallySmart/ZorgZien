@@ -1,0 +1,16 @@
+#offcanvas-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+    margin: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: #7a7a7a;
+    box-shadow: 0 0 0.5rem rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    &:hover{
+        transform: scale(1.1);
+    }
+}

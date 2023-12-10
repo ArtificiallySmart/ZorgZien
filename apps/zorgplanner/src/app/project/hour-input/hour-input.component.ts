@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   AddCareDemandList,
   CareDemandList,
+  RemoveCareDemandList,
 } from '../../shared/interfaces/care-demand';
 import { ParserService } from '../services/parser.service';
 
@@ -19,13 +20,14 @@ export class HourInputComponent {
   @Output() newCareDemandList = new EventEmitter<
     Omit<AddCareDemandList, 'projectId'>
   >();
+  @Output() removeCareDemandList = new EventEmitter<RemoveCareDemandList>();
   @Input() careDemandLists: CareDemandList[] = [];
 
   selectedList: CareDemandList | undefined;
   zorgUren = '';
   title = '';
 
-  addHours() {
+  addList() {
     const data = this.parserService.parse(this.zorgUren);
     this.newCareDemandList.emit({
       title: this.title,
@@ -36,8 +38,12 @@ export class HourInputComponent {
 
   selectList(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const list = this.careDemandLists.find((list) => list.id === target.value);
+    const list = this.careDemandLists.find((list) => list.id == target.value);
     this.selectedList = list;
-    console.log(list?.careDemand[Symbol.iterator]());
+  }
+
+  removeList(listId: RemoveCareDemandList) {
+    this.removeCareDemandList.emit(listId);
+    this.selectedList = undefined;
   }
 }

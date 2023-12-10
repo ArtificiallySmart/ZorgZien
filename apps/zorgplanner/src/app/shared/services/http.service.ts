@@ -14,4 +14,8 @@ export class HttpService {
   post<T, S>(endpoint: string, body: S) {
     return this.http.post<T>(endpoint, body);
   }
+
+  delete<T>(endpoint: string) {
+    return this.http.delete<T>(endpoint);
+  }
 }

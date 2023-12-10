@@ -23,21 +23,28 @@
         <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
     </div>
-    <button (click)="addHours()"> submit</button>
+    <button (click)="addList()"> submit</button>
 
-    <table class="table" *ngIf="selectedList">
-        <thead>
-            <th>Postcode</th>
-            <th>zorgbehoefte</th>
-        </thead>
-        <tbody>
-            @for (demand of selectedList.careDemand; track demand){
-            <tr>
-                <td>{{demand[0]}}</td>
-                <td>{{demand[1]}}</td>
-            </tr>
-            }
-        </tbody>
-    </table>
+    <div *ngIf="selectedList">
+        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
+
+        <div class="row">
+            <div class="col-6">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <th>Postcode</th>
+                        <th>zorgbehoefte</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let demand of selectedList.careDemand | keyvalue">
+                            <td>{{demand.key}}</td>
+                            <td>{{demand.value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 
 </div>

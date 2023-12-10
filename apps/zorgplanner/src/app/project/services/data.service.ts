@@ -58,9 +58,26 @@ export class DataService {
   }
 
   addCareDemandList(careDemandList: AddCareDemandList) {
-    return this.httpService.post<CareDemandList, AddCareDemandList>(
-      `/api/care-demand`,
-      careDemandList
-    );
+    return this.httpService
+      .post<ApiCareDemandList, AddCareDemandList>(
+        `/api/care-demand`,
+        careDemandList
+      )
+      .pipe(
+        map((list) => {
+          const careDemandMap = new Map<number, number>();
+          Object.entries(list.careDemand).forEach(([key, value]) => {
+            careDemandMap.set(parseInt(key), value);
+          });
+          return {
+            ...list,
+            careDemand: careDemandMap,
+          };
+        })
+      );
+  }
+
+  removeCareDemandList(id: string) {
+    return this.httpService.delete<CareDemandList>(`/api/care-demand/${id}`);
   }
 }

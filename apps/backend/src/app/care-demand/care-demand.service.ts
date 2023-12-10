@@ -34,10 +34,18 @@ export class CareDemandService {
   }
 
   update(id: number, updateCareDemandDto: UpdateCareDemandDto) {
-    return `This action updates a #${id} careDemand`;
+    return `this returns ${id} and ${updateCareDemandDto}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} careDemand`;
+  async remove(id: number) {
+    const careDemand = await this.careDemandRepository.findOne({
+      where: { id },
+    });
+    if (!careDemand) return;
+    const careNeed = await this.careDemandRepository.remove(careDemand);
+    return {
+      ...careNeed,
+      id: id,
+    };
   }
 }

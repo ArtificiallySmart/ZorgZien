@@ -1,4 +1,3 @@
-{{projectService.state() | json}}
 <div class="container">
     <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
         <li [ngbNavItem]="1">
@@ -37,6 +36,7 @@
             <button ngbNavLink>Zorgbehoefte</button>
             <ng-template ngbNavContent>
                 <zorgplanner-hour-input (newCareDemandList)="addCareDemandList($event)"
+                    (removeCareDemandList)="removeCareDemandList($event)"
                     [careDemandLists]="careDemand()"></zorgplanner-hour-input>
 
             </ng-template>

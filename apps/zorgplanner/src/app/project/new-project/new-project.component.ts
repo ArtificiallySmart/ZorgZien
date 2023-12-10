@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AddProject } from '../../shared/interfaces/project';
 import { DataService } from '../services/data.service';
 import { ProjectService } from '../services/project.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'zorgplanner-new-project',
@@ -15,11 +16,18 @@ import { ProjectService } from '../services/project.service';
 export class NewProjectComponent {
   dataService = inject(DataService);
   projectService = inject(ProjectService);
+  private router = inject(Router);
   projectTitle = '';
   projectDescription = '';
   projectProvinces = ['groningen'];
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      if (this.projectService.loaded()) {
+        this.router.navigate(['project', this.projectService.project().id]);
+      }
+    });
+  }
 
   initiateProject() {
     const project = {

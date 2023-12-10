@@ -81,7 +81,7 @@ export class CareDemandService {
         ...state,
         careDemandLists: state.careDemandLists.map((careDemandList) =>
           careDemandList.id === update.id
-            ? { ...careDemandList, title: update.data.title }
+            ? { ...careDemandList, ...update.data, title: update.data.title }
             : careDemandList
         ),
       }))
@@ -97,7 +97,6 @@ export class CareDemandService {
 
     effect(() => {
       if (this.project().id) {
-        console.log('effect in care need service', this.project().id);
         this.loadCareDemandLists(this.project().id);
         return;
       }
@@ -118,12 +117,21 @@ export class CareDemandService {
       ...careDemandList,
       projectId: this.projectService.project().id,
     };
-    console.log(addCareDemandList);
+
     this.dataService.addCareDemandList(addCareDemandList).subscribe({
       next: (careDemandList) => {
         this.add$.next(careDemandList);
       },
       error: (err) => this.add$.next(err),
+    });
+  }
+
+  removeCareDemandList(id: RemoveCareDemandList) {
+    this.dataService.removeCareDemandList(id).subscribe({
+      next: (res) => {
+        this.remove$.next(res.id);
+      },
+      error: (err) => this.remove$.next(err),
     });
   }
 }

@@ -28,7 +28,7 @@ export class ProjectComponent implements OnDestroy {
   careDemand = this.careDemandService.careDemandLists;
   selectedList: string | undefined;
 
-  active = 1;
+  active = 2;
   zorgUren = '';
 
   constructor() {
@@ -47,6 +47,10 @@ export class ProjectComponent implements OnDestroy {
 
   addCareDemandList(event: Omit<AddCareDemandList, 'projectId'>) {
     this.careDemandService.addCareDemandList(event);
+  }
+
+  removeCareDemandList(event: string) {
+    this.careDemandService.removeCareDemandList(event);
   }
 
   selectList(event: Event) {
