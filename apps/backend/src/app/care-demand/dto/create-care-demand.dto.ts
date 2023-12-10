@@ -1,11 +1,11 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateCareNeedDto {
+export class CreateCareDemandDto {
   @IsNotEmpty()
   title: string;
 
   @IsNotEmpty()
-  careNeed: [number, number][];
+  careDemand: [number, number][];
 
   @IsNotEmpty()
   projectId: number;

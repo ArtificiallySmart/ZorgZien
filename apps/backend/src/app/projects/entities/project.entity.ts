@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CareNeed } from '../../care-need/entities/care-need.entity';
+import { CareDemand } from '../../care-demand/entities/care-demand.entity';
 
 @Entity()
 export class Project {
@@ -28,6 +28,6 @@ export class Project {
   @Column({ nullable: true })
   provinces: string;
 
-  @OneToMany(() => CareNeed, (careNeed) => careNeed.project)
-  careNeeds: CareNeed[];
+  @OneToMany(() => CareDemand, (careDemand) => careDemand.project)
+  careDemands: CareDemand[];
 }

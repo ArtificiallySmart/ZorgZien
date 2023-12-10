@@ -5,7 +5,7 @@ import { FeatureCollection, GeoJsonProperties } from 'geojson';
 import * as topojson from 'topojson';
 import { Objects } from 'topojson-specification';
 
-import { CareNeedList } from '../../shared/interfaces/care-need';
+import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { DataService } from './data.service';
 
 @Injectable({
@@ -115,8 +115,8 @@ export class ChoroplethService {
     this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
   }
 
-  addHours(careList: CareNeedList) {
-    const data = careList.careNeed;
+  addHours(careList: CareDemandList) {
+    const data = careList.careDemand;
     const svg = this.svg;
     const path = this.path;
     const max = d3.max(Array.from(data.values()));

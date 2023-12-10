@@ -13,15 +13,15 @@
                         <div class="form-group">
                             <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
                             <select class="form-control" id="exampleFormControlSelect1"
-                                [disabled]="(careNeed().length === 0) ? true : false" (change)="selectList($event)">
+                                [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
 
-                                <option value="test" *ngIf="careNeed().length === 0; else lists">U heeft nog geen
+                                <option value="test" *ngIf="careDemand().length === 0; else lists">U heeft nog geen
                                     zorgbehoefte lijsten
                                     opgeslagen
                                 </option>
                                 <ng-template #lists>
                                     <option>Selecteer een lijst</option>
-                                    <option [value]="list.id" *ngFor="let list of careNeed()">{{list.title}}</option>
+                                    <option [value]="list.id" *ngFor="let list of careDemand()">{{list.title}}</option>
                                 </ng-template>
 
                             </select>
@@ -36,8 +36,8 @@
 
             <button ngbNavLink>Zorgbehoefte</button>
             <ng-template ngbNavContent>
-                <zorgplanner-hour-input (newCareNeedList)="addCareNeedList($event)"
-                    [careNeedLists]="careNeed()"></zorgplanner-hour-input>
+                <zorgplanner-hour-input (newCareDemandList)="addCareDemandList($event)"
+                    [careDemandLists]="careDemand()"></zorgplanner-hour-input>
 
             </ng-template>
         </li>

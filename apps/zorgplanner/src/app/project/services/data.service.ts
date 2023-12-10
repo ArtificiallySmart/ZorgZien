@@ -4,10 +4,10 @@ import { GeoJsonProperties } from 'geojson';
 import { Objects } from 'topojson-specification';
 import { AddProject, Project } from '../../shared/interfaces/project';
 import {
-  AddCareNeedList,
-  ApiCareNeedList,
-  CareNeedList,
-} from '../../shared/interfaces/care-need';
+  AddCareDemandList,
+  ApiCareDemandList,
+  CareDemandList,
+} from '../../shared/interfaces/care-demand';
 import { Observable, map } from 'rxjs';
 
 @Injectable({
@@ -38,29 +38,29 @@ export class DataService {
     return this.httpService.get<Project>(`/api/projects/${id}`);
   }
 
-  loadCareNeedLists(projectId: number): Observable<CareNeedList[]> {
+  loadCareDemandLists(projectId: number): Observable<CareDemandList[]> {
     return this.httpService
-      .get<ApiCareNeedList[]>(`/api/care-need/${projectId}`)
+      .get<ApiCareDemandList[]>(`/api/care-demand/${projectId}`)
       .pipe(
         map((lists) => {
           return lists.map((list) => {
-            const careNeedMap = new Map<number, number>();
-            Object.entries(list.careNeed).forEach(([key, value]) => {
-              careNeedMap.set(parseInt(key), value);
+            const careDemandMap = new Map<number, number>();
+            Object.entries(list.careDemand).forEach(([key, value]) => {
+              careDemandMap.set(parseInt(key), value);
             });
             return {
               ...list,
-              careNeed: careNeedMap,
+              careDemand: careDemandMap,
             };
           });
         })
       );
   }
 
-  addCareNeedList(careNeedList: AddCareNeedList) {
-    return this.httpService.post<CareNeedList, AddCareNeedList>(
-      `/api/care-need`,
-      careNeedList
+  addCareDemandList(careDemandList: AddCareDemandList) {
+    return this.httpService.post<CareDemandList, AddCareDemandList>(
+      `/api/care-demand`,
+      careDemandList
     );
   }
 }

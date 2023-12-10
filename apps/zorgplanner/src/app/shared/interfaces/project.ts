@@ -1,4 +1,4 @@
-import { CareNeedList } from './care-need';
+import { CareDemandList } from './care-demand';
 
 export interface Project {
   id: number;
@@ -7,7 +7,7 @@ export interface Project {
   startDate: Date;
   lastOpened: Date;
   provinces: string[];
-  careNeeds?: CareNeedList[];
+  careDemands?: CareDemandList[];
 }
 
 export type AddProject = Omit<Project, 'id' | 'startDate' | 'lastOpened'>;

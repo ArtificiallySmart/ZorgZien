@@ -8,7 +8,7 @@ import {
 import { Project } from '../../projects/entities/project.entity';
 
 @Entity()
-export class CareNeed {
+export class CareDemand {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,11 +16,11 @@ export class CareNeed {
   title: string;
 
   @Column('jsonb')
-  careNeed: { [k: string]: number };
+  careDemand: { [k: string]: number };
 
   @CreateDateColumn()
   startDate: Date;
 
-  @ManyToOne(() => Project, (project) => project.careNeeds)
+  @ManyToOne(() => Project, (project) => project.careDemands)
   project: Project;
 }

@@ -6,8 +6,8 @@ import { ProjectsModule } from './projects/projects.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Project } from './projects/entities/project.entity';
-import { CareNeedModule } from './care-need/care-need.module';
-import { CareNeed } from './care-need/entities/care-need.entity';
+import { CareDemandModule } from './care-demand/care-demand.module';
+import { CareDemand } from './care-demand/entities/care-demand.entity';
 
 @Module({
   imports: [
@@ -19,10 +19,10 @@ import { CareNeed } from './care-need/entities/care-need.entity';
       username: 'test',
       password: 'test',
       database: 'test',
-      entities: [Project, CareNeed],
+      entities: [Project, CareDemand],
       synchronize: true,
     }),
-    CareNeedModule,
+    CareDemandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

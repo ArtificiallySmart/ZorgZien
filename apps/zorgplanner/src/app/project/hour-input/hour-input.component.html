@@ -2,14 +2,14 @@
     <div class="form-group">
         <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
         <select class="form-control" id="exampleFormControlSelect1"
-            [disabled]="(careNeedLists.length === 0) ? true : false" (change)="selectList($event)">
+            [disabled]="(careDemandLists.length === 0) ? true : false" (change)="selectList($event)">
 
-            <option value="test" *ngIf="careNeedLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
+            <option value="test" *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
                 opgeslagen
             </option>
             <ng-template #lists>
                 <option>Selecteer een lijst</option>
-                <option [value]="list.id" *ngFor="let list of careNeedLists">{{list.title}}</option>
+                <option [value]="list.id" *ngFor="let list of careDemandLists">{{list.title}}</option>
             </ng-template>
 
         </select>
@@ -31,10 +31,10 @@
             <th>zorgbehoefte</th>
         </thead>
         <tbody>
-            @for (need of selectedList.careNeed; track need){
+            @for (demand of selectedList.careDemand; track demand){
             <tr>
-                <td>{{need[0]}}</td>
-                <td>{{need[1]}}</td>
+                <td>{{demand[0]}}</td>
+                <td>{{demand[1]}}</td>
             </tr>
             }
         </tbody>
