@@ -1,6 +1,4 @@
 <div class="container">
-    <p>home works!</p>
-    <a [routerLink]="['/project']"> to projects</a>
 
     <h2>open een eerder project</h2>
     <select #select class="custom-select" (change)="onChange(select.value)">
@@ -8,6 +6,7 @@
         </option>
 
         <ng-template #projectlist>
+            <option hidden>Select a project:</option>
             <option [value]="item.id" *ngFor="let item of (projectList$ | async)">{{item.title}}</option>
         </ng-template>
     </select>

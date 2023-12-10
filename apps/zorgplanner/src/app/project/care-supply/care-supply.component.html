@@ -1,0 +1,51 @@
+<div class="input-container">
+    <div class="form-group">
+        <label for="careSupplySelect">Selecteer een zorgbeschikbaarheids lijst:</label>
+        <select name="" id="careSupplySelect" class="form-control" [disabled]="careSupplyLists.length === 0">
+            <option *ngIf="careSupplyLists.length === 0; else lists">U heeft nog geen zorgbeschikbaarheid
+                lijsten opgeslagen</option>
+            <ng-template #lists>
+                <option>Selecteer een lijst</option>
+                <option [value]="list.id" *ngFor="let list of careSupplyLists">{{list.title}}</option>
+            </ng-template>
+
+        </select>
+    </div>
+    <div class="new-list my-5">
+        <h2>Nieuwe lijst</h2>
+        <div class="form-group">
+            <label for="beschikbaarheidslijst">Titel van de beschikbaarheidslijst</label>
+            <input type="text" class="form-control" id="beschikbaarheidslijst" [(ngModel)]="title">
+        </div>
+
+    </div>
+
+    <div class="my-5">
+        <h3>ZorgTeams toevoegen</h3>
+
+        <label for="teamName">Naam zorgTeam:</label>
+        <input type="text" id="teamName" class="form-control">
+        <label for="teamPostalCodes">Postcodegebieden:</label>
+        <input type="text" id="teamPostalCodes" class="form-control">
+    </div>
+    <button class="btn btn-primary">toevoegen</button>
+
+    <ng-container *ngIf="careSupplyEntries.length">
+        <div class="row">
+            <div class="col-6">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <th>Naam</th>
+                        <th>gebied</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let entry of careSupplyEntries">
+                            <td>{{entry.name}}</td>
+                            <td>{{entry.areaPostalCodes}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ng-container>
+</div>

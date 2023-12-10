@@ -9,6 +9,10 @@ import {
   CareDemandList,
 } from '../../shared/interfaces/care-demand';
 import { Observable, map } from 'rxjs';
+import {
+  AddCareSupplyList,
+  CareSupplyList,
+} from '../../shared/interfaces/care-supply';
 
 @Injectable({
   providedIn: 'root',
@@ -79,5 +83,22 @@ export class DataService {
 
   removeCareDemandList(id: string) {
     return this.httpService.delete<CareDemandList>(`/api/care-demand/${id}`);
+  }
+
+  loadCareSupplyLists(projectId: number) {
+    return this.httpService.get<CareSupplyList[]>(
+      `/api/care-supply/${projectId}`
+    );
+  }
+
+  addCareSupplyList(careSupplyList: AddCareSupplyList) {
+    return this.httpService.post<CareSupplyList, AddCareSupplyList>(
+      `/api/care-supply`,
+      careSupplyList
+    );
+  }
+
+  removeCareSupplyList(id: string) {
+    return this.httpService.delete<CareSupplyList>(`/api/care-supply/${id}`);
   }
 }

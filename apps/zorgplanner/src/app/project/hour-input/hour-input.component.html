@@ -1,10 +1,10 @@
 <div class="input-container">
     <div class="form-group">
         <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-        <select class="form-control" id="exampleFormControlSelect1"
-            [disabled]="(careDemandLists.length === 0) ? true : false" (change)="selectList($event)">
+        <select class="form-control" id="exampleFormControlSelect1" [disabled]="careDemandLists.length === 0"
+            (change)="selectList($event)">
 
-            <option value="test" *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
+            <option *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
                 opgeslagen
             </option>
             <ng-template #lists>

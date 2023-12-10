@@ -9,11 +9,18 @@ import { CareDemandService } from './services/care-demand.service';
 import { ChoroplethService } from './services/choropleth.service';
 import { ParserService } from './services/parser.service';
 import { ProjectService } from './services/project.service';
+import { CareSupplyComponent } from './care-supply/care-supply.component';
 
 @Component({
   selector: 'zorgplanner-project',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbNavModule, HourInputComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgbNavModule,
+    HourInputComponent,
+    CareSupplyComponent,
+  ],
   templateUrl: './project.component.html',
   styleUrl: './project.component.scss',
 })
@@ -28,7 +35,7 @@ export class ProjectComponent implements OnDestroy {
   careDemand = this.careDemandService.careDemandLists;
   selectedList: string | undefined;
 
-  active = 2;
+  active = 3;
   zorgUren = '';
 
   constructor() {
