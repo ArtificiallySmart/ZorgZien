@@ -17,13 +17,16 @@ export class CareNeedService {
       where: { id: createCareNeedDto.projectId },
     });
     careNeed.title = createCareNeedDto.title;
+
     careNeed.careNeed = Object.fromEntries(createCareNeedDto.careNeed);
 
     return this.careNeedRepository.save(careNeed);
   }
 
-  findAll() {
-    return `This action returns all careNeed`;
+  findAll(projectId: number) {
+    return this.careNeedRepository.find({
+      where: { project: { id: projectId } },
+    });
   }
 
   findOne(id: number) {

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   AddCareNeedList,
@@ -16,7 +16,9 @@ import { ParserService } from '../services/parser.service';
 })
 export class HourInputComponent {
   private parserService = inject(ParserService);
-  @Output() newCareNeedList = new EventEmitter<AddCareNeedList>();
+  @Output() newCareNeedList = new EventEmitter<
+    Omit<AddCareNeedList, 'projectId'>
+  >();
   @Input() careNeedLists: CareNeedList[] = [];
 
   selectedList: CareNeedList | undefined;
@@ -25,7 +27,10 @@ export class HourInputComponent {
 
   addHours() {
     const data = this.parserService.parse(this.zorgUren);
-    this.newCareNeedList.emit({ title: this.title, careNeed: data });
+    this.newCareNeedList.emit({
+      title: this.title,
+      careNeed: data,
+    });
     this.title = this.zorgUren = '';
   }
 

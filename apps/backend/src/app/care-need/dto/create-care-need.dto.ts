@@ -1,4 +1,3 @@
-import { Transform } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateCareNeedDto {
@@ -6,8 +5,7 @@ export class CreateCareNeedDto {
   title: string;
 
   @IsNotEmpty()
-  @Transform(({ value }) => Array.from(value.entries()))
-  careNeed: Map<number, number>;
+  careNeed: [number, number][];
 
   @IsNotEmpty()
   projectId: number;

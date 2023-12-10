@@ -83,7 +83,8 @@ export class ChoroplethService {
   }
 
   removeLabels() {
-    this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
+    // this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
+    this.svg.selectAll('.label-group').remove();
   }
 
   togglePostcode(value: boolean) {
@@ -110,7 +111,9 @@ export class ChoroplethService {
       });
   };
 
-  removeHours() {}
+  removeHours() {
+    this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
+  }
 
   addHours(careList: CareNeedList) {
     const data = careList.careNeed;

@@ -20,14 +20,9 @@ export class CareNeedController {
     return this.careNeedService.create(createCareNeedDto);
   }
 
-  @Get()
-  findAll() {
-    return this.careNeedService.findAll();
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.careNeedService.findOne(+id);
+    return this.careNeedService.findAll(+id);
   }
 
   @Patch(':id')

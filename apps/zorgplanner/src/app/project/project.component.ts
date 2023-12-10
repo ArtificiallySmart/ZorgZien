@@ -45,8 +45,8 @@ export class ProjectComponent implements OnDestroy {
     this.choroplethService.togglePostcode(target.checked);
   }
 
-  addCareNeedList(event: AddCareNeedList) {
-    this.careNeedService.add$.next(event);
+  addCareNeedList(event: Omit<AddCareNeedList, 'projectId'>) {
+    this.careNeedService.addCareNeedList(event);
   }
 
   selectList(event: Event) {
@@ -55,12 +55,14 @@ export class ProjectComponent implements OnDestroy {
     }
     const target = event.target as HTMLSelectElement;
     this.selectedList = target.value;
-    const list = this.careNeed().find((list) => list.id === target.value);
+    const list = this.careNeed().find((list) => list.id == target.value);
+    console.log(this.careNeed(), this.selectedList, list);
     if (!list) return;
     this.choroplethService.addHours(list);
   }
 
   ngOnDestroy() {
     this.projectService.clear$.next();
+    this.careNeedService.clear$.next();
   }
 }

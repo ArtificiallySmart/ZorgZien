@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Subject } from 'rxjs';
@@ -9,6 +9,8 @@ import {
   RemoveCareNeedList,
 } from '../../shared/interfaces/care-need';
 import { StorageService } from '../../shared/services/storage.service';
+import { ProjectService } from './project.service';
+import { DataService } from './data.service';
 
 export interface CareNeedState {
   careNeedLists: CareNeedList[];
@@ -21,6 +23,10 @@ export interface CareNeedState {
 })
 export class CareNeedService {
   private storageService = inject(StorageService);
+  private dataService = inject(DataService);
+  private projectService = inject(ProjectService);
+
+  project = this.projectService.project;
 
   //state
   public state = signal<CareNeedState>({
@@ -35,10 +41,11 @@ export class CareNeedService {
   error = computed(() => this.state().error);
 
   //sources
-  private careNeedListsLoaded$ = this.storageService.loadCareNeedLists();
-  add$ = new Subject<AddCareNeedList>();
+  careNeedListsLoaded$ = new Subject<CareNeedList[]>();
+  add$ = new Subject<CareNeedList>();
   edit$ = new Subject<EditCareNeedList>();
   remove$ = new Subject<RemoveCareNeedList>();
+  clear$ = new Subject<void>();
 
   constructor() {
     this.careNeedListsLoaded$.pipe(takeUntilDestroyed()).subscribe({
@@ -58,10 +65,7 @@ export class CareNeedService {
     this.add$.pipe(takeUntilDestroyed()).subscribe((careNeedList) => {
       this.state.update((state) => ({
         ...state,
-        careNeedLists: [
-          ...state.careNeedLists,
-          this.addIdToCareNeedList(careNeedList),
-        ],
+        careNeedLists: [...state.careNeedLists, careNeedList],
       }));
     });
 
@@ -85,17 +89,43 @@ export class CareNeedService {
       }))
     );
 
-    // effect(() => {
-    //   if (this.loaded()) {
-    //     console.log(this.careNeed());
-    //   }
-    // });
+    this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
+      this.state.update((state) => ({
+        ...state,
+        careNeedLists: [],
+        loaded: false,
+      }))
+    );
+
+    effect(() => {
+      if (this.project().id) {
+        console.log('effect in care need service', this.project().id);
+        this.loadCareNeedLists(this.project().id);
+        return;
+      }
+    });
   }
 
-  private addIdToCareNeedList(careNeedList: AddCareNeedList): CareNeedList {
-    return {
+  loadCareNeedLists(projectId: number) {
+    this.dataService.loadCareNeedLists(projectId).subscribe({
+      next: (careNeedLists) => {
+        this.careNeedListsLoaded$.next(careNeedLists);
+      },
+      error: (err) => this.careNeedListsLoaded$.next(err),
+    });
+  }
+
+  addCareNeedList(careNeedList: Omit<AddCareNeedList, 'projectId'>) {
+    const addCareNeedList: AddCareNeedList = {
       ...careNeedList,
-      id: Math.random().toString(36).substr(2, 9),
+      projectId: this.projectService.project().id,
     };
+    console.log(addCareNeedList);
+    this.dataService.addCareNeedList(addCareNeedList).subscribe({
+      next: (careNeedList) => {
+        this.add$.next(careNeedList);
+      },
+      error: (err) => this.add$.next(err),
+    });
   }
 }
