@@ -10,6 +10,8 @@ import { ChoroplethService } from './services/choropleth.service';
 import { ParserService } from './services/parser.service';
 import { ProjectService } from './services/project.service';
 import { CareSupplyComponent } from './care-supply/care-supply.component';
+import { CareSupplyService } from './services/care-supply.service';
+import { AddCareSupplyList } from '../shared/interfaces/care-supply';
 
 @Component({
   selector: 'zorgplanner-project',
@@ -29,6 +31,7 @@ export class ProjectComponent implements OnDestroy {
   parserService = inject(ParserService);
   careDemandService = inject(CareDemandService);
   projectService = inject(ProjectService);
+  careSupplyService = inject(CareSupplyService);
 
   route = inject(ActivatedRoute);
 
@@ -70,6 +73,10 @@ export class ProjectComponent implements OnDestroy {
     console.log(this.careDemand(), this.selectedList, list);
     if (!list) return;
     this.choroplethService.addHours(list);
+  }
+
+  addCareSupplyList(event: Omit<AddCareSupplyList, 'projectId'>) {
+    this.careSupplyService.addCareSupplyList(event);
   }
 
   ngOnDestroy() {

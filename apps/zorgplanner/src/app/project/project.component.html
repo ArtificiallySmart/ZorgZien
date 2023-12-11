@@ -44,7 +44,7 @@
         <li [ngbNavItem]="3">
             <button ngbNavLink>Zorgbeschikbaarheid</button>
             <ng-template ngbNavContent>
-                <zorgplanner-care-supply></zorgplanner-care-supply>
+                <zorgplanner-care-supply (newCareSupplyList)="addCareSupplyList($event)"></zorgplanner-care-supply>
             </ng-template>
         </li>
     </ul>

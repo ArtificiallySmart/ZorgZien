@@ -28,4 +28,21 @@ export class CareSupplyComponent {
   careSupplyEntries: CareSupplyEntry[] = [];
   newTeamName = '';
   areaPostalCodes = '';
+
+  submitEntry() {
+    this.careSupplyEntries.push({
+      name: this.newTeamName,
+      areaPostalCodes: this.areaPostalCodes.split(','),
+    });
+    this.newTeamName = this.areaPostalCodes = '';
+  }
+
+  submitList() {
+    this.newCareSupplyList.emit({
+      title: this.title,
+      careSupply: this.careSupplyEntries,
+    });
+    this.title = '';
+    this.careSupplyEntries = [];
+  }
 }
