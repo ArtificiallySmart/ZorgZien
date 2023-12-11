@@ -29,6 +29,12 @@ export class CareSupplyComponent {
   newTeamName = '';
   areaPostalCodes = '';
 
+  selectList(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const list = this.careSupplyLists.find((list) => list.id == target.value);
+    this.selectedList = list;
+  }
+
   submitEntry() {
     this.careSupplyEntries.push({
       name: this.newTeamName,
@@ -44,5 +50,10 @@ export class CareSupplyComponent {
     });
     this.title = '';
     this.careSupplyEntries = [];
+  }
+
+  removeList(listId: RemoveCareSupplyList) {
+    this.removeCareSupplyList.emit(listId);
+    this.selectedList = undefined;
   }
 }

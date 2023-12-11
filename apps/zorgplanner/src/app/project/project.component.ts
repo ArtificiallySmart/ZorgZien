@@ -36,9 +36,11 @@ export class ProjectComponent implements OnDestroy {
   route = inject(ActivatedRoute);
 
   careDemand = this.careDemandService.careDemandLists;
-  selectedList: string | undefined;
+  careSupply = this.careSupplyService.careSupplyLists;
+  selectedDemandList: string | undefined;
+  selectedSupplyList: string | undefined;
 
-  active = 3;
+  active = 1;
   zorgUren = '';
 
   constructor() {
@@ -63,16 +65,29 @@ export class ProjectComponent implements OnDestroy {
     this.careDemandService.removeCareDemandList(event);
   }
 
+  removeCareSupplyList(event: string) {
+    this.careSupplyService.removeCareSupplyList(event);
+  }
+
   selectList(event: Event) {
-    if (this.selectedList !== undefined) {
-      this.choroplethService.removeHours();
+    if (this.selectedDemandList !== undefined) {
+      this.choroplethService.removeDemand();
     }
     const target = event.target as HTMLSelectElement;
-    this.selectedList = target.value;
+    this.selectedDemandList = target.value;
     const list = this.careDemand().find((list) => list.id == target.value);
-    console.log(this.careDemand(), this.selectedList, list);
     if (!list) return;
-    this.choroplethService.addHours(list);
+    this.choroplethService.addDemand(list);
+  }
+  selectSupplyList(event: Event) {
+    if (this.selectedSupplyList !== undefined) {
+      this.choroplethService.removeSupply();
+    }
+    const target = event.target as HTMLSelectElement;
+    this.selectedSupplyList = target.value;
+    const list = this.careSupply().find((list) => list.id == target.value);
+    if (!list) return;
+    this.choroplethService.addSupply(list);
   }
 
   addCareSupplyList(event: Omit<AddCareSupplyList, 'projectId'>) {

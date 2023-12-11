@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CareDemand } from '../../care-demand/entities/care-demand.entity';
+import { CareSupplyList } from '../../care-supply/entities/care-supply-list.entity';
 
 @Entity()
 export class Project {
@@ -30,4 +31,7 @@ export class Project {
 
   @OneToMany(() => CareDemand, (careDemand) => careDemand.project)
   careDemands: CareDemand[];
+
+  @OneToMany(() => CareSupplyList, (careSupplyList) => careSupplyList.project)
+  careSupplyLists: CareSupplyList[];
 }

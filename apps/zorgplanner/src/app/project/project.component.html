@@ -26,6 +26,25 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect2">Selecteer een Zorgbeschikbaarheid lijst:</label>
+                            <select class="form-control" id="exampleFormControlSelect2"
+                                [disabled]="(careSupply().length === 0) ? true : false"
+                                (change)="selectSupplyList($event)">
+
+                                <option value="test" *ngIf="careSupply().length === 0; else lists2">U heeft nog geen
+                                    zorgbehoefte lijsten
+                                    opgeslagen
+                                </option>
+                                <ng-template #lists2>
+                                    <option>Selecteer een lijst</option>
+                                    <option [value]="list.id" *ngFor="let list of careSupply()">{{list.title}}</option>
+                                </ng-template>
+
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -44,7 +63,9 @@
         <li [ngbNavItem]="3">
             <button ngbNavLink>Zorgbeschikbaarheid</button>
             <ng-template ngbNavContent>
-                <zorgplanner-care-supply (newCareSupplyList)="addCareSupplyList($event)"></zorgplanner-care-supply>
+                <zorgplanner-care-supply (newCareSupplyList)="addCareSupplyList($event)"
+                    (removeCareSupplyList)="removeCareSupplyList($event)"
+                    [careSupplyLists]="careSupply()"></zorgplanner-care-supply>
             </ng-template>
         </li>
     </ul>

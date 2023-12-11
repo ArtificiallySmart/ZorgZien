@@ -1,7 +1,8 @@
 <div class="input-container">
     <div class="form-group">
         <label for="careSupplySelect">Selecteer een zorgbeschikbaarheids lijst:</label>
-        <select name="" id="careSupplySelect" class="form-control" [disabled]="careSupplyLists.length === 0">
+        <select name="" id="careSupplySelect" class="form-control" [disabled]="careSupplyLists.length === 0"
+            (change)="selectList($event)">
             <option *ngIf="careSupplyLists.length === 0; else lists">U heeft nog geen zorgbeschikbaarheid
                 lijsten opgeslagen</option>
             <ng-template #lists>
@@ -51,4 +52,24 @@
             </div>
         </div>
     </ng-container>
+    <div *ngIf="selectedList">
+        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
+        <div class="row">
+            <div class="col-6">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <th>Naam</th>
+                        <th>Postcodegebieden</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let supply of selectedList.careSupply">
+                            <td>{{supply.name}}</td>
+                            <td>{{supply.areaPostalCodes}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>

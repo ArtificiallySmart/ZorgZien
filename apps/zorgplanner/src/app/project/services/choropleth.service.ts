@@ -7,6 +7,10 @@ import { Objects } from 'topojson-specification';
 
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { DataService } from './data.service';
+import {
+  CareSupplyEntry,
+  CareSupplyList,
+} from '../../shared/interfaces/care-supply';
 
 @Injectable({
   providedIn: 'root',
@@ -83,7 +87,6 @@ export class ChoroplethService {
   }
 
   removeLabels() {
-    // this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
     this.svg.selectAll('.label-group').remove();
   }
 
@@ -111,11 +114,11 @@ export class ChoroplethService {
       });
   };
 
-  removeHours() {
-    this.svg.selectAll('path').attr('fill', 'grey').attr('stroke', 'grey');
+  removeDemand() {
+    this.svg.selectAll('.care-demand').remove();
   }
 
-  addHours(careList: CareDemandList) {
+  addDemand(careList: CareDemandList) {
     const data = careList.careDemand;
     const svg = this.svg;
     const path = this.path;
@@ -126,6 +129,7 @@ export class ChoroplethService {
 
     svg
       .append('g')
+      .attr('class', 'care-demand')
       .selectAll('path')
       .data(this.mapFeatures.features)
       .join('path')
@@ -138,5 +142,31 @@ export class ChoroplethService {
         }
         return 'white';
       });
+  }
+
+  addSupply(supplyList: CareSupplyList) {
+    const data = supplyList.careSupply;
+    const svg = this.svg;
+    const path = this.path;
+
+    svg
+      .append('g')
+      .attr('class', 'care-supply')
+      .selectAll('path')
+      .data(this.mapFeatures.features)
+      .join('path')
+      .attr('d', path)
+      .attr('fill', (d) => {
+        const postcode = d.properties!['postcode4'];
+        const isInEntry = (entry: CareSupplyEntry) => {
+          return entry.areaPostalCodes!.includes(postcode);
+        };
+        const index = data.findIndex(isInEntry);
+        return index !== -1 ? d3.schemeCategory10[index] : 'white';
+      });
+  }
+
+  removeSupply() {
+    this.svg.selectAll('.care-supply').remove();
   }
 }
