@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface CareSupplyState {
   careSupplyLists: CareSupplyList[];
+  selectedCareSupplyList: CareSupplyList | null;
   loaded: boolean;
   error: string | null;
 }
@@ -28,17 +29,20 @@ export class CareSupplyService {
   //state
   public state = signal<CareSupplyState>({
     careSupplyLists: [],
+    selectedCareSupplyList: null,
     loaded: false,
     error: null,
   });
 
   //selectors
   careSupplyLists = computed(() => this.state().careSupplyLists);
+  selectedCareSupplyList = computed(() => this.state().selectedCareSupplyList);
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
   //sources
   careSupplyListsLoaded$ = new Subject<CareSupplyList[]>();
+  selectCareSupplyListId$ = new Subject<string>();
   add$ = new Subject<CareSupplyList>();
   edit$ = new Subject<EditCareSupplyList>();
   remove$ = new Subject<RemoveCareSupplyList>();
@@ -103,6 +107,18 @@ export class CareSupplyService {
           error: err,
         })),
     });
+
+    this.selectCareSupplyListId$
+      .pipe(takeUntilDestroyed())
+      .subscribe((careSupplyList) => {
+        const selectedCareSupplyList = this.careSupplyLists().find(
+          (list) => list.id == careSupplyList
+        );
+        this.state.update((state) => ({
+          ...state,
+          selectedCareSupplyList: selectedCareSupplyList || null,
+        }));
+      });
 
     this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
       this.state.update((state) => ({

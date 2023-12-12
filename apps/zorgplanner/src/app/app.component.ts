@@ -22,6 +22,7 @@ export class AppComponent {
   open(content: TemplateRef<string>) {
     this.offcanvasService.open(content, {
       ariaLabelledBy: 'offcanvas-basic-title',
+      backdrop: false,
     });
   }
 }

@@ -28,6 +28,8 @@
         <input type="text" id="teamName" class="form-control" [(ngModel)]=newTeamName>
         <label for="teamPostalCodes">Postcodegebieden:</label>
         <input type="text" id="teamPostalCodes" class="form-control" [(ngModel)]=areaPostalCodes>
+        <label for="teamColor">Kleur voor het zorgTeam</label>
+        <input id="teamColor" [(colorPicker)]="color" [style.background]="color" />
     </div>
     <button class="btn btn-primary" (click)="submitEntry()">toevoegen</button>
     <button type="button" class="btn btn-success" [disabled]="!careSupplyEntries.length" (click)="submitList()">

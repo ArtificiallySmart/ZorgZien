@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ColorPickerModule } from 'ngx-color-picker';
 import {
   AddCareSupplyList,
   CareSupplyEntry,
@@ -11,7 +12,7 @@ import {
 @Component({
   selector: 'zorgplanner-care-supply',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ColorPickerModule],
   templateUrl: './care-supply.component.html',
   styleUrl: './care-supply.component.scss',
 })
@@ -28,6 +29,7 @@ export class CareSupplyComponent {
   careSupplyEntries: CareSupplyEntry[] = [];
   newTeamName = '';
   areaPostalCodes = '';
+  color = '';
 
   selectList(event: Event) {
     const target = event.target as HTMLSelectElement;
