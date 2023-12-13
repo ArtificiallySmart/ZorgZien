@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareDemandService } from './services/care-demand.service';
@@ -22,6 +22,7 @@ import { AddCareSupplyList } from '../shared/interfaces/care-supply';
     NgbNavModule,
     HourInputComponent,
     CareSupplyComponent,
+    NgbTooltipModule,
   ],
   templateUrl: './project.component.html',
   styleUrl: './project.component.scss',

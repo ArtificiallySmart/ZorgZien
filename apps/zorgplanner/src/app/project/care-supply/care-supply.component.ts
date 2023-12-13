@@ -31,18 +31,38 @@ export class CareSupplyComponent {
   areaPostalCodes = '';
   color = '';
 
+  //Blue, BlueViolet, DarkGreen, Gold, LawnGreen, Orange, Sienna
+  //#0000FF, #8A2BE2, #006400, #FFD700, #7CFC00, #FFA500, #A0522D
+
+  colorList = [
+    'hsl(240, 100%, 50%)',
+    'hsl(271, 76%, 53%)',
+    'hsl(120, 100%, 20%)',
+    'hsl(51, 100%, 50%)',
+    'hsl(90, 100%, 49%)',
+    'hsl(39, 100%, 50%)',
+    'hsl(19, 56%, 40%)',
+  ];
+
   selectList(event: Event) {
     const target = event.target as HTMLSelectElement;
     const list = this.careSupplyLists.find((list) => list.id == target.value);
     this.selectedList = list;
   }
 
+  changeColor(color: string) {
+    this.color = color;
+  }
+
   submitEntry() {
+    let color = this.color || this.colorList[this.careSupplyEntries.length];
+    color = color.replace('hsl(', 'hsla(').replace(')', ',ALPHA)');
     this.careSupplyEntries.push({
       name: this.newTeamName,
       areaPostalCodes: this.areaPostalCodes.split(','),
+      color: color,
     });
-    this.newTeamName = this.areaPostalCodes = '';
+    this.newTeamName = this.areaPostalCodes = this.color = '';
   }
 
   submitList() {

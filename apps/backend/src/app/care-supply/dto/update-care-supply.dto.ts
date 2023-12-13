@@ -16,6 +16,10 @@ class UpdateCareSupplyEntryDto {
   @IsOptional()
   amount?: number;
 
+  @IsString()
+  @IsOptional()
+  color?: string;
+
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

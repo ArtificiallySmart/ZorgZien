@@ -29,7 +29,9 @@
         <label for="teamPostalCodes">Postcodegebieden:</label>
         <input type="text" id="teamPostalCodes" class="form-control" [(ngModel)]=areaPostalCodes>
         <label for="teamColor">Kleur voor het zorgTeam</label>
-        <input id="teamColor" [(colorPicker)]="color" [style.background]="color" />
+        <input id="teamColor" [(colorPicker)]="colorList[careSupplyEntries.length]"
+            [style.background]="colorList[careSupplyEntries.length]" [cpAlphaChannel]="'disabled'"
+            [cpOutputFormat]="'hsla'" [cpOKButton]="true" (colorPickerSelect)="changeColor($event)" />
     </div>
     <button class="btn btn-primary" (click)="submitEntry()">toevoegen</button>
     <button type="button" class="btn btn-success" [disabled]="!careSupplyEntries.length" (click)="submitList()">

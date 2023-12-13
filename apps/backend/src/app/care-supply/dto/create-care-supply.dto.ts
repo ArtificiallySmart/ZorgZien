@@ -16,6 +16,9 @@ class CreateCareSupplyEntryDto {
   @IsOptional()
   amount?: number;
 
+  @IsString()
+  color: string;
+
   @IsArray()
   @IsString({ each: true })
   areaPostalCodes?: string[];

@@ -14,6 +14,13 @@ import { DataService } from './data.service';
 import { CareDemandService } from './care-demand.service';
 import { CareSupplyService } from './care-supply.service';
 
+export interface PostalCodeData {
+  postalCode: string;
+  demand: number | null;
+  assignedTeam: string | null;
+  color: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,20 +39,28 @@ export class ChoroplethService {
 
   combineDemandSupply = signal<boolean>(false);
 
+  demandPostalCodeData: PostalCodeData[] = [];
+  supplyPostalCodeData: PostalCodeData[] = [];
+
   constructor() {
     effect(() => {
-      console.log(this.combineDemandSupply());
-    });
-
-    effect(() => {
       if (this.careDemandService.loaded()) {
-        this.changeDemand(this.careDemandService.selectedCareDemandList());
+        console.log('demand loaded');
+        this.demandPostalCodeData = this.convertDemandList(
+          this.careDemandService.selectedCareDemandList()
+        );
+        this.combinePostalCodeData();
       }
     });
 
     effect(() => {
       if (this.careSupplyService.loaded()) {
-        this.changeSupply(this.careSupplyService.selectedCareSupplyList());
+        //console.log('supply loaded');
+        this.supplyPostalCodeData = this.convertSupplyList(
+          this.careSupplyService.selectedCareSupplyList()
+        );
+        //console.log(this.demandPostalCodeData, this.supplyPostalCodeData);
+        this.combinePostalCodeData();
       }
     });
   }
@@ -55,6 +70,96 @@ export class ChoroplethService {
       next: (geoData) => this.makeFeatures(geoData),
       error: (err) => console.log(err),
     });
+  }
+
+  convertDemandList(demandList: CareDemandList | null) {
+    if (demandList === null) {
+      return [];
+    }
+    const data: PostalCodeData[] = [];
+    demandList.careDemand.forEach((value, key) => {
+      data.push({
+        postalCode: key.toString(),
+        demand: value,
+        assignedTeam: null,
+        color: null,
+      });
+    });
+    return data;
+  }
+
+  convertSupplyList(supplyList: CareSupplyList | null) {
+    if (supplyList === null) {
+      return [];
+    }
+    const data: PostalCodeData[] = [];
+    supplyList.careSupply.forEach((entry) => {
+      entry.areaPostalCodes?.forEach((postalCode) => {
+        data.push({
+          postalCode: postalCode,
+          demand: null,
+          assignedTeam: entry.name,
+          color: entry.color,
+        });
+      });
+    });
+    return data;
+  }
+
+  combinePostalCodeData() {
+    const list1 = this.demandPostalCodeData.map((entry) => ({ ...entry }));
+    const list2 = this.supplyPostalCodeData.map((entry) => ({ ...entry }));
+
+    list2.forEach((entry) => {
+      const index = list1.findIndex((el) => el.postalCode === entry.postalCode);
+      if (index !== -1) {
+        list1[index].assignedTeam = entry.assignedTeam ?? null;
+        list1[index].color = entry.color ?? null;
+      } else {
+        list1.push(entry);
+      }
+    });
+
+    this.plotPostalCodeData(list1);
+    // return data;
+  }
+
+  plotPostalCodeData(data2: PostalCodeData[]) {
+    const svg = this.svg;
+    const path = this.path;
+    const data = [...data2];
+
+    svg.selectAll('.postal-code-data').remove();
+
+    const filteredMapFeatures = this.filterMapFeatures(data);
+    const maxDemand = d3.max(data, (d) => d.demand);
+    const logScale = d3.scaleLog().domain([1, maxDemand || 1]);
+    const alphaValue = (value: number) => {
+      return value !== null ? logScale(value) * 0.8 + 0.2 : 1;
+    };
+
+    svg
+      .append('g')
+      .attr('class', 'postal-code-data')
+      .selectAll('path')
+      .data(filteredMapFeatures)
+      .join('path')
+      .attr('d', path)
+      .attr('fill', (d) => {
+        const index = data.findIndex(
+          (entry) => entry.postalCode === d.properties!['postcode4']
+        );
+        if (index === -1) {
+          return 'grey';
+        }
+        const alpha = alphaValue(data[index].demand!).toString();
+
+        if (data[index].color === null) {
+          return `hsla(0, 100%, 50%, ${alpha})`;
+        }
+        data[index].color = data[index].color!.replace('ALPHA', alpha);
+        return data[index].color;
+      });
   }
 
   makeFeatures(geoData2: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
@@ -71,7 +176,6 @@ export class ChoroplethService {
   draw() {
     const svg = this.svg;
     const path = this.path;
-    console.log(this.mapFeatures);
     svg
       .append('g')
       .selectAll('path')
@@ -138,36 +242,79 @@ export class ChoroplethService {
       });
   };
 
-  changeDemand(careList: CareDemandList | null) {
-    if (careList === null) {
-      this.svg.selectAll('.care-demand').remove();
-      return;
-    }
-    const data = careList.careDemand;
-    const svg = this.svg;
-    const path = this.path;
-    const max = d3.max(Array.from(data.values()));
-    const min = d3.min(Array.from(data.values()));
-    const colorScale = d3.scaleLog().domain([min || 1, max || 1]);
-
-    svg
-      .append('g')
-      .attr('class', 'care-demand')
-      .selectAll('path')
-      .data(this.mapFeatures.features)
-      .join('path')
-      .attr('d', path)
-      .attr('fill', (d) => {
-        const postcode = d.properties!['postcode4'];
-        const value = data.get(+postcode);
-        if (value !== undefined) {
-          console.log(value, colorScale(value));
-          //return d3.interpolateReds(colorScale(value));
-          return `hsla(242, 100%, 50%, ${colorScale(value || 0)})`;
-        }
-        return 'grey';
-      });
+  filterMapFeatures(dataList: PostalCodeData[]) {
+    const features = this.mapFeatures.features.filter((feature) => {
+      const postcode = feature.properties!['postcode4'];
+      const index = dataList.findIndex(
+        (entry) => entry.postalCode === postcode
+      );
+      return index !== -1;
+    });
+    return features;
   }
+
+  // changeDemand(careList: CareDemandList | null) {
+  //   if (careList === null) {
+  //     this.svg.selectAll('.care-demand').remove();
+  //     return;
+  //   }
+  //   const data = careList.careDemand;
+  //   const svg = this.svg;
+  //   const path = this.path;
+  //   const max = d3.max(Array.from(data.values()));
+  //   const min = d3.min(Array.from(data.values()));
+  //   const colorScale = d3.scaleLog().domain([min || 1, max || 1]);
+
+  //   const test = this.filterMapFeatures(careList);
+  //   console.log(test);
+  //   svg
+  //     .append('g')
+  //     .attr('class', 'care-demand')
+  //     .selectAll('path')
+  //     .data(test)
+  //     .join('path')
+  //     .attr('d', path)
+  //     // .attr('fill', 'white')
+  //     .attr('fill', (d) => {
+  //       const postcode = d.properties!['postcode4'];
+  //       const value = data.get(+postcode);
+  //       if (value !== undefined) {
+  //         const alpha = colorScale(value) * 0.8 + 0.2;
+  //         return `hsla(0, 100%, 50%, ${alpha})`;
+  //       }
+  //       return null;
+  //     });
+  // }
+  // changeDemand(careList: CareDemandList | null) {
+  //   if (careList === null) {
+  //     this.svg.selectAll('.care-demand').remove();
+  //     return;
+  //   }
+  //   const data = careList.careDemand;
+  //   const svg = this.svg;
+  //   const path = this.path;
+  //   const max = d3.max(Array.from(data.values()));
+  //   const min = d3.min(Array.from(data.values()));
+  //   const colorScale = d3.scaleLog().domain([min || 1, max || 1]);
+
+  //   svg
+  //     .append('g')
+  //     .attr('class', 'care-demand')
+  //     .selectAll('path')
+  //     .data(this.mapFeatures.features)
+  //     .join('path')
+  //     .attr('d', path)
+  //     .attr('fill', 'white')
+  //     .attr('fill', (d) => {
+  //       const postcode = d.properties!['postcode4'];
+  //       const value = data.get(+postcode);
+  //       if (value !== undefined) {
+  //         const alpha = colorScale(value) * 0.8 + 0.2;
+  //         return `hsla(0, 100%, 50%, ${alpha})`;
+  //       }
+  //       return null;
+  //     });
+  // }
 
   changeSupply(careList: CareSupplyList | null) {
     if (careList === null) {
@@ -191,8 +338,7 @@ export class ChoroplethService {
           return entry.areaPostalCodes!.includes(postcode);
         };
         const index = data.findIndex(isInEntry);
-        console.log(d3.schemeCategory10[index]);
-        return index !== -1 ? '#4682b401' : 'white';
+        return index !== -1 ? data[index].color : 'grey';
         // return index !== -1 ? d3.schemeCategory10[index] : 'white';
       });
   }
