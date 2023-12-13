@@ -6,10 +6,7 @@ import * as topojson from 'topojson';
 import { Objects } from 'topojson-specification';
 
 import { CareDemandList } from '../../shared/interfaces/care-demand';
-import {
-  CareSupplyEntry,
-  CareSupplyList,
-} from '../../shared/interfaces/care-supply';
+import { CareSupplyList } from '../../shared/interfaces/care-supply';
 import { DataService } from './data.service';
 import { CareDemandService } from './care-demand.service';
 import { CareSupplyService } from './care-supply.service';
@@ -128,7 +125,7 @@ export class ChoroplethService {
     const svg = this.svg;
     const path = this.path;
     const data = [...data2];
-
+    if (!this.svg) return;
     svg.selectAll('.postal-code-data').remove();
 
     const filteredMapFeatures = this.filterMapFeatures(data);
@@ -159,7 +156,8 @@ export class ChoroplethService {
         }
         data[index].color = data[index].color!.replace('ALPHA', alpha);
         return data[index].color;
-      });
+      })
+      .attr('transform', this.transform?.toString() ?? null);
   }
 
   makeFeatures(geoData2: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
@@ -251,95 +249,5 @@ export class ChoroplethService {
       return index !== -1;
     });
     return features;
-  }
-
-  // changeDemand(careList: CareDemandList | null) {
-  //   if (careList === null) {
-  //     this.svg.selectAll('.care-demand').remove();
-  //     return;
-  //   }
-  //   const data = careList.careDemand;
-  //   const svg = this.svg;
-  //   const path = this.path;
-  //   const max = d3.max(Array.from(data.values()));
-  //   const min = d3.min(Array.from(data.values()));
-  //   const colorScale = d3.scaleLog().domain([min || 1, max || 1]);
-
-  //   const test = this.filterMapFeatures(careList);
-  //   console.log(test);
-  //   svg
-  //     .append('g')
-  //     .attr('class', 'care-demand')
-  //     .selectAll('path')
-  //     .data(test)
-  //     .join('path')
-  //     .attr('d', path)
-  //     // .attr('fill', 'white')
-  //     .attr('fill', (d) => {
-  //       const postcode = d.properties!['postcode4'];
-  //       const value = data.get(+postcode);
-  //       if (value !== undefined) {
-  //         const alpha = colorScale(value) * 0.8 + 0.2;
-  //         return `hsla(0, 100%, 50%, ${alpha})`;
-  //       }
-  //       return null;
-  //     });
-  // }
-  // changeDemand(careList: CareDemandList | null) {
-  //   if (careList === null) {
-  //     this.svg.selectAll('.care-demand').remove();
-  //     return;
-  //   }
-  //   const data = careList.careDemand;
-  //   const svg = this.svg;
-  //   const path = this.path;
-  //   const max = d3.max(Array.from(data.values()));
-  //   const min = d3.min(Array.from(data.values()));
-  //   const colorScale = d3.scaleLog().domain([min || 1, max || 1]);
-
-  //   svg
-  //     .append('g')
-  //     .attr('class', 'care-demand')
-  //     .selectAll('path')
-  //     .data(this.mapFeatures.features)
-  //     .join('path')
-  //     .attr('d', path)
-  //     .attr('fill', 'white')
-  //     .attr('fill', (d) => {
-  //       const postcode = d.properties!['postcode4'];
-  //       const value = data.get(+postcode);
-  //       if (value !== undefined) {
-  //         const alpha = colorScale(value) * 0.8 + 0.2;
-  //         return `hsla(0, 100%, 50%, ${alpha})`;
-  //       }
-  //       return null;
-  //     });
-  // }
-
-  changeSupply(careList: CareSupplyList | null) {
-    if (careList === null) {
-      this.svg.selectAll('.care-supply').remove();
-      return;
-    }
-    const data = careList.careSupply;
-    const svg = this.svg;
-    const path = this.path;
-
-    svg
-      .append('g')
-      .attr('class', 'care-supply')
-      .selectAll('path')
-      .data(this.mapFeatures.features)
-      .join('path')
-      .attr('d', path)
-      .attr('fill', (d) => {
-        const postcode = d.properties!['postcode4'];
-        const isInEntry = (entry: CareSupplyEntry) => {
-          return entry.areaPostalCodes!.includes(postcode);
-        };
-        const index = data.findIndex(isInEntry);
-        return index !== -1 ? data[index].color : 'grey';
-        // return index !== -1 ? d3.schemeCategory10[index] : 'white';
-      });
   }
 }
