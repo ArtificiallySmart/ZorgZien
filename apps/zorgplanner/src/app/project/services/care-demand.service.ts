@@ -13,6 +13,7 @@ import { DataService } from './data.service';
 
 export interface CareDemandState {
   careDemandLists: CareDemandList[];
+  selectedCareDemandList: CareDemandList | null;
   loaded: boolean;
   error: string | null;
 }
@@ -29,17 +30,20 @@ export class CareDemandService {
   //state
   public state = signal<CareDemandState>({
     careDemandLists: [],
+    selectedCareDemandList: null,
     loaded: false,
     error: null,
   });
 
   //selectors
   careDemandLists = computed(() => this.state().careDemandLists);
+  selectedCareDemandList = computed(() => this.state().selectedCareDemandList);
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
   //sources
   careDemandListsLoaded$ = new Subject<CareDemandList[]>();
+  selectCareDemandListId$ = new Subject<string>();
   add$ = new Subject<CareDemandList>();
   edit$ = new Subject<EditCareDemandList>();
   remove$ = new Subject<RemoveCareDemandList>();
@@ -86,6 +90,18 @@ export class CareDemandService {
         ),
       }))
     );
+
+    this.selectCareDemandListId$
+      .pipe(takeUntilDestroyed())
+      .subscribe((careDemandList) => {
+        const selectedCareDemandList = this.careDemandLists().find(
+          (list) => list.id == careDemandList
+        );
+        this.state.update((state) => ({
+          ...state,
+          selectedCareDemandList: selectedCareDemandList || null,
+        }));
+      });
 
     this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
       this.state.update((state) => ({

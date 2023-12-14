@@ -7,6 +7,7 @@ export interface CareSupplyList {
 export interface CareSupplyEntry {
   name: string;
   amount?: number;
+  color: string;
   areaPostalCodes?: string[];
 }
 

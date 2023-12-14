@@ -20,6 +20,7 @@ export class CareSupplyService {
       careSupplyEntry.name = entry.name;
       careSupplyEntry.amount = entry.amount ?? 0;
       careSupplyEntry.areaPostalCodes = entry.areaPostalCodes;
+      careSupplyEntry.color = entry.color;
       careSupplyEntries.push(careSupplyEntry);
     });
     careSupply.project = await this.projectRepository.findOne({

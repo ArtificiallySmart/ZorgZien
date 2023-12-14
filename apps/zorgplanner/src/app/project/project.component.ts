@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareDemandService } from './services/care-demand.service';
@@ -22,6 +22,7 @@ import { AddCareSupplyList } from '../shared/interfaces/care-supply';
     NgbNavModule,
     HourInputComponent,
     CareSupplyComponent,
+    NgbTooltipModule,
   ],
   templateUrl: './project.component.html',
   styleUrl: './project.component.scss',
@@ -37,7 +38,6 @@ export class ProjectComponent implements OnDestroy {
 
   careDemand = this.careDemandService.careDemandLists;
   careSupply = this.careSupplyService.careSupplyLists;
-  selectedDemandList: string | undefined;
   selectedSupplyList: string | undefined;
 
   active = 1;
@@ -56,6 +56,11 @@ export class ProjectComponent implements OnDestroy {
     const target = event.target as HTMLInputElement;
     this.choroplethService.togglePostcode(target.checked);
   }
+  onCheckbox2Change(event: Event) {
+    this.choroplethService.combineDemandSupply.update(
+      () => (event.target as HTMLInputElement).checked
+    );
+  }
 
   addCareDemandList(event: Omit<AddCareDemandList, 'projectId'>) {
     this.careDemandService.addCareDemandList(event);
@@ -70,24 +75,13 @@ export class ProjectComponent implements OnDestroy {
   }
 
   selectList(event: Event) {
-    if (this.selectedDemandList !== undefined) {
-      this.choroplethService.removeDemand();
-    }
     const target = event.target as HTMLSelectElement;
-    this.selectedDemandList = target.value;
-    const list = this.careDemand().find((list) => list.id == target.value);
-    if (!list) return;
-    this.choroplethService.addDemand(list);
+    this.careDemandService.selectCareDemandListId$.next(target.value);
   }
+
   selectSupplyList(event: Event) {
-    if (this.selectedSupplyList !== undefined) {
-      this.choroplethService.removeSupply();
-    }
     const target = event.target as HTMLSelectElement;
-    this.selectedSupplyList = target.value;
-    const list = this.careSupply().find((list) => list.id == target.value);
-    if (!list) return;
-    this.choroplethService.addSupply(list);
+    this.careSupplyService.selectCareSupplyListId$.next(target.value);
   }
 
   addCareSupplyList(event: Omit<AddCareSupplyList, 'projectId'>) {

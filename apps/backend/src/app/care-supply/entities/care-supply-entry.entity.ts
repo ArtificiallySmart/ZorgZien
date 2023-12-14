@@ -15,6 +15,9 @@ export class CareSupplyEntry {
   @Column()
   name: string;
 
+  @Column()
+  color: string;
+
   @Column({ nullable: true, type: 'int' })
   amount?: number;
 

@@ -7,7 +7,15 @@
                     <svg></svg>
                 </div>
                 <div class="row">
-                    <div class="col"><input type="checkbox" (change)="onCheckboxChange($event)">Postcode</div>
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" (change)="onCheckbox2Change($event)">Combineer zorgbehoefte en
+                            zorgbeschikbaarheid
+                        </div>
+                    </div>
                     <div class="col">
                         <div class="form-group">
                             <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
@@ -19,14 +27,14 @@
                                     opgeslagen
                                 </option>
                                 <ng-template #lists>
-                                    <option>Selecteer een lijst</option>
+                                    <option [value]="0">Selecteer een lijst</option>
                                     <option [value]="list.id" *ngFor="let list of careDemand()">{{list.title}}</option>
                                 </ng-template>
 
                             </select>
                         </div>
-                    </div>
-                    <div class="col">
+
+
                         <div class="form-group">
                             <label for="exampleFormControlSelect2">Selecteer een Zorgbeschikbaarheid lijst:</label>
                             <select class="form-control" id="exampleFormControlSelect2"
@@ -45,6 +53,9 @@
                             </select>
                         </div>
                     </div>
+
+
+
                 </div>
 
 
