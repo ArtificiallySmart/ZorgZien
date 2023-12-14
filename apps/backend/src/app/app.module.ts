@@ -11,6 +11,8 @@ import { CareDemand } from './care-demand/entities/care-demand.entity';
 import { CareSupplyModule } from './care-supply/care-supply.module';
 import { CareSupplyEntry } from './care-supply/entities/care-supply-entry.entity';
 import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
     }),
     CareDemandModule,
     CareSupplyModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
