@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, ViewChild, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NgbNavModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbNavModule,
+  NgbPopover,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareDemandService } from './services/care-demand.service';
@@ -12,6 +16,7 @@ import { ProjectService } from './services/project.service';
 import { CareSupplyComponent } from './care-supply/care-supply.component';
 import { CareSupplyService } from './services/care-supply.service';
 import { AddCareSupplyList } from '../shared/interfaces/care-supply';
+import { Options } from '@popperjs/core';
 
 @Component({
   selector: 'zorgplanner-project',
@@ -28,6 +33,7 @@ import { AddCareSupplyList } from '../shared/interfaces/care-supply';
   styleUrl: './project.component.scss',
 })
 export class ProjectComponent implements OnDestroy {
+  @ViewChild('myPopover') myPopover!: NgbPopover;
   choroplethService = inject(ChoroplethService);
   parserService = inject(ParserService);
   careDemandService = inject(CareDemandService);
@@ -40,6 +46,19 @@ export class ProjectComponent implements OnDestroy {
   careSupply = this.careSupplyService.careSupplyLists;
   selectedSupplyList: string | undefined;
 
+  popperOptions = (options: Partial<Options>) => {
+    options.onFirstUpdate = (state) => {
+      console.log('onFirstUpdate', state);
+    };
+    options.modifiers?.push({
+      name: 'offset',
+      options: {
+        offset: [0, 8],
+      },
+    });
+    return options;
+  };
+
   active = 1;
   zorgUren = '';
 
@@ -50,9 +69,35 @@ export class ProjectComponent implements OnDestroy {
         this.projectService.loadProject(params['id']);
       }
     });
+
+    effect(() => {
+      if (this.choroplethService.clickLocation().x !== 0) {
+        this.setPopperOptions([
+          this.choroplethService.clickLocation().x,
+          this.choroplethService.clickLocation().y,
+        ]);
+        console.log(this.choroplethService.clickLocation().postalCodeData);
+        const test = this.choroplethService.clickLocation().postalCodeData;
+        setTimeout(() => this.myPopover.open({ test }), 100);
+      }
+    });
+  }
+
+  setPopperOptions(location: [number, number]) {
+    this.popperOptions = (options: Partial<Options>) => {
+      options.modifiers?.push({
+        name: 'offset',
+        options: {
+          offset: [location[0], location[1]],
+        },
+      });
+
+      return options;
+    };
   }
 
   onCheckboxChange(event: Event) {
+    // this.popoverButton.open();
     const target = event.target as HTMLInputElement;
     this.choroplethService.togglePostcode(target.checked);
   }

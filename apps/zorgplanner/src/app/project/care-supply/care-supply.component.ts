@@ -78,4 +78,8 @@ export class CareSupplyComponent {
     this.removeCareSupplyList.emit(listId);
     this.selectedList = undefined;
   }
+
+  convertColor(color: string) {
+    return color.replace('hsla(', 'hsl(').replace(',ALPHA)', ')');
+  }
 }

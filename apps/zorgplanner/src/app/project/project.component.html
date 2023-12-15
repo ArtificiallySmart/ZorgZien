@@ -4,8 +4,23 @@
             <button ngbNavLink>Map</button>
             <ng-template ngbNavContent>
                 <div class="svg-container">
+                    <div class="popover" #myPopover="ngbPopover" [popperOptions]="popperOptions"
+                        [ngbPopover]="popContent" [popoverTitle]="popTitle" [autoClose]="false"></div>
                     <svg></svg>
+                    <ng-template let-test="test" #popContent>
+                        <p>Zorgbehoefte: {{test.demand ?? 0}} uur</p>
+                        <p *ngIf="test.assignedTeam">Team: {{test.assignedTeam}}</p>
+                    </ng-template>
+                    <ng-template let-test="test" #popTitle>
+                        <div class="d-flex justify-content-between">
+                            <p class="d-inline mb-0">{{test.postalCode}}</p>
+                            <button type="button" class="btn btn-close btn-sm d-inline" aria-label="Close"
+                                (click)="myPopover.close()"></button>
+                        </div>
+                    </ng-template>
+
                 </div>
+
                 <div class="row">
                     <div class="col">
                         <div class="form-group">

@@ -1,4 +1,4 @@
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 
 import * as d3 from 'd3';
 import { FeatureCollection, GeoJsonProperties } from 'geojson';
@@ -7,15 +7,21 @@ import { Objects } from 'topojson-specification';
 
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { CareSupplyList } from '../../shared/interfaces/care-supply';
-import { DataService } from './data.service';
 import { CareDemandService } from './care-demand.service';
 import { CareSupplyService } from './care-supply.service';
+import { DataService } from './data.service';
 
 export interface PostalCodeData {
   postalCode: string;
   demand: number | null;
   assignedTeam: string | null;
   color: string | null;
+}
+
+export interface PopoverLocationState {
+  x: number;
+  y: number;
+  postalCodeData: PostalCodeData;
 }
 
 @Injectable({
@@ -36,6 +42,14 @@ export class ChoroplethService {
 
   demandPostalCodeData: PostalCodeData[] = [];
   supplyPostalCodeData: PostalCodeData[] = [];
+
+  clickLocation = signal<PopoverLocationState>({
+    x: 0,
+    y: 0,
+    postalCodeData: {} as PostalCodeData,
+  });
+
+  // clickLocation = signal<[number, number]>([0, 0]);
 
   constructor() {
     effect(() => {
@@ -116,10 +130,10 @@ export class ChoroplethService {
     // return data;
   }
 
-  plotPostalCodeData(data2: PostalCodeData[]) {
+  plotPostalCodeData(data: PostalCodeData[]) {
     const svg = this.svg;
     const path = this.path;
-    const data = [...data2];
+
     if (!this.svg) return;
     svg.selectAll('.postal-code-data').remove();
 
@@ -155,6 +169,7 @@ export class ChoroplethService {
       .attr('transform', this.transform?.toString() ?? null);
 
     this.addMouseOver();
+    this.addClick(data);
   }
 
   addMouseOver() {
@@ -168,6 +183,37 @@ export class ChoroplethService {
       .on('mouseout', function () {
         d3.select(this).attr('stroke', 'grey').lower();
       });
+  }
+
+  addClick(data: PostalCodeData[]) {
+    const svg = this.svg;
+
+    svg.selectAll('path').on('click', (event) => {
+      //console.log(event.target.__data__.properties!['postcode4']);
+      console.log(event);
+      const index = data.findIndex(
+        (entry) =>
+          entry.postalCode == event.target.__data__.properties!['postcode4']
+      );
+      let postalCodeData: PostalCodeData = {} as PostalCodeData;
+      postalCodeData = {
+        ...data[index],
+        postalCode: event.target.__data__.properties!['postcode4'],
+      };
+
+      this.clickLocation.update(() => {
+        return {
+          x: event.offsetX,
+          y: event.offsetY,
+          postalCodeData: postalCodeData,
+        };
+      });
+      // this.clickLocation.update(
+      //   () => [event.offsetX, event.offsetY] as [number, number]
+      // );
+
+      //console.log(event.offsetX, event.offsetY);
+    });
   }
 
   makeFeatures(geoData2: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
