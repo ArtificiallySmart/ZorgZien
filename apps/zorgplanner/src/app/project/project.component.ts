@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { HourInputComponent } from './hour-input/hour-input.component';
 import { CareDemandService } from './services/care-demand.service';
@@ -22,7 +22,7 @@ import { AddCareSupplyList } from '../shared/interfaces/care-supply';
     NgbNavModule,
     HourInputComponent,
     CareSupplyComponent,
-    NgbTooltipModule,
+    NgbPopoverModule,
   ],
   templateUrl: './project.component.html',
   styleUrl: './project.component.scss',
@@ -55,11 +55,6 @@ export class ProjectComponent implements OnDestroy {
   onCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement;
     this.choroplethService.togglePostcode(target.checked);
-  }
-  onCheckbox2Change(event: Event) {
-    this.choroplethService.combineDemandSupply.update(
-      () => (event.target as HTMLInputElement).checked
-    );
   }
 
   addCareDemandList(event: Omit<AddCareDemandList, 'projectId'>) {

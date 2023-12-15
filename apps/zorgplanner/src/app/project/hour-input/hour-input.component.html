@@ -1,4 +1,18 @@
 <div class="input-container">
+
+    <h2>Nieuwe zorgbehoefte lijst</h2>
+    <div class="form-group">
+        <label for="uren-lijst-titel">Titel van de zorgbehoefte lijst:</label>
+        <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="title">
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
+    </div>
+    <button (click)="addList()"> submit</button>
+
+    <h2>Bestaande zorgbehoefte lijsten</h2>
+
     <div class="form-group">
         <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
         <select class="form-control" id="exampleFormControlSelect1" [disabled]="careDemandLists.length === 0"
@@ -15,20 +29,19 @@
         </select>
     </div>
 
-    <div class="form-group">
-        <label for="uren-lijst-titel">Titel van de zorgbehoefte lijst:</label>
-        <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="title">
-    </div>
-    <div class="form-group">
-        <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
-    </div>
-    <button (click)="addList()"> submit</button>
-
     <div *ngIf="selectedList">
-        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
 
-        <div class="row">
+        <h2>{{selectedList.title}}</h2>
+
+        <p>{{selectedList.careDemand.size}} postcode{{selectedList.careDemand.size > 1 ? 's' : ''}}. </p>
+        <button type="button" class="btn btn-outline-primary ms-2" (click)="isCollapsed = !isCollapsed"
+            [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+            Toggle with Two Way Binding
+        </button>
+
+
+
+        <div class="row" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
             <div class="col-6">
                 <table class="table table-bordered">
                     <thead class="table-dark">
@@ -44,6 +57,8 @@
                 </table>
             </div>
         </div>
+
+        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
 
     </div>
 

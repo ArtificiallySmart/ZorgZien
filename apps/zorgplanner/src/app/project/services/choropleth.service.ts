@@ -1,4 +1,4 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 
 import * as d3 from 'd3';
 import { FeatureCollection, GeoJsonProperties } from 'geojson';
@@ -34,15 +34,12 @@ export class ChoroplethService {
   path = d3.geoPath(this.projection);
   transform: d3.ZoomTransform | null = null;
 
-  combineDemandSupply = signal<boolean>(false);
-
   demandPostalCodeData: PostalCodeData[] = [];
   supplyPostalCodeData: PostalCodeData[] = [];
 
   constructor() {
     effect(() => {
       if (this.careDemandService.loaded()) {
-        console.log('demand loaded');
         this.demandPostalCodeData = this.convertDemandList(
           this.careDemandService.selectedCareDemandList()
         );
@@ -52,11 +49,9 @@ export class ChoroplethService {
 
     effect(() => {
       if (this.careSupplyService.loaded()) {
-        //console.log('supply loaded');
         this.supplyPostalCodeData = this.convertSupplyList(
           this.careSupplyService.selectedCareSupplyList()
         );
-        //console.log(this.demandPostalCodeData, this.supplyPostalCodeData);
         this.combinePostalCodeData();
       }
     });
@@ -158,6 +153,21 @@ export class ChoroplethService {
         return data[index].color;
       })
       .attr('transform', this.transform?.toString() ?? null);
+
+    this.addMouseOver();
+  }
+
+  addMouseOver() {
+    const svg = this.svg;
+    //const path = this.path;
+    svg
+      .selectAll('path')
+      .on('mouseover', function () {
+        d3.select(this).attr('stroke', '#000').raise();
+      })
+      .on('mouseout', function () {
+        d3.select(this).attr('stroke', 'grey').lower();
+      });
   }
 
   makeFeatures(geoData2: TopoJSON.Topology<Objects<GeoJsonProperties>>) {

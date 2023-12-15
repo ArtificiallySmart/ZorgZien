@@ -7,11 +7,12 @@ import {
   RemoveCareDemandList,
 } from '../../shared/interfaces/care-demand';
 import { ParserService } from '../services/parser.service';
+import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'zorgplanner-hour-input',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgbCollapseModule],
   templateUrl: './hour-input.component.html',
   styleUrl: './hour-input.component.css',
 })
@@ -24,6 +25,7 @@ export class HourInputComponent {
   @Input() careDemandLists: CareDemandList[] = [];
 
   selectedList: CareDemandList | undefined;
+  isCollapsed = true;
   zorgUren = '';
   title = '';
 
