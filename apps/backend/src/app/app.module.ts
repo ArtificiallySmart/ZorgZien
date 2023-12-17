@@ -13,18 +13,26 @@ import { CareSupplyEntry } from './care-supply/entities/care-supply-entry.entity
 import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ConfigModule } from '@nestjs/config';
+import { UserEntity } from './users/models/user.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.dev.env',
+    }),
     ProjectsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'test',
-      password: 'test',
-      database: 'test',
-      entities: [Project, CareDemand, CareSupplyEntry, CareSupplyList],
+      url: process.env.DATABASE_URL,
+      entities: [
+        Project,
+        CareDemand,
+        CareSupplyEntry,
+        CareSupplyList,
+        UserEntity,
+      ],
       synchronize: true,
     }),
     CareDemandModule,

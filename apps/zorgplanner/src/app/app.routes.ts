@@ -12,6 +12,11 @@ export const appRoutes: Route[] = [
       import('./home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'login',
+    loadComponent: () =>
+      import('./auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: 'project',
     loadComponent: () =>
       import('./project/new-project/new-project.component').then(
