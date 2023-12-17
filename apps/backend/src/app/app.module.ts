@@ -16,11 +16,13 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserEntity } from './users/models/user.entity';
 
+const envFilePath = process.env.NODE_ENV === 'production' ? '.env' : '.dev.env';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.dev.env',
+      envFilePath: envFilePath,
     }),
     ProjectsModule,
     TypeOrmModule.forRoot({

@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,7 +7,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { HttpService } from '../../shared/services/http.service';
+import { Router } from '@angular/router';
+import { tap } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'zorgplanner-login',
@@ -17,7 +19,8 @@ import { HttpService } from '../../shared/services/http.service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  private httpService = inject(HttpService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
   hasAccount = true;
 
   loginForm = new FormGroup({
@@ -25,15 +28,16 @@ export class LoginComponent {
       Validators.required,
       Validators.email,
     ]),
-    password: new FormControl('test2', Validators.required),
+    password: new FormControl('test', Validators.required),
   });
 
   onSubmit(loginForm: FormGroup) {
-    console.log(loginForm.valid);
     if (!loginForm.valid) {
       return;
     }
-    console.log(loginForm.value);
-    this.httpService.post('api/users/login', loginForm.value).subscribe();
+    this.authService
+      .login(loginForm)
+      .pipe(tap(() => this.router.navigate(['/home'])))
+      .subscribe();
   }
 }
