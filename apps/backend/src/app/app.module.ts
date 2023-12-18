@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserEntity } from './users/models/user.entity';
+import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserEntity } from './users/models/user.entity';
         CareSupplyEntry,
         CareSupplyList,
         UserEntity,
+        TokenBlacklistEntity,
       ],
       synchronize: true,
     }),

@@ -38,7 +38,5 @@ import { LocalStrategy } from './strategies/local.strategy';
   exports: [AuthService],
 })
 export class AuthModule {
-  constructor(private config: ConfigService) {
-    console.log(config.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME'));
-  }
+  constructor(private config: ConfigService) {}
 }

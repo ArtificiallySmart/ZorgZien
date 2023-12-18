@@ -1,10 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { from } from 'rxjs';
-import { User } from '../users/models/user.interface';
+import { from, map, switchMap } from 'rxjs';
+import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { ConfigService } from '@nestjs/config';
+import { User } from '../users/models/user.interface';
+import { TokenBlacklistEntity } from './models/token-blacklist.entity';
 
 export type DecodedToken = {
   user: Omit<User, 'password'>;
@@ -17,8 +19,11 @@ export type DecodedToken = {
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private dataSource: DataSource
   ) {}
+
+  tokenRepository = this.dataSource.getRepository(TokenBlacklistEntity);
 
   createAccessToken(user: Omit<User, 'password'>) {
     return from(this.jwtService.signAsync({ user }));
@@ -55,7 +60,21 @@ export class AuthService {
   }
 
   replaceRefreshToken(user: Omit<User, 'password'>, oldTokenId: string) {
-    // TODO: Invalidate the old refresh token in the database
-    return this.createRefreshToken(user);
+    return from(
+      this.tokenRepository.exist({ where: { token: oldTokenId } })
+    ).pipe(
+      switchMap((exists: boolean) => {
+        if (exists) {
+          throw new UnauthorizedException('Invalid refresh token');
+        } else {
+          const newToken = this.tokenRepository.create({ token: oldTokenId });
+          this.tokenRepository.save(newToken);
+          return this.createRefreshToken(user);
+        }
+      }),
+      map((token: string) => {
+        return token;
+      })
+    );
   }
 }
