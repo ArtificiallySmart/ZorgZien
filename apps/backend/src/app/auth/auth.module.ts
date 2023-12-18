@@ -19,7 +19,9 @@ import { LocalStrategy } from './strategies/local.strategy';
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '10h' },
+        signOptions: {
+          expiresIn: config.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+        },
       }),
     }),
   ],
@@ -35,4 +37,8 @@ import { LocalStrategy } from './strategies/local.strategy';
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule {
+  constructor(private config: ConfigService) {
+    console.log(config.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME'));
+  }
+}

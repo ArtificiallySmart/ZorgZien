@@ -1,34 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { from } from 'rxjs';
 import { User } from '../users/models/user.interface';
+import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
+
+export type DecodedToken = {
+  user: Omit<User, 'password'>;
+  tokenId: string;
+  iat: number;
+  exp: number;
+};
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService
+  ) {}
 
-  // async validateUser(
-  //   username: string,
-  //   pass: string
-  // ): Promise<Omit<User, 'password'>> {
-  //   const user = await this.usersService.findOne(username);
-  //   if (user && user.password === pass) {
-  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //     const { password, ...result } = user;
-  //     return result;
-  //   }
-  //   return null;
-  // }
-
-  // async login(user: Omit<User, 'password'>) {
-  //   const payload = { email: user.email, sub: user.id };
-  //   return {
-  //     access_token: this.jwtService.sign(payload),
-  //   };
-  // }
-
-  generateJWT(user: Omit<User, 'password'>) {
+  createAccessToken(user: Omit<User, 'password'>) {
     return from(this.jwtService.signAsync({ user }));
   }
 
@@ -38,5 +30,32 @@ export class AuthService {
 
   comparePasswords(newPassword: string, passwordHash: string) {
     return from(bcrypt.compare(newPassword, passwordHash));
+  }
+
+  createRefreshToken(user: Omit<User, 'password'>) {
+    const tokenId = uuidv4();
+    return from(
+      this.jwtService.signAsync(
+        { user, tokenId: tokenId },
+        {
+          expiresIn: this.configService.get<string>(
+            'JWT_REFRESH_TOKEN_EXPIRATION_TIME'
+          ),
+        }
+      )
+    );
+  }
+
+  decodeRefreshToken(token: string) {
+    try {
+      return this.jwtService.verify<DecodedToken>(token);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  replaceRefreshToken(user: Omit<User, 'password'>, oldTokenId: string) {
+    // TODO: Invalidate the old refresh token in the database
+    return this.createRefreshToken(user);
   }
 }

@@ -42,7 +42,6 @@ export class ChoroplethService {
   constructor() {
     effect(() => {
       if (this.careDemandService.loaded()) {
-        console.log('demand loaded');
         this.demandPostalCodeData = this.convertDemandList(
           this.careDemandService.selectedCareDemandList()
         );
@@ -52,11 +51,9 @@ export class ChoroplethService {
 
     effect(() => {
       if (this.careSupplyService.loaded()) {
-        //console.log('supply loaded');
         this.supplyPostalCodeData = this.convertSupplyList(
           this.careSupplyService.selectedCareSupplyList()
         );
-        //console.log(this.demandPostalCodeData, this.supplyPostalCodeData);
         this.combinePostalCodeData();
       }
     });
