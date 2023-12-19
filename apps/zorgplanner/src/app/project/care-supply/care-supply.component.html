@@ -25,20 +25,24 @@
     <button type="button" class="btn btn-success" [disabled]="!careSupplyEntries.length" (click)="submitList()">
         zorgbeschikbaarheid lijst
         opslaan</button>
-    <h2>Bestaande zorgbeschikbaarheid lijsten</h2>
-    <div class="form-group">
-        <label for="careSupplySelect">Selecteer een zorgbeschikbaarheids lijst:</label>
-        <select name="" id="careSupplySelect" class="form-control" [disabled]="careSupplyLists.length === 0"
-            (change)="selectList($event)">
-            <option *ngIf="careSupplyLists.length === 0; else lists">U heeft nog geen zorgbeschikbaarheid
-                lijsten opgeslagen</option>
-            <ng-template #lists>
-                <option>Selecteer een lijst</option>
-                <option [value]="list.id" *ngFor="let list of careSupplyLists">{{list.title}}</option>
-            </ng-template>
 
-        </select>
+    <div class="my-5">
+        <h2>Bestaande zorgbeschikbaarheid lijsten</h2>
+        <div class="form-group">
+            <label for="careSupplySelect">Selecteer een zorgbeschikbaarheids lijst:</label>
+            <select name="" id="careSupplySelect" class="form-control" [disabled]="careSupplyLists.length === 0"
+                (change)="selectList($event)">
+                <option *ngIf="careSupplyLists.length === 0; else lists">U heeft nog geen zorgbeschikbaarheid
+                    lijsten opgeslagen</option>
+                <ng-template #lists>
+                    <option>Selecteer een lijst</option>
+                    <option [value]="list.id" *ngFor="let list of careSupplyLists">{{list.title}}</option>
+                </ng-template>
+
+            </select>
+        </div>
     </div>
+
     <ng-container *ngIf="careSupplyEntries.length">
         <div class="row">
             <div class="col-6">
@@ -57,33 +61,40 @@
             </div>
         </div>
     </ng-container>
+
     <div *ngIf="selectedList">
-        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
-        <div class="row">
-            <div class="col-6">
+        <ng-container *ngIf="editSupplyList; else displayList">
+            <zorgplanner-edit-care-supply [careSupplyList]="selectedList"></zorgplanner-edit-care-supply>
+        </ng-container>
+        <ng-template #displayList>
+            <div class="row">
+                <div class="col-6">
 
-                <table class="table table-bordered">
-                    <thead class="table table-dark">
-                        <tr>
-                            <th>Naam</th>
-                            <th>Postcodegebieden</th>
-                            <th>Kleur</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let supply of selectedList.careSupply">
-                            <td>{{supply.name}}</td>
-                            <td>{{supply.areaPostalCodes}}</td>
-                            <td><input id="teamColor" [(colorPicker)]="colorList[careSupplyEntries.length]"
-                                    [style.background]="convertColor(supply.color)" [cpAlphaChannel]="'disabled'"
-                                    [cpOutputFormat]="'hsla'" [cpOKButton]="true"
-                                    (colorPickerSelect)="changeColor($event)" /></td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <table class="table table-bordered">
+                        <thead class="table table-dark">
+                            <tr>
+                                <th>Naam</th>
+                                <th>Postcodegebieden</th>
+                                <th>Kleur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let supply of selectedList.careSupply">
+                                <td>{{supply.name}}</td>
+                                <td>{{supply.areaPostalCodes}}</td>
+                                <td><input id="teamColor" [(colorPicker)]="colorList[careSupplyEntries.length]"
+                                        [style.background]="convertColor(supply.color)" [cpAlphaChannel]="'disabled'"
+                                        [cpOutputFormat]="'hsla'" [cpOKButton]="true"
+                                        (colorPickerSelect)="changeColor($event)" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
+                </div>
             </div>
-        </div>
+        </ng-template>
+        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
+        <button class="btn btn-secondary" (click)="editSupplyList = !editSupplyList">Lijst aanpassen</button>
 
     </div>
 </div>

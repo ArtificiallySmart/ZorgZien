@@ -72,7 +72,12 @@ export class AuthService {
           throw new UnauthorizedException('Invalid refresh token');
         } else {
           const newToken = this.tokenRepository.create({ token: oldTokenId });
-          this.tokenRepository.save(newToken);
+          try {
+            this.tokenRepository.save(newToken);
+          } catch (error) {
+            console.log(error);
+            throw new UnauthorizedException('Invalid refresh token');
+          }
           return this.createRefreshToken(user);
         }
       }),

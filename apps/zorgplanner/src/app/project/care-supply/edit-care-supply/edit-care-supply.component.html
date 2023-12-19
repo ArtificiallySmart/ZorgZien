@@ -1,0 +1,43 @@
+<form [formGroup]="careSupplyListForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" class="form-control" formControlName="title">
+    </div>
+
+
+    <div formArrayName="careSupply" *ngFor="let supply of careSupplyListForm.value.careSupply; let i = index">
+        <div [formGroupName]="i" class="card mb-3">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" class="form-control" formControlName="name">
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" class="form-control" formControlName="amount">
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" class="form-control" formControlName="color">
+                </div>
+
+                <button type="button" class="btn btn-outline-primary" (click)="collapse.toggle()"
+                    [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+                    Toggle with Function
+                </button>
+                <div #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed[i]">
+                    <div formArrayName="areaPostalCodes"
+                        *ngFor="let postalCode of supply.areaPostalCodes; let j = index">
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" class="form-control" [formControlName]="j">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

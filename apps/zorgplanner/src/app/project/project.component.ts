@@ -59,7 +59,7 @@ export class ProjectComponent implements OnDestroy {
     return options;
   };
 
-  active = 1;
+  active = 3;
   zorgUren = '';
 
   constructor() {

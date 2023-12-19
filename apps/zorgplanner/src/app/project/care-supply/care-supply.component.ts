@@ -8,11 +8,17 @@ import {
   CareSupplyList,
   RemoveCareSupplyList,
 } from '../../shared/interfaces/care-supply';
+import { EditCareSupplyComponent } from './edit-care-supply/edit-care-supply.component';
 
 @Component({
   selector: 'zorgplanner-care-supply',
   standalone: true,
-  imports: [CommonModule, FormsModule, ColorPickerModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ColorPickerModule,
+    EditCareSupplyComponent,
+  ],
   templateUrl: './care-supply.component.html',
   styleUrl: './care-supply.component.scss',
 })
@@ -30,6 +36,8 @@ export class CareSupplyComponent {
   newTeamName = '';
   areaPostalCodes = '';
   color = '';
+
+  editSupplyList = false;
 
   //Blue, BlueViolet, DarkGreen, Gold, LawnGreen, Orange, Sienna
   //#0000FF, #8A2BE2, #006400, #FFD700, #7CFC00, #FFA500, #A0522D
