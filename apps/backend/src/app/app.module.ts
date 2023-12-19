@@ -11,22 +11,31 @@ import { CareDemand } from './care-demand/entities/care-demand.entity';
 import { CareSupplyModule } from './care-supply/care-supply.module';
 import { CareSupplyEntry } from './care-supply/entities/care-supply-entry.entity';
 import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { UserEntity } from './users/models/user.entity';
+import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 
 @Module({
   imports: [
     ProjectsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'test',
-      password: 'test',
-      database: 'test',
-      entities: [Project, CareDemand, CareSupplyEntry, CareSupplyList],
+      url: process.env.DATABASE_URL,
+      entities: [
+        Project,
+        CareDemand,
+        CareSupplyEntry,
+        CareSupplyList,
+        UserEntity,
+        TokenBlacklistEntity,
+      ],
       synchronize: true,
     }),
     CareDemandModule,
     CareSupplyModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
