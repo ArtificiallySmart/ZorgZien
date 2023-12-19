@@ -5,6 +5,8 @@
         States
     </div>
     <div class="offcanvas-body">
+        Authenticated:
+        <pre>{{authService.authState() | json}}</pre>
         ProjectState:
         <pre>{{projectService.state() | json}}</pre>
         <hr>

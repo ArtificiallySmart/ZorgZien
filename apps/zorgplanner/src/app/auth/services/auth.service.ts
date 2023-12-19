@@ -1,13 +1,17 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, Subject, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
 
 interface LoginResponse {
   access_token: string;
   // Include other properties if there are any
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
 }
 
 @Injectable({
@@ -17,7 +21,21 @@ export class AuthService {
   private httpService = inject(HttpService);
   private jwtHelper = inject(JwtHelperService);
   private router = inject(Router);
-  constructor() {}
+
+  constructor() {
+    this.authenticate$.subscribe((isAuthenticated) => {
+      this.authState.update((state) => ({
+        ...state,
+        isAuthenticated,
+      }));
+    });
+  }
+
+  public authState = signal<AuthState>({
+    isAuthenticated: false,
+  });
+
+  authenticate$ = new Subject<boolean>();
 
   login(loginForm: FormGroup) {
     return this.httpService
@@ -25,26 +43,14 @@ export class AuthService {
       .pipe(
         map((res) => {
           this.setAccessToken(res.access_token);
+          this.authenticate$.next(true);
           return res;
+        }),
+        catchError((err) => {
+          console.log('login error', err);
+          throw err;
         })
       );
-  }
-
-  // isAuthenticated(): boolean {
-  //   const token = localStorage.getItem('access_token');
-  //   return !this.jwtHelper.isTokenExpired(token);
-  // }
-  isAuthenticated(): boolean {
-    let isAuthenticated = false;
-    const token = localStorage.getItem('access_token');
-    if (!this.jwtHelper.isTokenExpired(token)) return true;
-    this.refreshToken().subscribe((res) => {
-      console.log('refreshToken response', res);
-      this.setAccessToken(res);
-      isAuthenticated = true;
-    });
-
-    return isAuthenticated;
   }
 
   refreshToken(): Observable<string> {
@@ -52,10 +58,15 @@ export class AuthService {
       .post<{ access_token: string }, object>('api/users/refresh', {})
       .pipe(
         tap((response) => {
-          console.log('refreshToken response', response);
           this.setAccessToken(response.access_token);
+          this.authenticate$.next(true);
         }),
-        map((response) => response.access_token)
+        map((response) => response.access_token),
+        catchError(() => {
+          this.authenticate$.next(false);
+          return '';
+          // throw new Error('No refresh token provided');
+        })
       );
   }
 

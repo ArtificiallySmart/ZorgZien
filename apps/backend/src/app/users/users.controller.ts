@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   ParseIntPipe,
   Post,
@@ -55,6 +56,10 @@ export class UsersController {
   @Post('refresh')
   refresh(@Res() res: Response, @Req() req: Request) {
     const oldRefreshToken = req.cookies['refresh_token'];
+    if (!oldRefreshToken) {
+      // throw new Error('No refresh token provided');
+      throw new HttpException('No refresh token provided', 400);
+    }
     const decodedToken = this.authService.decodeRefreshToken(oldRefreshToken);
     // Validate old refresh token, if invalid, throw an error.
     const user = decodedToken.user;

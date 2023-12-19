@@ -20,7 +20,6 @@ async function bootstrap() {
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
-  Logger.warn(`TODO: add a chron job to clean up expired tokens`);
 }
 
 bootstrap();
