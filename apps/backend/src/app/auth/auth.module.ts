@@ -1,5 +1,4 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
@@ -14,15 +13,11 @@ import { LocalStrategy } from './strategies/local.strategy';
   imports: [
     forwardRef(() => UsersModule),
     PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: config.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
-        },
-      }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME,
+      },
     }),
   ],
   providers: [
@@ -37,6 +32,4 @@ import { LocalStrategy } from './strategies/local.strategy';
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {
-  constructor(private config: ConfigService) {}
-}
+export class AuthModule {}

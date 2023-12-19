@@ -74,7 +74,6 @@ export class UsersController {
         });
         return res.send({ access_token: tokens[0] });
       }),
-      // catchError((err) => of({ error: err.message }))
       catchError((err) => {
         throw err;
       })

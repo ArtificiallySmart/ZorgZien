@@ -17,7 +17,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((err) => {
       if (err.status === 401) {
-        // Handle 401 errors
         return authService.refreshToken().pipe(
           switchMap((newToken: string) => {
             const newReq = req.clone({
@@ -34,28 +33,3 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
-
-// // token.interceptor.ts
-// intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-//   // Attach access token to request headers
-//   const authorizedReq = req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + this.authService.getAccessToken()) });
-
-//   return next.handle(authorizedReq).pipe(
-//     catchError((error: HttpErrorResponse) => {
-//       if (error.status === 401) {
-//         // Access token is expired, try refreshing
-//         return this.authService.refreshToken().pipe(
-//           switchMap((newToken: string) => {
-//             // Set the new token in authService for in-memory storage
-//             this.authService.setAccessToken(newToken);
-
-//             // Use the new token for the retry
-//             const retriedReq = req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + newToken) });
-//             return next.handle(retriedReq);
-//           })
-//         );
-//       }
-//       return throwError(error);
-//     })
-//   );
-// }

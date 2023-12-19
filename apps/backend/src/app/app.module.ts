@@ -13,15 +13,11 @@ import { CareSupplyEntry } from './care-supply/entities/care-supply-entry.entity
 import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
 import { UserEntity } from './users/models/user.entity';
 import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     ProjectsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',

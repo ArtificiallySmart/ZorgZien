@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { from, map, switchMap } from 'rxjs';
@@ -7,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/models/user.interface';
 import { TokenBlacklistEntity } from './models/token-blacklist.entity';
+import { CronJob } from 'cron';
 
 export type DecodedToken = {
   user: Omit<User, 'password'>;
@@ -17,13 +17,19 @@ export type DecodedToken = {
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
-    private dataSource: DataSource
-  ) {}
+  constructor(private jwtService: JwtService, private dataSource: DataSource) {}
 
   tokenRepository = this.dataSource.getRepository(TokenBlacklistEntity);
+
+  removeExpiredRefreshTokens = CronJob.from({
+    cronTime: '0 0 * * *',
+    onTick: () => {
+      this.tokenRepository.delete({
+        expires: new Date(Date.now()),
+      });
+    },
+    start: true,
+  });
 
   createAccessToken(user: Omit<User, 'password'>) {
     return from(this.jwtService.signAsync({ user }));
@@ -43,9 +49,7 @@ export class AuthService {
       this.jwtService.signAsync(
         { user, tokenId: tokenId },
         {
-          expiresIn: this.configService.get<string>(
-            'JWT_REFRESH_TOKEN_EXPIRATION_TIME'
-          ),
+          expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
         }
       )
     );
