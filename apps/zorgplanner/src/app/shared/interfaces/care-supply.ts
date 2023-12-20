@@ -5,6 +5,7 @@ export interface CareSupplyList {
   projectId: number;
 }
 export interface CareSupplyEntry {
+  id?: string;
   name: string;
   amount?: number;
   color: string;

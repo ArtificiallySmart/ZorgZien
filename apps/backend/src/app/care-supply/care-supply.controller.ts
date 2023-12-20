@@ -35,7 +35,7 @@ export class CareSupplyController {
     @Param('id') id: string,
     @Body() updateCareSupplyListDto: UpdateCareSupplyListDto
   ) {
-    return this.careSupplyService.update(+id, updateCareSupplyListDto);
+    return this.careSupplyService.update(id, updateCareSupplyListDto);
   }
 
   @Delete(':id')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCareSupplyListDto } from './dto/create-care-supply.dto';
 import { UpdateCareSupplyListDto } from './dto/update-care-supply.dto';
 import { DataSource } from 'typeorm';
@@ -10,6 +10,7 @@ import { CareSupplyEntry } from './entities/care-supply-entry.entity';
 export class CareSupplyService {
   constructor(private dataSource: DataSource) {}
   careSupplyRepository = this.dataSource.getRepository(CareSupplyList);
+  careSupplyEntryRepository = this.dataSource.getRepository(CareSupplyEntry);
   projectRepository = this.dataSource.getRepository(Project);
 
   async create(createCareSupplyListDto: CreateCareSupplyListDto) {
@@ -43,8 +44,47 @@ export class CareSupplyService {
     });
   }
 
-  update(id: number, updateCareSupplyListDto: UpdateCareSupplyListDto) {
-    return `This action updates a #${id} careSupply ${updateCareSupplyListDto}}`;
+  async update(id: string, updateCareSupplyListDto: UpdateCareSupplyListDto) {
+    const careSupplyList = await this.careSupplyRepository.findOne({
+      where: { id },
+      relations: ['careSupply'],
+    });
+
+    if (!careSupplyList) throw new NotFoundException();
+
+    const { title, careSupply: newCareSupplyEntries } = updateCareSupplyListDto;
+
+    if (title) careSupplyList.title = title;
+
+    if (!newCareSupplyEntries)
+      return this.careSupplyRepository.save(careSupplyList);
+
+    const oldCareSupplyEntries = careSupplyList.careSupply;
+
+    careSupplyList.careSupply = [];
+
+    for (const newEntry of newCareSupplyEntries) {
+      const newCareSupplyEntry = new CareSupplyEntry();
+      newCareSupplyEntry.name = newEntry.name;
+      newCareSupplyEntry.amount = newEntry.amount ?? 0;
+      newCareSupplyEntry.color = newEntry.color;
+      newCareSupplyEntry.areaPostalCodes = newEntry.areaPostalCodes;
+      careSupplyList.careSupply.push(newCareSupplyEntry);
+    }
+
+    try {
+      await this.removeCareSupplyEntries(oldCareSupplyEntries);
+    } catch (error) {
+      throw new Error(error);
+    }
+
+    return this.careSupplyRepository.save(careSupplyList);
+  }
+
+  async removeCareSupplyEntries(entries: CareSupplyEntry[]) {
+    entries.forEach(async (entry) => {
+      await this.careSupplyEntryRepository.remove(entry);
+    });
   }
 
   async remove(id: string) {

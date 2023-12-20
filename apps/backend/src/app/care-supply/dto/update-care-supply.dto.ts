@@ -10,6 +10,10 @@ import {
 class UpdateCareSupplyEntryDto {
   @IsString()
   @IsOptional()
+  id: string;
+
+  @IsString()
+  @IsOptional()
   name?: string;
 
   @IsInt()
@@ -27,6 +31,10 @@ class UpdateCareSupplyEntryDto {
 }
 
 export class UpdateCareSupplyListDto {
+  @IsString()
+  @IsOptional()
+  id: string;
+
   @IsString()
   @IsOptional()
   title?: string;

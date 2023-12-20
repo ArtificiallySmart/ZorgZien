@@ -12,6 +12,7 @@ import { Observable, map } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
+  EditCareSupplyList,
 } from '../../shared/interfaces/care-supply';
 
 @Injectable({
@@ -95,6 +96,13 @@ export class DataService {
     return this.httpService.post<CareSupplyList, AddCareSupplyList>(
       `/api/care-supply`,
       careSupplyList
+    );
+  }
+
+  editCareSupplyList(careSupplyList: EditCareSupplyList) {
+    return this.httpService.patch<CareSupplyList, AddCareSupplyList>(
+      `/api/care-supply/${careSupplyList.id}`,
+      careSupplyList.data
     );
   }
 

@@ -59,7 +59,9 @@
                                 </option>
                                 <ng-template #lists2>
                                     <option>Selecteer een lijst</option>
-                                    <option [value]="list.id" *ngFor="let list of careSupply()">{{list.title}}</option>
+                                    <option [value]="list.id" *ngFor="let list of careSupply()"
+                                        [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
+                                        {{list.title}}</option>
                                 </ng-template>
 
                             </select>

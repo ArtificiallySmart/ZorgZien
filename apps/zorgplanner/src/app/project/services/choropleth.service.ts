@@ -189,8 +189,6 @@ export class ChoroplethService {
     const svg = this.svg;
 
     svg.selectAll('path').on('click', (event) => {
-      //console.log(event.target.__data__.properties!['postcode4']);
-      console.log(event);
       const index = data.findIndex(
         (entry) =>
           entry.postalCode == event.target.__data__.properties!['postcode4']
@@ -208,11 +206,6 @@ export class ChoroplethService {
           postalCodeData: postalCodeData,
         };
       });
-      // this.clickLocation.update(
-      //   () => [event.offsetX, event.offsetY] as [number, number]
-      // );
-
-      //console.log(event.offsetX, event.offsetY);
     });
   }
 

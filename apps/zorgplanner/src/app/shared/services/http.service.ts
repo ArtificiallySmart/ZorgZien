@@ -18,4 +18,8 @@ export class HttpService {
   delete<T>(endpoint: string) {
     return this.http.delete<T>(endpoint);
   }
+
+  patch<T, S>(endpoint: string, body: S) {
+    return this.http.patch<T>(endpoint, body);
+  }
 }

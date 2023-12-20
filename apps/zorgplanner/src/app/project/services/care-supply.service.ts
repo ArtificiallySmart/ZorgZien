@@ -85,6 +85,10 @@ export class CareSupplyService {
               ? { ...careSupplyList, ...data }
               : careSupplyList
           ),
+          selectedCareSupplyList:
+            state.selectedCareSupplyList?.id === id
+              ? { ...state.selectedCareSupplyList, ...data }
+              : state.selectedCareSupplyList,
         })),
       error: (err) =>
         this.state.update((state) => ({
@@ -97,6 +101,7 @@ export class CareSupplyService {
       next: (id) =>
         this.state.update((state) => ({
           ...state,
+          selectedCareSupplyList: null,
           careSupplyLists: state.careSupplyLists.filter(
             (careSupplyList) => careSupplyList.id !== id
           ),
@@ -154,6 +159,13 @@ export class CareSupplyService {
     this.dataService.addCareSupplyList(addCareSupplyList).subscribe({
       next: (careSupplyList) => this.add$.next(careSupplyList),
       error: (err) => this.add$.error(err),
+    });
+  }
+
+  editCareSupplyList({ id, data }: EditCareSupplyList) {
+    this.dataService.editCareSupplyList({ id, data }).subscribe({
+      next: () => this.edit$.next({ id, data }),
+      error: (err) => this.edit$.error(err),
     });
   }
 
