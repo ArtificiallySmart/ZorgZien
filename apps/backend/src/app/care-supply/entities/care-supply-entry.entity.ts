@@ -26,7 +26,8 @@ export class CareSupplyEntry {
 
   @ManyToOne(
     () => CareSupplyList,
-    (careSupplyList) => careSupplyList.careSupply
+    (careSupplyList) => careSupplyList.careSupply,
+    { onDelete: 'CASCADE' }
   )
   @JoinColumn({ name: 'careSupplyListId' })
   careSupplyList: CareSupplyList;

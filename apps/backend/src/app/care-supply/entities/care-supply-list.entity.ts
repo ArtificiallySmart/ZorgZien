@@ -21,6 +21,7 @@ export class CareSupplyList {
     (careSupplyEntry) => careSupplyEntry.careSupplyList,
     {
       cascade: true,
+      onDelete: 'CASCADE',
     }
   )
   careSupply: CareSupplyEntry[];

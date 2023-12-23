@@ -18,4 +18,9 @@ export class ParserService {
 
     return map;
   }
+
+  parseZipcodes(data: string) {
+    const zipcodes = data.match(/(\d{4})/g);
+    return zipcodes ?? [];
+  }
 }

@@ -163,13 +163,21 @@ export class ChoroplethService {
         if (data[index].color === null) {
           return `hsla(0, 100%, 50%, ${alpha})`;
         }
-        data[index].color = data[index].color!.replace('ALPHA', alpha);
+        data[index].color = this.hslToHsla(data[index].color!, +alpha);
         return data[index].color;
       })
       .attr('transform', this.transform?.toString() ?? null);
 
     this.addMouseOver();
     this.addClick(data);
+  }
+
+  hslToHsla(hsl: string, alpha: number) {
+    if (hsl.startsWith('hsla')) {
+      return hsl;
+    }
+    const hsla = hsl.replace(')', `, ${alpha})`);
+    return hsla;
   }
 
   addMouseOver() {
