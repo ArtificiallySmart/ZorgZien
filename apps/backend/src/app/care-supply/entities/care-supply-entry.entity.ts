@@ -22,7 +22,7 @@ export class CareSupplyEntry {
   amount?: number;
 
   @Column('simple-array', { nullable: true })
-  areaPostalCodes?: string[];
+  areaZipcodes?: string[];
 
   @ManyToOne(
     () => CareSupplyList,

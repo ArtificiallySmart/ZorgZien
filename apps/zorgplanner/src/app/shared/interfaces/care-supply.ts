@@ -9,7 +9,7 @@ export interface CareSupplyEntry {
   name: string;
   amount?: number;
   color: string;
-  areaPostalCodes?: string[];
+  areaZipcodes?: string[];
 }
 
 export type AddCareSupplyList = Omit<CareSupplyList, 'id'>;

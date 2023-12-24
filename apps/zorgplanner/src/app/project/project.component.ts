@@ -75,8 +75,7 @@ export class ProjectComponent implements OnDestroy {
           this.choroplethService.clickLocation().x,
           this.choroplethService.clickLocation().y,
         ]);
-        const zipcodeData =
-          this.choroplethService.clickLocation().postalCodeData;
+        const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
         setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
       }
     });

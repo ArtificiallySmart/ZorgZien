@@ -11,8 +11,8 @@ import { CareDemandService } from './care-demand.service';
 import { CareSupplyService } from './care-supply.service';
 import { DataService } from './data.service';
 
-export interface PostalCodeData {
-  postalCode: string;
+export interface ZipcodeData {
+  zipcode: string;
   demand: number | null;
   assignedTeam: string | null;
   color: string | null;
@@ -21,7 +21,7 @@ export interface PostalCodeData {
 export interface PopoverLocationState {
   x: number;
   y: number;
-  postalCodeData: PostalCodeData;
+  zipcodeData: ZipcodeData;
 }
 
 @Injectable({
@@ -40,13 +40,13 @@ export class ChoroplethService {
   path = d3.geoPath(this.projection);
   transform: d3.ZoomTransform | null = null;
 
-  demandPostalCodeData: PostalCodeData[] = [];
-  supplyPostalCodeData: PostalCodeData[] = [];
+  demandZipcodeData: ZipcodeData[] = [];
+  supplyZipcodeData: ZipcodeData[] = [];
 
   clickLocation = signal<PopoverLocationState>({
     x: 0,
     y: 0,
-    postalCodeData: {} as PostalCodeData,
+    zipcodeData: {} as ZipcodeData,
   });
 
   // clickLocation = signal<[number, number]>([0, 0]);
@@ -54,19 +54,19 @@ export class ChoroplethService {
   constructor() {
     effect(() => {
       if (this.careDemandService.loaded()) {
-        this.demandPostalCodeData = this.convertDemandList(
+        this.demandZipcodeData = this.convertDemandList(
           this.careDemandService.selectedCareDemandList()
         );
-        this.combinePostalCodeData();
+        this.combineZipcodeData();
       }
     });
 
     effect(() => {
       if (this.careSupplyService.loaded()) {
-        this.supplyPostalCodeData = this.convertSupplyList(
+        this.supplyZipcodeData = this.convertSupplyList(
           this.careSupplyService.selectedCareSupplyList()
         );
-        this.combinePostalCodeData();
+        this.combineZipcodeData();
       }
     });
   }
@@ -82,10 +82,10 @@ export class ChoroplethService {
     if (demandList === null) {
       return [];
     }
-    const data: PostalCodeData[] = [];
+    const data: ZipcodeData[] = [];
     demandList.careDemand.forEach((value, key) => {
       data.push({
-        postalCode: key.toString(),
+        zipcode: key.toString(),
         demand: value,
         assignedTeam: null,
         color: null,
@@ -98,11 +98,11 @@ export class ChoroplethService {
     if (supplyList === null) {
       return [];
     }
-    const data: PostalCodeData[] = [];
+    const data: ZipcodeData[] = [];
     supplyList.careSupply.forEach((entry) => {
-      entry.areaPostalCodes?.forEach((postalCode) => {
+      entry.areaZipcodes?.forEach((zipcode) => {
         data.push({
-          postalCode: postalCode,
+          zipcode: zipcode,
           demand: null,
           assignedTeam: entry.name,
           color: entry.color,
@@ -112,12 +112,12 @@ export class ChoroplethService {
     return data;
   }
 
-  combinePostalCodeData() {
-    const list1 = this.demandPostalCodeData.map((entry) => ({ ...entry }));
-    const list2 = this.supplyPostalCodeData.map((entry) => ({ ...entry }));
+  combineZipcodeData() {
+    const list1 = this.demandZipcodeData.map((entry) => ({ ...entry }));
+    const list2 = this.supplyZipcodeData.map((entry) => ({ ...entry }));
 
     list2.forEach((entry) => {
-      const index = list1.findIndex((el) => el.postalCode === entry.postalCode);
+      const index = list1.findIndex((el) => el.zipcode === entry.zipcode);
       if (index !== -1) {
         list1[index].assignedTeam = entry.assignedTeam ?? null;
         list1[index].color = entry.color ?? null;
@@ -126,16 +126,16 @@ export class ChoroplethService {
       }
     });
 
-    this.plotPostalCodeData(list1);
+    this.plotZipcodeData(list1);
     // return data;
   }
 
-  plotPostalCodeData(data: PostalCodeData[]) {
+  plotZipcodeData(data: ZipcodeData[]) {
     const svg = this.svg;
     const path = this.path;
 
     if (!this.svg) return;
-    svg.selectAll('.postal-code-data').remove();
+    svg.selectAll('.zipcode-data').remove();
 
     const filteredMapFeatures = this.filterMapFeatures(data);
     const maxDemand = d3.max(data, (d) => d.demand);
@@ -146,14 +146,14 @@ export class ChoroplethService {
 
     svg
       .append('g')
-      .attr('class', 'postal-code-data')
+      .attr('class', 'zipcode-data')
       .selectAll('path')
       .data(filteredMapFeatures)
       .join('path')
       .attr('d', path)
       .attr('fill', (d) => {
         const index = data.findIndex(
-          (entry) => entry.postalCode === d.properties!['postcode4']
+          (entry) => entry.zipcode === d.properties!['postcode4']
         );
         if (index === -1) {
           return 'grey';
@@ -193,25 +193,25 @@ export class ChoroplethService {
       });
   }
 
-  addClick(data: PostalCodeData[]) {
+  addClick(data: ZipcodeData[]) {
     const svg = this.svg;
 
     svg.selectAll('path').on('click', (event) => {
       const index = data.findIndex(
         (entry) =>
-          entry.postalCode == event.target.__data__.properties!['postcode4']
+          entry.zipcode == event.target.__data__.properties!['postcode4']
       );
-      let postalCodeData: PostalCodeData = {} as PostalCodeData;
-      postalCodeData = {
+      let zipcodeData: ZipcodeData = {} as ZipcodeData;
+      zipcodeData = {
         ...data[index],
-        postalCode: event.target.__data__.properties!['postcode4'],
+        zipcode: event.target.__data__.properties!['postcode4'],
       };
 
       this.clickLocation.update(() => {
         return {
           x: event.offsetX,
           y: event.offsetY,
-          postalCodeData: postalCodeData,
+          zipcodeData: zipcodeData,
         };
       });
     });
@@ -297,12 +297,10 @@ export class ChoroplethService {
       });
   };
 
-  filterMapFeatures(dataList: PostalCodeData[]) {
+  filterMapFeatures(dataList: ZipcodeData[]) {
     const features = this.mapFeatures.features.filter((feature) => {
       const postcode = feature.properties!['postcode4'];
-      const index = dataList.findIndex(
-        (entry) => entry.postalCode === postcode
-      );
+      const index = dataList.findIndex((entry) => entry.zipcode === postcode);
       return index !== -1;
     });
     return features;

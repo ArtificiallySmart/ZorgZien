@@ -39,9 +39,9 @@
                         <div ngbAccordionBody [formGroupName]="i">
                             <ng-template>
 
-                                <div formArrayName="areaPostalCodes" class="form-group row mb-3">
+                                <div formArrayName="areaZipcodes" class="form-group row mb-3">
                                     <div class="col-4"
-                                        *ngFor="let postalCode of supply.areaPostalCodes; let j = index; trackBy zipCodeById">
+                                        *ngFor="let zipcode of supply.areaZipcodes; let j = index; trackBy zipCodeById">
                                         <div class="input-group mb-3"
                                             [ngClass]="getInnerFormControl(i,j).errors ? 'is-invalid' : ''">
                                             <input type="text" class="form-control" id="autoSizingInputGroup"

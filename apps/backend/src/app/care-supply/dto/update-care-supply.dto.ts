@@ -27,7 +27,7 @@ class UpdateCareSupplyEntryDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  areaPostalCodes?: string[];
+  areaZipcodes?: string[];
 }
 
 export class UpdateCareSupplyListDto {

@@ -21,7 +21,7 @@ class CreateCareSupplyEntryDto {
 
   @IsArray()
   @IsString({ each: true })
-  areaPostalCodes?: string[];
+  areaZipcodes?: string[];
 }
 
 export class CreateCareSupplyListDto {

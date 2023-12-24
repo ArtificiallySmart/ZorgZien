@@ -34,7 +34,7 @@ export class CareSupplyComponent {
   title = '';
   careSupplyEntries: CareSupplyEntry[] = [];
   newTeamName = '';
-  areaPostalCodes = '';
+  areaZipcodes = '';
   color = '';
 
   editSupplyList = true;
@@ -67,10 +67,10 @@ export class CareSupplyComponent {
     color = color.replace('hsl(', 'hsla(').replace(')', ',ALPHA)');
     this.careSupplyEntries.push({
       name: this.newTeamName,
-      areaPostalCodes: this.areaPostalCodes.split(','),
+      areaZipcodes: this.areaZipcodes.split(','),
       color: color,
     });
-    this.newTeamName = this.areaPostalCodes = this.color = '';
+    this.newTeamName = this.areaZipcodes = this.color = '';
   }
 
   submitList() {

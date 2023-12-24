@@ -20,7 +20,7 @@ export class CareSupplyService {
       const careSupplyEntry = new CareSupplyEntry();
       careSupplyEntry.name = entry.name;
       careSupplyEntry.amount = entry.amount ?? 0;
-      careSupplyEntry.areaPostalCodes = entry.areaPostalCodes;
+      careSupplyEntry.areaZipcodes = entry.areaZipcodes;
       careSupplyEntry.color = entry.color;
       careSupplyEntries.push(careSupplyEntry);
     });
@@ -68,7 +68,7 @@ export class CareSupplyService {
       newCareSupplyEntry.name = newEntry.name;
       newCareSupplyEntry.amount = newEntry.amount ?? 0;
       newCareSupplyEntry.color = newEntry.color;
-      newCareSupplyEntry.areaPostalCodes = newEntry.areaPostalCodes;
+      newCareSupplyEntry.areaZipcodes = newEntry.areaZipcodes;
       careSupplyList.careSupply.push(newCareSupplyEntry);
     }
 

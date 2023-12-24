@@ -102,7 +102,7 @@ export class EditCareSupplyComponent implements OnInit {
     return (
       (this.careSupplyListForm.get('careSupply') as FormArray)
         .at(outerIndex)
-        .get('areaPostalCodes') as FormArray
+        .get('areaZipcodes') as FormArray
     ).at(innerIndex) as FormControl;
   }
 
@@ -111,9 +111,9 @@ export class EditCareSupplyComponent implements OnInit {
       name: [supplyEntry.name, Validators.required],
       amount: [supplyEntry.amount],
       color: [supplyEntry.color],
-      areaPostalCodes: this.fb.array(
+      areaZipcodes: this.fb.array(
         [
-          ...(supplyEntry.areaPostalCodes ?? []).map(
+          ...(supplyEntry.areaZipcodes ?? []).map(
             (x) => new FormControl(x, [zipcodeValidator()])
           ),
         ],
@@ -160,14 +160,14 @@ export class EditCareSupplyComponent implements OnInit {
       zipcodeValidator(),
     ]);
     const careSupplyEntry = this.careSupply.at(index) as FormGroup;
-    const zipcodes = careSupplyEntry.get('areaPostalCodes') as FormArray;
+    const zipcodes = careSupplyEntry.get('areaZipcodes') as FormArray;
     zipcodes.push(zipcode);
     el.value = '';
   }
 
   deleteZipcode(index: number, zipcodeIndex: number) {
     const careSupplyEntry = this.careSupply.at(index) as FormGroup;
-    const postalCodes = careSupplyEntry.get('areaPostalCodes') as FormArray;
-    postalCodes.removeAt(zipcodeIndex);
+    const zipcodes = careSupplyEntry.get('areaZipcodes') as FormArray;
+    zipcodes.removeAt(zipcodeIndex);
   }
 }

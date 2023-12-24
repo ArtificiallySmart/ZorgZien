@@ -14,8 +14,8 @@
 
         <label for="teamName">Naam zorgTeam:</label>
         <input type="text" id="teamName" class="form-control" [(ngModel)]=newTeamName>
-        <label for="teamPostalCodes">Postcodegebieden:</label>
-        <input type="text" id="teamPostalCodes" class="form-control" [(ngModel)]=areaPostalCodes>
+        <label for="teamZipcodes">Postcodegebieden:</label>
+        <input type="text" id="teamZipcodes" class="form-control" [(ngModel)]=areaZipcodes>
         <label for="teamColor">Kleur voor het zorgTeam</label>
         <input id="teamColor" [(colorPicker)]="colorList[careSupplyEntries.length]"
             [style.background]="colorList[careSupplyEntries.length]" [cpAlphaChannel]="'disabled'"
@@ -54,7 +54,7 @@
                     <tbody>
                         <tr *ngFor="let entry of careSupplyEntries">
                             <td>{{entry.name}}</td>
-                            <td>{{entry.areaPostalCodes}}</td>
+                            <td>{{entry.areaZipcodes}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -81,7 +81,7 @@
                         <tbody>
                             <tr *ngFor="let supply of selectedList.careSupply">
                                 <td>{{supply.name}}</td>
-                                <td>{{supply.areaPostalCodes}}</td>
+                                <td>{{supply.areaZipcodes}}</td>
                                 <td><input id="teamColor" [(colorPicker)]="colorList[careSupplyEntries.length]"
                                         [style.background]="convertColor(supply.color)" [cpAlphaChannel]="'disabled'"
                                         [cpOutputFormat]="'hsla'" [cpOKButton]="true"
