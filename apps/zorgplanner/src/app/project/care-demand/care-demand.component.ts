@@ -10,13 +10,13 @@ import { ParserService } from '../services/parser.service';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'zorgplanner-hour-input',
+  selector: 'zorgplanner-care-demand',
   standalone: true,
   imports: [CommonModule, FormsModule, NgbCollapseModule],
-  templateUrl: './hour-input.component.html',
-  styleUrl: './hour-input.component.css',
+  templateUrl: './care-demand.component.html',
+  styleUrl: './care-demand.component.css',
 })
-export class HourInputComponent {
+export class CareDemandComponent {
   private parserService = inject(ParserService);
   @Output() newCareDemandList = new EventEmitter<
     Omit<AddCareDemandList, 'projectId'>

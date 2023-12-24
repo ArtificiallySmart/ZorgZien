@@ -25,9 +25,9 @@ export class CareSupplyController {
     return this.careSupplyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.careSupplyService.findOne(+id);
+  @Get(':projectId')
+  findOne(@Param('projectId') projectId: string) {
+    return this.careSupplyService.findOne(+projectId);
   }
 
   @Patch(':id')

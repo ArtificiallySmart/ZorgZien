@@ -8,7 +8,7 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
-import { HourInputComponent } from './hour-input/hour-input.component';
+import { CareDemandComponent } from './care-demand/care-demand.component';
 import { CareDemandService } from './services/care-demand.service';
 import { ChoroplethService } from './services/choropleth.service';
 import { ParserService } from './services/parser.service';
@@ -25,7 +25,7 @@ import { Options } from '@popperjs/core';
     CommonModule,
     FormsModule,
     NgbNavModule,
-    HourInputComponent,
+    CareDemandComponent,
     CareSupplyComponent,
     NgbPopoverModule,
   ],
@@ -47,9 +47,6 @@ export class ProjectComponent implements OnDestroy {
   selectedSupplyList: string | undefined;
 
   popperOptions = (options: Partial<Options>) => {
-    options.onFirstUpdate = (state) => {
-      console.log('onFirstUpdate', state);
-    };
     options.modifiers?.push({
       name: 'offset',
       options: {
@@ -60,7 +57,6 @@ export class ProjectComponent implements OnDestroy {
   };
 
   active = 3;
-  zorgUren = '';
 
   constructor() {
     this.choroplethService.init();
@@ -72,12 +68,16 @@ export class ProjectComponent implements OnDestroy {
 
     effect(() => {
       if (this.choroplethService.clickLocation().x !== 0) {
+        if (this.myPopover.isOpen()) {
+          this.myPopover.close();
+        }
         this.setPopperOptions([
           this.choroplethService.clickLocation().x,
           this.choroplethService.clickLocation().y,
         ]);
-        const test = this.choroplethService.clickLocation().postalCodeData;
-        setTimeout(() => this.myPopover.open({ test }), 100);
+        const zipcodeData =
+          this.choroplethService.clickLocation().postalCodeData;
+        setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
       }
     });
   }
@@ -96,7 +96,6 @@ export class ProjectComponent implements OnDestroy {
   }
 
   onCheckboxChange(event: Event) {
-    // this.popoverButton.open();
     const target = event.target as HTMLInputElement;
     this.choroplethService.togglePostcode(target.checked);
   }

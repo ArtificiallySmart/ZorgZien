@@ -44,7 +44,7 @@ export class ProjectService {
         return this.state.update((state) => ({
           ...state,
           loaded: false,
-          error: result.message, // or any other property of HttpErrorResponse you want to use
+          error: result.message,
         }));
       }
       this.state.update(() => ({

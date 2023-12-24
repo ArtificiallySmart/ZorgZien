@@ -3,17 +3,18 @@
         <li [ngbNavItem]="1">
             <button ngbNavLink>Map</button>
             <ng-template ngbNavContent>
+
                 <div class="svg-container">
                     <div class="popover" #myPopover="ngbPopover" [popperOptions]="popperOptions"
-                        [ngbPopover]="popContent" [popoverTitle]="popTitle" [autoClose]="false"></div>
+                        [ngbPopover]="popContent" [popoverTitle]="popTitle" [autoClose]="'outside'"></div>
                     <svg></svg>
-                    <ng-template let-test="test" #popContent>
-                        <p>Zorgbehoefte: {{test.demand ?? 0}} uur</p>
-                        <p *ngIf="test.assignedTeam">Team: {{test.assignedTeam}}</p>
+                    <ng-template let-zipcodeData="zipcodeData" #popContent>
+                        <p>Zorgbehoefte: {{zipcodeData.demand ?? 0}} uur</p>
+                        <p *ngIf="zipcodeData.assignedTeam">Team: {{zipcodeData.assignedTeam}}</p>
                     </ng-template>
-                    <ng-template let-test="test" #popTitle>
+                    <ng-template let-zipcodeData="zipcodeData" #popTitle>
                         <div class="d-flex justify-content-between">
-                            <p class="d-inline mb-0">{{test.postalCode}}</p>
+                            <p class="d-inline mb-0">{{zipcodeData.postalCode}}</p>
                             <button type="button" class="btn btn-close btn-sm d-inline" aria-label="Close"
                                 (click)="myPopover.close()"></button>
                         </div>
@@ -79,9 +80,9 @@
 
             <button ngbNavLink>Zorgbehoefte</button>
             <ng-template ngbNavContent>
-                <zorgplanner-hour-input (newCareDemandList)="addCareDemandList($event)"
+                <zorgplanner-care-demand (newCareDemandList)="addCareDemandList($event)"
                     (removeCareDemandList)="removeCareDemandList($event)"
-                    [careDemandLists]="careDemand()"></zorgplanner-hour-input>
+                    [careDemandLists]="careDemand()"></zorgplanner-care-demand>
 
             </ng-template>
         </li>

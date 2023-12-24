@@ -37,9 +37,9 @@ export class CareSupplyService {
     return `This action returns all careSupply`;
   }
 
-  findOne(id: number) {
+  findOne(projectId: number) {
     return this.careSupplyRepository.find({
-      where: { project: { id: id } },
+      where: { project: { id: projectId } },
       relations: ['careSupply'],
     });
   }
