@@ -32,7 +32,7 @@ export class ChoroplethService {
   private careDemandService = inject(CareDemandService);
   private careSupplyService = inject(CareSupplyService);
 
-  private centerGroningen: [number, number] = [6.5, 53.259];
+  private centerGroningen: [number, number] = [6.4, 53.259];
 
   mapFeatures!: FeatureCollection;
   svg!: d3.Selection<SVGElement, unknown, HTMLElement, unknown>;
@@ -67,6 +67,7 @@ export class ChoroplethService {
           this.careSupplyService.selectedCareSupplyList()
         );
         this.combineZipcodeData();
+        this.createLegend(this.careSupplyService.selectedCareSupplyList());
       }
     });
   }
@@ -125,9 +126,7 @@ export class ChoroplethService {
         list1.push(entry);
       }
     });
-
     this.plotZipcodeData(list1);
-    // return data;
   }
 
   plotZipcodeData(data: ZipcodeData[]) {
@@ -161,7 +160,7 @@ export class ChoroplethService {
         const alpha = alphaValue(data[index].demand!).toString();
 
         if (data[index].color === null) {
-          return `hsla(0, 100%, 50%, ${alpha})`;
+          return `hsla(0, 100%, 0%, ${alpha})`;
         }
         data[index].color = this.hslToHsla(data[index].color!, +alpha);
         return data[index].color;
@@ -267,6 +266,76 @@ export class ChoroplethService {
       .text(function (d) {
         return d.properties!['postcode4'];
       });
+  }
+
+  createLegend(careSupplyList: CareSupplyList | null = null) {
+    if (careSupplyList === null) {
+      this.svg.selectAll('.legend').remove();
+      return;
+    }
+
+    const keyvalue: { [key: string]: string } = {};
+
+    careSupplyList.careSupply.forEach(
+      (entry: { name: string; color: string }) => {
+        keyvalue[entry.name] = entry.color;
+      }
+    );
+
+    const legend = {
+      dots: {
+        centerX: 25,
+        firstCenterY: 40,
+        radius: 7,
+        spaceBetween: 25,
+        centerY: (i: number) => {
+          return legend.dots.firstCenterY + i * legend.dots.spaceBetween;
+        },
+      },
+      spaceBetweenDotsAndText: 10,
+      text: {
+        get startX() {
+          return (
+            legend.dots.centerX +
+            legend.dots.radius +
+            legend.spaceBetweenDotsAndText
+          );
+        },
+        centerY: (i: number) => {
+          return legend.dots.centerY(i);
+        },
+      },
+    };
+
+    this.svg
+      .selectAll('circles')
+      .data(Object.keys(keyvalue))
+      .enter()
+      .append('circle')
+      .attr('class', 'legend')
+      .attr('cx', legend.dots.centerX)
+      .attr('cy', (d, i) => {
+        return legend.dots.centerY(i);
+      })
+      .attr('r', legend.dots.radius)
+      .style('fill', (d: string) => keyvalue[d] as string);
+
+    this.svg
+      .selectAll('labels')
+      .data(Object.keys(keyvalue))
+      .enter()
+      .append('text')
+      .attr('class', 'legend')
+      .attr('x', legend.text.startX)
+      .attr('y', function (d, i) {
+        return legend.text.centerY(i);
+      })
+      .style('fill', (d: string) => keyvalue[d] as string)
+      .text(function (d) {
+        return Object.keys(keyvalue).find((key) => key === d) as string;
+      })
+      .attr('text-anchor', 'left')
+      .style('alignment-baseline', 'middle');
   }
 
   removeLabels() {

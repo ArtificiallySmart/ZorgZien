@@ -56,7 +56,7 @@ export class ProjectComponent implements OnDestroy {
     return options;
   };
 
-  active = 3;
+  active = 1;
 
   constructor() {
     this.choroplethService.init();
