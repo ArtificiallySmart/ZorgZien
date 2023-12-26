@@ -7,9 +7,9 @@ import {
   CareDemandList,
   EditCareDemandList,
   RemoveCareDemandList,
-} from '../../shared/interfaces/care-demand';
-import { ProjectService } from './project.service';
-import { DataService } from './data.service';
+} from '../../../shared/interfaces/care-demand';
+import { ProjectService } from '../../services/project.service';
+import { DataService } from '../../services/data.service';
 
 export interface CareDemandState {
   careDemandLists: CareDemandList[];

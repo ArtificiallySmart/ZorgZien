@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCareDemandDto } from './dto/create-care-demand.dto';
 import { UpdateCareDemandDto } from './dto/update-care-demand.dto';
 import { CareDemand } from './entities/care-demand.entity';
@@ -29,12 +29,30 @@ export class CareDemandService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} careDemand`;
+  async findOne(id: number) {
+    try {
+      return await this.careDemandRepository.findOneOrFail({
+        where: { id },
+      });
+    } catch (error) {
+      throw new NotFoundException('CareDemand not found');
+    }
   }
 
-  update(id: number, updateCareDemandDto: UpdateCareDemandDto) {
-    return `this returns ${id} and ${updateCareDemandDto}`;
+  async update(id: number, updateCareDemandDto: UpdateCareDemandDto) {
+    const careDemand = await this.findOne(id);
+
+    const { title, careDemand: newCareDemand } = updateCareDemandDto;
+
+    if (title) careDemand.title = title;
+
+    if (newCareDemand)
+      careDemand.careDemand = Object.fromEntries(newCareDemand);
+    try {
+      return await this.careDemandRepository.save(careDemand);
+    } catch (e) {
+      throw new HttpException(e, 500);
+    }
   }
 
   async remove(id: number) {
@@ -42,9 +60,11 @@ export class CareDemandService {
       where: { id },
     });
     if (!careDemand) return;
-    const careNeed = await this.careDemandRepository.remove(careDemand);
+    const deletedCareDemand = await this.careDemandRepository.remove(
+      careDemand
+    );
     return {
-      ...careNeed,
+      ...deletedCareDemand,
       id: id,
     };
   }

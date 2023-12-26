@@ -9,7 +9,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { CareDemandComponent } from './care-demand/care-demand.component';
-import { CareDemandService } from './services/care-demand.service';
+import { CareDemandService } from './care-demand/services/care-demand.service';
 import { ChoroplethService } from './services/choropleth.service';
 import { ParserService } from './services/parser.service';
 import { ProjectService } from './services/project.service';

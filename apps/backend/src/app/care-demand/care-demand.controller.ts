@@ -20,8 +20,8 @@ export class CareDemandController {
     return this.careDemandService.create(createCareDemandDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') projectId: string) {
+  @Get(':projectId')
+  findOne(@Param('projectId') projectId: string) {
     return this.careDemandService.findAll(+projectId);
   }
 

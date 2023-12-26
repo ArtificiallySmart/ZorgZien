@@ -7,7 +7,7 @@ import { Objects } from 'topojson-specification';
 
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { CareSupplyList } from '../../shared/interfaces/care-supply';
-import { CareDemandService } from './care-demand.service';
+import { CareDemandService } from '../care-demand/services/care-demand.service';
 import { CareSupplyService } from './care-supply.service';
 import { DataService } from './data.service';
 
