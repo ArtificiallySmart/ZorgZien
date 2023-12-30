@@ -63,10 +63,10 @@
     </ng-container>
 
     <div *ngIf="selectedList">
-        <ng-container *ngIf="editSupplyList; else displayList">
-            <zorgplanner-edit-care-supply [careSupplyList]="selectedList"></zorgplanner-edit-care-supply>
-        </ng-container>
-        <ng-template #displayList>
+
+        <zorgplanner-edit-care-supply [careSupplyList]="selectedList"></zorgplanner-edit-care-supply>
+
+        <!-- <ng-template #displayList>
             <div class="row">
                 <div class="col-6">
 
@@ -92,7 +92,7 @@
 
                 </div>
             </div>
-        </ng-template>
+        </ng-template> -->
         <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
 
     </div>

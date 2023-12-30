@@ -15,8 +15,10 @@ export class CareDemand {
   @Column()
   title: string;
 
-  @Column('jsonb')
-  careDemand: { [k: string]: number };
+  @Column('int', {
+    array: true,
+  })
+  careDemand: [number, number][];
 
   @CreateDateColumn()
   startDate: Date;

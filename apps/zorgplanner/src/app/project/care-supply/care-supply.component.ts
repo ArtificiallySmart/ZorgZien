@@ -37,8 +37,6 @@ export class CareSupplyComponent {
   areaZipcodes = '';
   color = '';
 
-  editSupplyList = true;
-
   //Blue, BlueViolet, DarkGreen, Gold, LawnGreen, Orange, Sienna
   //#0000FF, #8A2BE2, #006400, #FFD700, #7CFC00, #FFA500, #A0522D
 

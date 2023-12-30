@@ -84,10 +84,10 @@ export class ChoroplethService {
       return [];
     }
     const data: ZipcodeData[] = [];
-    demandList.careDemand.forEach((value, key) => {
+    demandList.careDemand.forEach((entry) => {
       data.push({
-        zipcode: key.toString(),
-        demand: value,
+        zipcode: entry[0].toString(),
+        demand: entry[1],
         assignedTeam: null,
         color: null,
       });

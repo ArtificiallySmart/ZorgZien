@@ -8,7 +8,7 @@ import {
   ApiCareDemandList,
   CareDemandList,
 } from '../../shared/interfaces/care-demand';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -44,42 +44,30 @@ export class DataService {
   }
 
   loadCareDemandLists(projectId: number): Observable<CareDemandList[]> {
-    return this.httpService
-      .get<ApiCareDemandList[]>(`/api/care-demand/${projectId}`)
-      .pipe(
-        map((lists) => {
-          return lists.map((list) => {
-            const careDemandMap = new Map<number, number>();
-            Object.entries(list.careDemand).forEach(([key, value]) => {
-              careDemandMap.set(parseInt(key), value);
-            });
-            return {
-              ...list,
-              careDemand: careDemandMap,
-            };
-          });
-        })
-      );
+    return this.httpService.get<ApiCareDemandList[]>(
+      `/api/care-demand/${projectId}`
+    );
+    // .pipe(
+    //   map((lists) => {
+    //     return lists.map((list) => {
+    //       const careDemandMap = new Map<number, number>();
+    //       Object.entries(list.careDemand).forEach(([key, value]) => {
+    //         careDemandMap.set(parseInt(key), value);
+    //       });
+    //       return {
+    //         ...list,
+    //         careDemand: careDemandMap,
+    //       };
+    //     });
+    //   })
+    // );
   }
 
   addCareDemandList(careDemandList: AddCareDemandList) {
-    return this.httpService
-      .post<ApiCareDemandList, AddCareDemandList>(
-        `/api/care-demand`,
-        careDemandList
-      )
-      .pipe(
-        map((list) => {
-          const careDemandMap = new Map<number, number>();
-          Object.entries(list.careDemand).forEach(([key, value]) => {
-            careDemandMap.set(parseInt(key), value);
-          });
-          return {
-            ...list,
-            careDemand: careDemandMap,
-          };
-        })
-      );
+    return this.httpService.post<ApiCareDemandList, AddCareDemandList>(
+      `/api/care-demand`,
+      careDemandList
+    );
   }
 
   removeCareDemandList(id: string) {

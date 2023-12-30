@@ -1,7 +1,7 @@
 export interface CareDemandList {
   id: string;
   title: string;
-  careDemand: Map<number, number>;
+  careDemand: [number, number][];
   projectId: number;
 }
 
@@ -17,6 +17,6 @@ export type RemoveCareDemandList = CareDemandList['id'];
 export interface ApiCareDemandList {
   id: string;
   title: string;
-  careDemand: Record<number, number>;
+  careDemand: [number, number][];
   projectId: number;
 }

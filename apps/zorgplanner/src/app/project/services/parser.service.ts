@@ -7,16 +7,20 @@ export class ParserService {
   constructor() {}
 
   //todo: make this a bit more robust
-  parse(data: string) {
-    const map = new Map<number, number>();
+  parse(data: string): { arr: [number, number][]; message?: string } {
+    const arr: [number, number][] = [];
+    let message = '';
+
     const rows = data.split('\n');
 
     for (const row of rows) {
       const [key, value] = row.split('\t').map((item) => item.trim());
-      map.set(parseInt(key), parseFloat(value.replace(',', '.')));
+      arr.push([parseInt(key), parseFloat(value.replace(',', '.'))]);
     }
-
-    return map;
+    if ([...new Set(arr)].length !== arr.length) {
+      message = 'Duplicate zipcodes found';
+    }
+    return { arr, message };
   }
 
   parseZipcodes(data: string) {

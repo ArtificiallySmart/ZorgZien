@@ -18,7 +18,7 @@ export class CareDemandService {
     });
     careDemand.title = createCareDemandDto.title;
 
-    careDemand.careDemand = Object.fromEntries(createCareDemandDto.careDemand);
+    careDemand.careDemand = createCareDemandDto.careDemand;
 
     return this.careDemandRepository.save(careDemand);
   }
@@ -46,8 +46,7 @@ export class CareDemandService {
 
     if (title) careDemand.title = title;
 
-    if (newCareDemand)
-      careDemand.careDemand = Object.fromEntries(newCareDemand);
+    if (newCareDemand) careDemand.careDemand = newCareDemand;
     try {
       return await this.careDemandRepository.save(careDemand);
     } catch (e) {

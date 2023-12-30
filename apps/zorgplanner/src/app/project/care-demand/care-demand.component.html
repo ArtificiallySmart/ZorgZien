@@ -30,8 +30,8 @@
     </div>
 
     <div *ngIf="selectedList">
-
-        <h2>{{selectedList.title}}</h2>
+        <zorgplanner-edit-care-demand [careDemandList]="selectedList"></zorgplanner-edit-care-demand>
+        <!-- <h2>{{selectedList.title}}</h2>
 
         <p>{{selectedList.careDemand.size}} postcode{{selectedList.careDemand.size > 1 ? 's' : ''}}. </p>
         <button type="button" class="btn btn-outline-primary ms-2" (click)="isCollapsed = !isCollapsed"
@@ -56,7 +56,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> -->
 
         <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
 

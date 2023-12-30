@@ -23,12 +23,26 @@ export class AuthService {
 
   removeExpiredRefreshTokens = CronJob.from({
     cronTime: '0 0 * * *',
-    onTick: () => {
-      this.tokenRepository.delete({
-        expires: new Date(Date.now()),
-      });
+    onTick: async () => {
+      const toRemove = await this.tokenRepository
+        .createQueryBuilder('token')
+        .where('token.expires < :now', { now: new Date(Date.now()) })
+        .getMany();
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(
+          toRemove.length > 0
+            ? `Removed ${toRemove.length} expired refresh tokens`
+            : 'No expired refresh tokens to remove'
+        );
+      }
+      try {
+        await this.tokenRepository.remove(toRemove);
+      } catch (error) {
+        console.log(error);
+      }
     },
     start: true,
+    runOnInit: process.env.NODE_ENV !== 'production',
   });
 
   createAccessToken(user: Omit<User, 'password'>) {

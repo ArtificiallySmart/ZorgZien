@@ -8,11 +8,17 @@ import {
 } from '../../shared/interfaces/care-demand';
 import { ParserService } from '../services/parser.service';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.component';
 
 @Component({
   selector: 'zorgplanner-care-demand',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbCollapseModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgbCollapseModule,
+    EditCareDemandComponent,
+  ],
   templateUrl: './care-demand.component.html',
   styleUrl: './care-demand.component.css',
 })
@@ -31,9 +37,13 @@ export class CareDemandComponent {
 
   addList() {
     const data = this.parserService.parse(this.zorgUren);
+    if (data.message) {
+      alert(data.message);
+      return;
+    }
     this.newCareDemandList.emit({
       title: this.title,
-      careDemand: data,
+      careDemand: data.arr,
     });
     this.title = this.zorgUren = '';
   }
