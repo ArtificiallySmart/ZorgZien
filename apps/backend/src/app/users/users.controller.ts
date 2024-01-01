@@ -1,23 +1,17 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
   HttpException,
-  Param,
-  ParseIntPipe,
   Post,
-  Put,
   Req,
   Res,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './models/user.entity';
-import { map, catchError, of, forkJoin } from 'rxjs';
-import { Public } from '../auth/decorators/public';
-import { Response, Request } from 'express';
+import { Request, Response } from 'express';
+import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
+import { Public } from '../auth/decorators/public';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
@@ -26,14 +20,14 @@ export class UsersController {
     private authService: AuthService
   ) {}
 
-  @Public()
-  @Post()
-  create(@Body() user: CreateUserDto) {
-    return this.usersService.create(user).pipe(
-      map((user: UserEntity) => user),
-      catchError((err) => of({ error: err.message }))
-    );
-  }
+  // @Public()
+  // @Post()
+  // create(@Body() user: CreateUserDto) {
+  //   return this.usersService.create(user).pipe(
+  //     map((user: UserEntity) => user),
+  //     catchError((err) => of({ error: err.message }))
+  //   );
+  // }
 
   @Public()
   @Post('login')
@@ -93,23 +87,23 @@ export class UsersController {
     // return res.send({ accessToken: newAccessToken });
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.usersService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOneById(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.usersService.findOneById(id);
+  // }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() user: UserEntity) {
-    return this.usersService.updateOne(+id, user);
-  }
+  // @Put(':id')
+  // update(@Param('id') id: string, @Body() user: UserEntity) {
+  //   return this.usersService.updateOne(+id, user);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.deleteOne(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.deleteOne(+id);
+  // }
 }
