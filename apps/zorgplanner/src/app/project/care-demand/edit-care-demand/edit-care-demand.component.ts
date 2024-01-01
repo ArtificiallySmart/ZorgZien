@@ -39,7 +39,7 @@ export class EditCareDemandComponent implements OnInit {
     const zipcodes = this.careDemandList.careDemand.map(
       (careDemand) => careDemand[0]
     );
-    this.rangeArr$.next(this.makeRangeValues(zipcodes));
+    this.rangeArr = this.makeRangeValues(zipcodes);
     this.initForm();
   }
 
@@ -65,6 +65,15 @@ export class EditCareDemandComponent implements OnInit {
 
   deleteDemand(index: number) {
     this.careDemand.removeAt(index);
+  }
+
+  addDemand(zipcode: number, amount: number) {
+    this.careDemand.push(
+      this.fb.group({
+        zipcode: zipcode,
+        amount: amount,
+      })
+    );
   }
 
   demandByIndex(index: number) {

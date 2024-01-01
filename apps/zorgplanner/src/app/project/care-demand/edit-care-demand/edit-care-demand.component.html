@@ -14,7 +14,12 @@
             </div>
 
             <h3>Zorgvraag per postcode</h3>
-
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" #zipInput>
+                <input type="text" class="form-control" #amInput>
+                <div class="input-group-text" id="addDemand" (click)="addDemand(+zipInput.value, +amInput.value)"><i
+                        class="bi bi-x-lg"></i></div>
+            </div>
 
             <div ngbAccordion>
                 <ng-container

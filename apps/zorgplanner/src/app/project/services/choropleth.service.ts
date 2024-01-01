@@ -165,7 +165,16 @@ export class ChoroplethService {
         data[index].color = this.hslToHsla(data[index].color!, +alpha);
         return data[index].color;
       })
-      .attr('transform', this.transform?.toString() ?? null);
+      .attr('transform', this.transform?.toString() ?? null)
+      .attr('class', (d) => {
+        const index = data.findIndex(
+          (entry) => entry.zipcode === d.properties!['postcode4']
+        );
+        if (index === -1) {
+          return 'unassigned';
+        }
+        return `${data[index].assignedTeam?.replace(/ /g, '').toLowerCase()}`;
+      });
 
     this.addMouseOver();
     this.addClick(data);
@@ -314,7 +323,7 @@ export class ChoroplethService {
       .append('circle')
       .attr('class', 'legend')
       .attr('cx', legend.dots.centerX)
-      .attr('cy', (d, i) => {
+      .attr('cy', (_, i) => {
         return legend.dots.centerY(i);
       })
       .attr('r', legend.dots.radius)
@@ -327,7 +336,7 @@ export class ChoroplethService {
       .append('text')
       .attr('class', 'legend')
       .attr('x', legend.text.startX)
-      .attr('y', function (d, i) {
+      .attr('y', function (_, i) {
         return legend.text.centerY(i);
       })
       .style('fill', (d: string) => keyvalue[d] as string)
@@ -335,7 +344,25 @@ export class ChoroplethService {
         return Object.keys(keyvalue).find((key) => key === d) as string;
       })
       .attr('text-anchor', 'left')
-      .style('alignment-baseline', 'middle');
+      .style('alignment-baseline', 'middle')
+      .style('cursor', 'pointer');
+
+    console.log(keyvalue);
+    this.addLegendMouseOver();
+  }
+
+  addLegendMouseOver() {
+    const svg = this.svg;
+    svg
+      .selectAll('.legend')
+      .on('mouseover', function (_, d) {
+        const className = (d as string).replace(/ /g, '').toLowerCase();
+        d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
+      })
+      .on('mouseout', function (_, d) {
+        const className = (d as string).replace(/ /g, '').toLowerCase();
+        d3.selectAll(`.${className}`).attr('stroke', 'grey').lower();
+      });
   }
 
   removeLabels() {
@@ -343,12 +370,7 @@ export class ChoroplethService {
   }
 
   togglePostcode(value: boolean) {
-    if (value) {
-      this.createLabels();
-    }
-    if (!value) {
-      this.removeLabels();
-    }
+    value ? this.createLabels() : this.removeLabels();
   }
 
   zoomed = ({ transform }: { transform: d3.ZoomTransform }) => {
