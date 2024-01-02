@@ -49,6 +49,8 @@ export class ChoroplethService {
     zipcodeData: {} as ZipcodeData,
   });
 
+  unassignedColor = 'hsla(0, 100%, 0%, 1)';
+
   // clickLocation = signal<[number, number]>([0, 0]);
 
   constructor() {
@@ -67,7 +69,7 @@ export class ChoroplethService {
           this.careSupplyService.selectedCareSupplyList()
         );
         this.combineZipcodeData();
-        this.createLegend(this.careSupplyService.selectedCareSupplyList());
+        //this.createLegend(this.careSupplyService.selectedCareSupplyList());
       }
     });
   }
@@ -79,6 +81,13 @@ export class ChoroplethService {
     });
   }
 
+  getUnassignedColor(alpha: number, hsl: boolean = false) {
+    if (hsl) {
+      return `hsl(0, 100%, 0%)`;
+    }
+    return `hsla(0, 100%, 0%, ${alpha})`;
+  }
+
   convertDemandList(demandList: CareDemandList | null) {
     if (demandList === null) {
       return [];
@@ -88,7 +97,7 @@ export class ChoroplethService {
       data.push({
         zipcode: entry[0].toString(),
         demand: entry[1],
-        assignedTeam: null,
+        assignedTeam: 'Niet toegewezen',
         color: null,
       });
     });
@@ -127,6 +136,7 @@ export class ChoroplethService {
       }
     });
     this.plotZipcodeData(list1);
+    this.createLegend(list1);
   }
 
   plotZipcodeData(data: ZipcodeData[]) {
@@ -160,7 +170,7 @@ export class ChoroplethService {
         const alpha = alphaValue(data[index].demand!).toString();
 
         if (data[index].color === null) {
-          return `hsla(0, 100%, 0%, ${alpha})`;
+          return this.getUnassignedColor(+alpha);
         }
         data[index].color = this.hslToHsla(data[index].color!, +alpha);
         return data[index].color;
@@ -184,8 +194,16 @@ export class ChoroplethService {
     if (hsl.startsWith('hsla')) {
       return hsl;
     }
-    const hsla = hsl.replace(')', `, ${alpha})`);
+    const hsla = hsl.replace(')', `, ${alpha})`).replace('hsl(', 'hsla(');
     return hsla;
+  }
+
+  hslaToHsl(hsla: string) {
+    if (hsla.startsWith('hsl(')) {
+      return hsla;
+    }
+    const hsl = hsla.replace(/, [0-9.]+\)/, ')').replace('hsla(', 'hsl(');
+    return hsl;
   }
 
   addMouseOver() {
@@ -250,7 +268,7 @@ export class ChoroplethService {
 
     const zoom = d3
       .zoom<SVGElement, unknown>()
-      .scaleExtent([-10, 8])
+      .scaleExtent([1, 8])
       .on('zoom', this.zoomed);
 
     svg.call(zoom);
@@ -277,19 +295,22 @@ export class ChoroplethService {
       });
   }
 
-  createLegend(careSupplyList: CareSupplyList | null = null) {
-    if (careSupplyList === null) {
+  createLegend(zipcodeData: ZipcodeData[]) {
+    try {
       this.svg.selectAll('.legend').remove();
+    } catch (error) {
       return;
     }
 
     const keyvalue: { [key: string]: string } = {};
 
-    careSupplyList.careSupply.forEach(
-      (entry: { name: string; color: string }) => {
-        keyvalue[entry.name] = entry.color;
+    zipcodeData.forEach((entry) => {
+      if (entry.color === null) {
+        keyvalue[entry.assignedTeam!] = this.getUnassignedColor(1, true);
+        return;
       }
-    );
+      keyvalue[entry.assignedTeam!] = this.hslaToHsl(entry.color!);
+    });
 
     const legend = {
       dots: {
@@ -318,7 +339,7 @@ export class ChoroplethService {
 
     this.svg
       .selectAll('circles')
-      .data(Object.keys(keyvalue))
+      .data(Object.keys(keyvalue).sort())
       .enter()
       .append('circle')
       .attr('class', 'legend')
@@ -331,7 +352,7 @@ export class ChoroplethService {
 
     this.svg
       .selectAll('labels')
-      .data(Object.keys(keyvalue))
+      .data(Object.keys(keyvalue).sort())
       .enter()
       .append('text')
       .attr('class', 'legend')
@@ -347,7 +368,6 @@ export class ChoroplethService {
       .style('alignment-baseline', 'middle')
       .style('cursor', 'pointer');
 
-    console.log(keyvalue);
     this.addLegendMouseOver();
   }
 

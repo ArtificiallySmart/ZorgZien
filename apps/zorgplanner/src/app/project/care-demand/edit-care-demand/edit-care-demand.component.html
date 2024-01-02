@@ -4,7 +4,8 @@
     (click)="resetValues($event)">Annuleren</button>
 <button *ngIf="editingEnabled" type="submit" class="btn btn-success me-3" (click)="onSubmit()">Opslaan</button>
 
-<button *ngIf="editingEnabled" type="button" class="btn btn-danger" (click)="removeCareDemandList">Verwijderen</button>
+<button *ngIf="editingEnabled" type="button" class="btn btn-danger"
+    (click)="removeCareDemandList()">Verwijderen</button>
 
 <div class="row" *ngIf="(careDemandList$ | async) as careDemandList">
 

@@ -116,8 +116,9 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
     return Array.from({ length: (high - low) / 100 }, (_, i) => low + i * 100);
   }
 
-  removeCareDemandList(event: string) {
-    this.careDemandService.removeCareDemandList(event);
+  removeCareDemandList() {
+    const id = this.careDemandListBS.value.id;
+    this.careDemandService.removeCareDemandList(id);
     this.clearSelectedCareDemandList.emit();
   }
 

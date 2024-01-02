@@ -32,7 +32,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-                            <select class="form-control" id="exampleFormControlSelect1"
+                            <select class="form-select" id="exampleFormControlSelect1"
                                 [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
 
                                 <option value="test" *ngIf="careDemand().length === 0; else lists">U heeft nog geen
@@ -50,7 +50,7 @@
 
                         <div class="form-group">
                             <label for="exampleFormControlSelect2">Selecteer een Zorgbeschikbaarheid lijst:</label>
-                            <select class="form-control" id="exampleFormControlSelect2"
+                            <select class="form-select" id="exampleFormControlSelect2"
                                 [disabled]="(careSupply().length === 0) ? true : false"
                                 (change)="selectSupplyList($event)">
 
