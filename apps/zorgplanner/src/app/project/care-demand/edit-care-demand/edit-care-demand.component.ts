@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, map } from 'rxjs';
@@ -17,10 +25,11 @@ import { CareDemandService } from '../services/care-demand.service';
     ZipcodeRangePipe,
   ],
   templateUrl: './edit-care-demand.component.html',
-  styleUrl: './edit-care-demand.component.css',
+  styleUrl: './edit-care-demand.component.scss',
 })
-export class EditCareDemandComponent implements OnInit {
+export class EditCareDemandComponent implements OnInit, OnChanges {
   @Input() selectedCareDemandList!: CareDemandList;
+  @Output() clearSelectedCareDemandList = new EventEmitter();
 
   private careDemandListBS: BehaviorSubject<CareDemandList> =
     new BehaviorSubject({} as CareDemandList);
@@ -36,8 +45,18 @@ export class EditCareDemandComponent implements OnInit {
     this.careDemandListBS.next(this.selectedCareDemandList);
   }
 
-  resetValues() {
+  ngOnChanges(): void {
     this.careDemandListBS.next(this.selectedCareDemandList);
+  }
+
+  resetValues(event: Event) {
+    (event.target as HTMLElement).focus();
+    this.careDemandListBS.next(this.selectedCareDemandList);
+    this.toggleEditing();
+  }
+
+  toggleEditing() {
+    this.editingEnabled = !this.editingEnabled;
   }
 
   groupedCareDemand$ = this.careDemandList$.pipe(
@@ -62,16 +81,22 @@ export class EditCareDemandComponent implements OnInit {
     })
   );
 
-  deleteDemand(zipcode: number, amount: number) {
+  deleteDemand(zipcode: number) {
+    if (!this.editingEnabled) return;
+    const oldCareDemand = this.careDemandListBS.value;
+
     this.careDemandListBS.next({
       ...this.selectedCareDemandList,
-      careDemand: this.selectedCareDemandList.careDemand.filter(
-        (careDemand) => careDemand[0] !== zipcode && careDemand[1] !== amount
-      ),
+      careDemand: [
+        ...oldCareDemand.careDemand.filter(
+          (careDemand) => careDemand[0] !== zipcode
+        ),
+      ],
     });
   }
 
   addDemand(zipcode: number, amount: number) {
+    if (!this.editingEnabled) return;
     this.careDemandListBS.next({
       ...this.selectedCareDemandList,
       careDemand: [
@@ -91,5 +116,16 @@ export class EditCareDemandComponent implements OnInit {
     return Array.from({ length: (high - low) / 100 }, (_, i) => low + i * 100);
   }
 
-  onSubmit(): void {}
+  removeCareDemandList(event: string) {
+    this.careDemandService.removeCareDemandList(event);
+    this.clearSelectedCareDemandList.emit();
+  }
+
+  onSubmit(): void {
+    const id = this.careDemandListBS.value.id;
+    const data = this.careDemandListBS.value;
+    this.careDemandService.updateCareDemandList({ id, data });
+
+    this.toggleEditing();
+  }
 }

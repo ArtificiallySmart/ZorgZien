@@ -80,16 +80,26 @@ export class CareDemandService {
       }))
     );
 
-    this.edit$.pipe(takeUntilDestroyed()).subscribe((update) =>
-      this.state.update((state) => ({
-        ...state,
-        careDemandLists: state.careDemandLists.map((careDemandList) =>
-          careDemandList.id === update.id
-            ? { ...careDemandList, ...update.data, title: update.data.title }
-            : careDemandList
-        ),
-      }))
-    );
+    this.edit$.pipe(takeUntilDestroyed()).subscribe({
+      next: (update) =>
+        this.state.update((state) => ({
+          ...state,
+          careDemandLists: state.careDemandLists.map((careDemandList) =>
+            careDemandList.id === update.id
+              ? { ...careDemandList, ...update.data }
+              : careDemandList
+          ),
+          selectedCareDemandList:
+            state.selectedCareDemandList?.id === update.id
+              ? { ...state.selectedCareDemandList, ...update.data }
+              : state.selectedCareDemandList,
+        })),
+      error: (err) =>
+        this.state.update((state) => ({
+          ...state,
+          error: err,
+        })),
+    });
 
     this.selectCareDemandListId$
       .pipe(takeUntilDestroyed())
@@ -116,6 +126,15 @@ export class CareDemandService {
         this.loadCareDemandLists(this.project().id);
         return;
       }
+    });
+  }
+
+  updateCareDemandList(update: EditCareDemandList) {
+    this.dataService.editCareDemandList(update).subscribe({
+      next: () => {
+        this.edit$.next(update);
+      },
+      error: (err) => this.edit$.next(err),
     });
   }
 

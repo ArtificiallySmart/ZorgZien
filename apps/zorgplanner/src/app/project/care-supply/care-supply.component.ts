@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ColorPickerModule } from 'ngx-color-picker';
 import {
-  AddCareSupplyList,
   CareSupplyEntry,
   CareSupplyList,
   RemoveCareSupplyList,
 } from '../../shared/interfaces/care-supply';
 import { EditCareSupplyComponent } from './edit-care-supply/edit-care-supply.component';
+import { CareSupplyService } from '../services/care-supply.service';
 
 @Component({
   selector: 'zorgplanner-care-supply',
@@ -23,11 +23,9 @@ import { EditCareSupplyComponent } from './edit-care-supply/edit-care-supply.com
   styleUrl: './care-supply.component.scss',
 })
 export class CareSupplyComponent {
-  @Output() newCareSupplyList = new EventEmitter<
-    Omit<AddCareSupplyList, 'projectId'>
-  >();
-  @Output() removeCareSupplyList = new EventEmitter<RemoveCareSupplyList>();
   @Input() careSupplyLists: CareSupplyList[] = [];
+
+  private careSupplyService = inject(CareSupplyService);
 
   selectedList: CareSupplyList | undefined;
 
@@ -72,7 +70,7 @@ export class CareSupplyComponent {
   }
 
   submitList() {
-    this.newCareSupplyList.emit({
+    this.careSupplyService.addCareSupplyList({
       title: this.title,
       careSupply: this.careSupplyEntries,
     });
@@ -81,7 +79,7 @@ export class CareSupplyComponent {
   }
 
   removeList(listId: RemoveCareSupplyList) {
-    this.removeCareSupplyList.emit(listId);
+    this.careSupplyService.removeCareSupplyList(listId);
     this.selectedList = undefined;
   }
 

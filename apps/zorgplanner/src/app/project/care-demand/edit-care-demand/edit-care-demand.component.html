@@ -1,7 +1,10 @@
-<button *ngIf="!editingEnabled" type="button" class="btn btn-warning" (click)="editingEnabled = !editingEnabled">Lijst
+<button *ngIf="!editingEnabled" type="button" class="btn btn-warning" (click)="toggleEditing()">Lijst
     aanpassen</button>
-<button *ngIf="editingEnabled" type="button" class="btn btn-warning me-3" (click)="resetValues()">Annuleren</button>
-<button *ngIf="editingEnabled" type="submit" class="btn btn-success">Opslaan</button>
+<button *ngIf="editingEnabled" type="button" class="btn btn-warning me-3"
+    (click)="resetValues($event)">Annuleren</button>
+<button *ngIf="editingEnabled" type="submit" class="btn btn-success me-3" (click)="onSubmit()">Opslaan</button>
+
+<button *ngIf="editingEnabled" type="button" class="btn btn-danger" (click)="removeCareDemandList">Verwijderen</button>
 
 <div class="row" *ngIf="(careDemandList$ | async) as careDemandList">
 
@@ -46,7 +49,11 @@
                                         <tr *ngFor="let entry of demandGroup">
                                             <td>{{entry[0]}}</td>
                                             <td>{{entry[1]}}</td>
-                                            <td><i class="bi bi-trash" (click)="deleteDemand(entry[0], entry[1])"></i>
+                                            <td>
+                                                <div class="delete-entry">
+                                                    <i class="bi bi-trash" (click)="deleteDemand(entry[0])"
+                                                        [ngClass]="editingEnabled ? '' : 'icon-disabled'"></i>
+                                                </div>
                                             </td>
                                         </tr>
 

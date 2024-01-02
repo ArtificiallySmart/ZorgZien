@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  AddCareDemandList,
-  CareDemandList,
-  RemoveCareDemandList,
-} from '../../shared/interfaces/care-demand';
-import { ParserService } from '../services/parser.service';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { CareDemandList } from '../../shared/interfaces/care-demand';
+import { ParserService } from '../services/parser.service';
 import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.component';
+import { CareDemandService } from './services/care-demand.service';
 
 @Component({
   selector: 'zorgplanner-care-demand',
@@ -24,10 +21,8 @@ import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.com
 })
 export class CareDemandComponent {
   private parserService = inject(ParserService);
-  @Output() newCareDemandList = new EventEmitter<
-    Omit<AddCareDemandList, 'projectId'>
-  >();
-  @Output() removeCareDemandList = new EventEmitter<RemoveCareDemandList>();
+  private careDemandService = inject(CareDemandService);
+
   @Input() careDemandLists: CareDemandList[] = [];
 
   selectedList: CareDemandList | undefined;
@@ -41,7 +36,7 @@ export class CareDemandComponent {
       alert(data.message);
       return;
     }
-    this.newCareDemandList.emit({
+    this.careDemandService.addCareDemandList({
       title: this.title,
       careDemand: data.arr,
     });
@@ -54,8 +49,7 @@ export class CareDemandComponent {
     this.selectedList = list;
   }
 
-  removeList(listId: RemoveCareDemandList) {
-    this.removeCareDemandList.emit(listId);
+  clearSelectedCareDemandList() {
     this.selectedList = undefined;
   }
 }

@@ -80,18 +80,14 @@
 
             <button ngbNavLink>Zorgbehoefte</button>
             <ng-template ngbNavContent>
-                <zorgplanner-care-demand (newCareDemandList)="addCareDemandList($event)"
-                    (removeCareDemandList)="removeCareDemandList($event)"
-                    [careDemandLists]="careDemand()"></zorgplanner-care-demand>
+                <zorgplanner-care-demand [careDemandLists]="careDemand()"></zorgplanner-care-demand>
 
             </ng-template>
         </li>
         <li [ngbNavItem]="3">
             <button ngbNavLink>Zorgbeschikbaarheid</button>
             <ng-template ngbNavContent>
-                <zorgplanner-care-supply (newCareSupplyList)="addCareSupplyList($event)"
-                    (removeCareSupplyList)="removeCareSupplyList($event)"
-                    [careSupplyLists]="careSupply()"></zorgplanner-care-supply>
+                <zorgplanner-care-supply [careSupplyLists]="careSupply()"></zorgplanner-care-supply>
             </ng-template>
         </li>
     </ul>

@@ -7,7 +7,6 @@ import {
   NgbPopover,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AddCareDemandList } from '../shared/interfaces/care-demand';
 import { CareDemandComponent } from './care-demand/care-demand.component';
 import { CareDemandService } from './care-demand/services/care-demand.service';
 import { ChoroplethService } from './services/choropleth.service';
@@ -15,7 +14,6 @@ import { ParserService } from './services/parser.service';
 import { ProjectService } from './services/project.service';
 import { CareSupplyComponent } from './care-supply/care-supply.component';
 import { CareSupplyService } from './services/care-supply.service';
-import { AddCareSupplyList } from '../shared/interfaces/care-supply';
 import { Options } from '@popperjs/core';
 
 @Component({
@@ -99,18 +97,6 @@ export class ProjectComponent implements OnDestroy {
     this.choroplethService.togglePostcode(target.checked);
   }
 
-  addCareDemandList(event: Omit<AddCareDemandList, 'projectId'>) {
-    this.careDemandService.addCareDemandList(event);
-  }
-
-  removeCareDemandList(event: string) {
-    this.careDemandService.removeCareDemandList(event);
-  }
-
-  removeCareSupplyList(event: string) {
-    this.careSupplyService.removeCareSupplyList(event);
-  }
-
   selectList(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.careDemandService.selectCareDemandListId$.next(target.value);
@@ -119,10 +105,6 @@ export class ProjectComponent implements OnDestroy {
   selectSupplyList(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.careSupplyService.selectCareSupplyListId$.next(target.value);
-  }
-
-  addCareSupplyList(event: Omit<AddCareSupplyList, 'projectId'>) {
-    this.careSupplyService.addCareSupplyList(event);
   }
 
   ngOnDestroy() {

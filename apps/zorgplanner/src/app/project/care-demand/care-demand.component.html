@@ -30,7 +30,8 @@
     </div>
 
     <div *ngIf="selectedList">
-        <zorgplanner-edit-care-demand [selectedCareDemandList]="selectedList"></zorgplanner-edit-care-demand>
+        <zorgplanner-edit-care-demand [selectedCareDemandList]="selectedList"
+            (clearSelectedCareDemandList)="clearSelectedCareDemandList()"></zorgplanner-edit-care-demand>
         <!-- <h2>{{selectedList.title}}</h2>
 
         <p>{{selectedList.careDemand.size}} postcode{{selectedList.careDemand.size > 1 ? 's' : ''}}. </p>
@@ -58,7 +59,6 @@
             </div>
         </div> -->
 
-        <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
 
     </div>
 

@@ -7,6 +7,7 @@ import {
   AddCareDemandList,
   ApiCareDemandList,
   CareDemandList,
+  EditCareDemandList,
 } from '../../shared/interfaces/care-demand';
 import { Observable } from 'rxjs';
 import {
@@ -67,6 +68,13 @@ export class DataService {
     return this.httpService.post<ApiCareDemandList, AddCareDemandList>(
       `/api/care-demand`,
       careDemandList
+    );
+  }
+
+  editCareDemandList(careDemandList: EditCareDemandList) {
+    return this.httpService.patch<CareDemandList, AddCareDemandList>(
+      `/api/care-demand/${careDemandList.id}`,
+      careDemandList.data
     );
   }
 
