@@ -11,7 +11,10 @@ import {
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, map } from 'rxjs';
-import { CareDemandList } from '../../../shared/interfaces/care-demand';
+import {
+  CareDemandList,
+  CareDemandEntry,
+} from '../../../shared/interfaces/care-demand';
 import { ZipcodeRangePipe } from '../../../shared/pipes/zipcode-range.pipe';
 import { CareDemandService } from '../services/care-demand.service';
 
@@ -62,11 +65,12 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   groupedCareDemand$ = this.careDemandList$.pipe(
     map((careDemandList) => {
       const range = this.makeRangeValues(
-        careDemandList.careDemand.map((careDemand) => careDemand[0])
+        careDemandList.careDemand.map((careDemand) => careDemand.zipcode)
       );
       return range.map((range) => {
         const group = careDemandList.careDemand.filter(
-          (careDemand) => careDemand[0] >= range && careDemand[0] < range + 100
+          (careDemand) =>
+            careDemand.zipcode >= range && careDemand.zipcode < range + 100
         );
         return group.sort();
       });
@@ -76,7 +80,7 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   zipcodeRange$ = this.careDemandList$.pipe(
     map((careDemandList) => {
       return this.makeRangeValues(
-        careDemandList.careDemand.map((careDemand) => careDemand[0])
+        careDemandList.careDemand.map((careDemand) => careDemand.zipcode)
       );
     })
   );
@@ -89,20 +93,23 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
       ...this.selectedCareDemandList,
       careDemand: [
         ...oldCareDemand.careDemand.filter(
-          (careDemand) => careDemand[0] !== zipcode
+          (careDemand) => careDemand.zipcode !== zipcode
         ),
       ],
     });
   }
 
-  addDemand(zipcode: number, amount: number) {
+  addDemand(zipcode: number, amountClient: number, amountHours: number) {
     if (!this.editingEnabled) return;
+    const newEntry: CareDemandEntry = {
+      zipcode,
+      clients: amountClient,
+      hours: amountHours,
+      careDemandListId: this.selectedCareDemandList.id,
+    };
     this.careDemandListBS.next({
       ...this.selectedCareDemandList,
-      careDemand: [
-        ...this.selectedCareDemandList.careDemand,
-        [zipcode, amount],
-      ],
+      careDemand: [...this.selectedCareDemandList.careDemand, newEntry],
     });
   }
 

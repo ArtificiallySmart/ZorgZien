@@ -13,7 +13,7 @@ import { ChoroplethService } from './services/choropleth.service';
 import { ParserService } from './services/parser.service';
 import { ProjectService } from './services/project.service';
 import { CareSupplyComponent } from './care-supply/care-supply.component';
-import { CareSupplyService } from './services/care-supply.service';
+import { CareSupplyService } from './care-supply/services/care-supply.service';
 import { Options } from '@popperjs/core';
 
 @Component({

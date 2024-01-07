@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Project } from './projects/entities/project.entity';
 import { CareDemandModule } from './care-demand/care-demand.module';
-import { CareDemand } from './care-demand/entities/care-demand.entity';
+import { CareDemandList } from './care-demand/entities/care-demand-list.entity';
 import { CareSupplyModule } from './care-supply/care-supply.module';
 import { CareSupplyEntry } from './care-supply/entities/care-supply-entry.entity';
 import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { UserEntity } from './users/models/user.entity';
 import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
+import { CareDemandEntry } from './care-demand/entities/care-demand-entry.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
       url: process.env.DATABASE_URL,
       entities: [
         Project,
-        CareDemand,
+        CareDemandList,
+        CareDemandEntry,
         CareSupplyEntry,
         CareSupplyList,
         UserEntity,

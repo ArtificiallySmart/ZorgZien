@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { CareDemandService } from './project/care-demand/services/care-demand.service';
 import { ProjectService } from './project/services/project.service';
-import { CareSupplyService } from './project/services/care-supply.service';
+import { CareSupplyService } from './project/care-supply/services/care-supply.service';
 import { AuthService } from './auth/services/auth.service';
 
 @Component({

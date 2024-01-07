@@ -3,6 +3,7 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -12,7 +13,7 @@ class CreateCareSupplyEntryDto {
   @IsString()
   name: string;
 
-  @IsInt()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsOptional()
   amount?: number;
 

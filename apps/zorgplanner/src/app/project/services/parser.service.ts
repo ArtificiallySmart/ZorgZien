@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CareDemandEntry } from '../../shared/interfaces/care-demand';
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +8,11 @@ export class ParserService {
   constructor() {}
 
   //todo: make this a bit more robust
-  parse(data: string): { arr: [number, number][]; message?: string } {
+  parse(data: string): {
+    demandValues: Omit<CareDemandEntry, 'id' | 'careDemandListId'>[];
+    message?: string;
+  } {
+    const demandValues: Omit<CareDemandEntry, 'id' | 'careDemandListId'>[] = [];
     const arr: [number, number][] = [];
     let message = '';
 
@@ -20,7 +25,7 @@ export class ParserService {
     if ([...new Set(arr)].length !== arr.length) {
       message = 'Duplicate zipcodes found';
     }
-    return { arr, message };
+    return { demandValues, message };
   }
 
   parseZipcodes(data: string) {

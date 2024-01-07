@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { CareSupplyList } from './care-supply-list.entity';
+import { ColumnNumericTransformer } from '../../shared/transformers/decimal-column.transformer';
 
 @Entity()
 export class CareSupplyEntry {
@@ -18,7 +19,12 @@ export class CareSupplyEntry {
   @Column()
   color: string;
 
-  @Column({ nullable: true, type: 'int' })
+  @Column('numeric', {
+    precision: 6,
+    scale: 2,
+    nullable: true,
+    transformer: new ColumnNumericTransformer(),
+  })
   amount?: number;
 
   @Column('simple-array', { nullable: true })

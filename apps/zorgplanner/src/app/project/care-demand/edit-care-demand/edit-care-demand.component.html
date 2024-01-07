@@ -18,9 +18,10 @@
         <h3>Zorgvraag per postcode</h3>
         <div class="input-group mb-3">
             <input type="text" class="form-control" #zipInput>
-            <input type="text" class="form-control" #amInput>
-            <div class="input-group-text" id="addDemand" (click)="addDemand(+zipInput.value, +amInput.value)"><i
-                    class="bi bi-x-lg"></i></div>
+            <input type="text" class="form-control" #clientAmt>
+            <input type="text" class="form-control" #hourAmt>
+            <div class="input-group-text" id="addDemand"
+                (click)="addDemand(+zipInput.value, +clientAmt.value, +hourAmt.value)"><i class="bi bi-x-lg"></i></div>
         </div>
 
         <div ngbAccordion>
@@ -42,17 +43,19 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Postcode</th>
-                                            <th scope="col">Zorgvraag</th>
+                                            <th scope="col">Aantal clienten</th>
+                                            <th scope="col">Aantal zorg uren</th>
                                             <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let entry of demandGroup">
-                                            <td>{{entry[0]}}</td>
-                                            <td>{{entry[1]}}</td>
+                                            <td>{{entry.zipcode}}</td>
+                                            <td>{{entry.clients}}</td>
+                                            <td>{{entry.hours}}</td>
                                             <td>
                                                 <div class="delete-entry">
-                                                    <i class="bi bi-trash" (click)="deleteDemand(entry[0])"
+                                                    <i class="bi bi-trash" (click)="deleteDemand(entry.zipcode)"
                                                         [ngClass]="editingEnabled ? '' : 'icon-disabled'"></i>
                                                 </div>
                                             </td>

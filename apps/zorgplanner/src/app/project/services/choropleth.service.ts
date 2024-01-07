@@ -8,12 +8,14 @@ import { Objects } from 'topojson-specification';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { CareSupplyList } from '../../shared/interfaces/care-supply';
 import { CareDemandService } from '../care-demand/services/care-demand.service';
-import { CareSupplyService } from './care-supply.service';
+import { CareSupplyService } from '../care-supply/services/care-supply.service';
 import { DataService } from './data.service';
 
 export interface ZipcodeData {
   zipcode: string;
   demand: number | null;
+  amountOfClients: number | null;
+  amountOfHours: number | null;
   assignedTeam: string | null;
   color: string | null;
 }
@@ -95,8 +97,10 @@ export class ChoroplethService {
     const data: ZipcodeData[] = [];
     demandList.careDemand.forEach((entry) => {
       data.push({
-        zipcode: entry[0].toString(),
-        demand: entry[1],
+        zipcode: entry.zipcode.toString(),
+        demand: entry.clients ?? 0,
+        amountOfClients: entry.clients ?? 0,
+        amountOfHours: entry.hours ?? 0,
         assignedTeam: 'Niet toegewezen',
         color: null,
       });
@@ -114,6 +118,8 @@ export class ChoroplethService {
         data.push({
           zipcode: zipcode,
           demand: null,
+          amountOfClients: null,
+          amountOfHours: null,
           assignedTeam: entry.name,
           color: entry.color,
         });
@@ -360,7 +366,7 @@ export class ChoroplethService {
       .attr('y', function (_, i) {
         return legend.text.centerY(i);
       })
-      .style('fill', (d: string) => keyvalue[d] as string)
+      //.style('fill', (d: string) => keyvalue[d] as string)
       .text(function (d) {
         return Object.keys(keyvalue).find((key) => key === d) as string;
       })

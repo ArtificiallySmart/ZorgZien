@@ -38,7 +38,7 @@ export class CareDemandComponent {
     }
     this.careDemandService.addCareDemandList({
       title: this.title,
-      careDemand: data.arr,
+      careDemand: data.demandValues,
     });
     this.title = this.zorgUren = '';
   }

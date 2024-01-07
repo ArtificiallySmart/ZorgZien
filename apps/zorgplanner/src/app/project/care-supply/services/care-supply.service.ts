@@ -4,9 +4,9 @@ import {
   CareSupplyList,
   EditCareSupplyList,
   RemoveCareSupplyList,
-} from '../../shared/interfaces/care-supply';
-import { DataService } from './data.service';
-import { ProjectService } from './project.service';
+} from '../../../shared/interfaces/care-supply';
+import { DataService } from '../../services/data.service';
+import { ProjectService } from '../../services/project.service';
 import { Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

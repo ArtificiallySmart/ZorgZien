@@ -5,7 +5,6 @@ import { Objects } from 'topojson-specification';
 import { AddProject, Project } from '../../shared/interfaces/project';
 import {
   AddCareDemandList,
-  ApiCareDemandList,
   CareDemandList,
   EditCareDemandList,
 } from '../../shared/interfaces/care-demand';
@@ -45,7 +44,7 @@ export class DataService {
   }
 
   loadCareDemandLists(projectId: number): Observable<CareDemandList[]> {
-    return this.httpService.get<ApiCareDemandList[]>(
+    return this.httpService.get<CareDemandList[]>(
       `/api/care-demand/${projectId}`
     );
     // .pipe(
@@ -65,7 +64,7 @@ export class DataService {
   }
 
   addCareDemandList(careDemandList: AddCareDemandList) {
-    return this.httpService.post<ApiCareDemandList, AddCareDemandList>(
+    return this.httpService.post<CareDemandList, AddCareDemandList>(
       `/api/care-demand`,
       careDemandList
     );

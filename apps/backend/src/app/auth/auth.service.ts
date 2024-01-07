@@ -85,8 +85,11 @@ export class AuthService {
         if (exists) {
           throw new UnauthorizedException('Invalid refresh token');
         } else {
-          const newToken = this.tokenRepository.create({ token: oldTokenId });
+          console.log('token does not exist');
           try {
+            const newToken = this.tokenRepository.create({
+              token: oldTokenId,
+            });
             this.tokenRepository.save(newToken);
           } catch (error) {
             console.log(error);

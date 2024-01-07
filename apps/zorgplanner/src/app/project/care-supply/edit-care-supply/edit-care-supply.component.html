@@ -39,6 +39,11 @@
                         <div ngbAccordionBody [formGroupName]="i">
                             <ng-template>
 
+                                <div class="mb-3">
+                                    <label for="fteInput" class="form-label">Beschikbare FTE's</label>
+                                    <input type="number" class="form-control" id="fteInput" formControlName="amount">
+                                </div>
+
                                 <div formArrayName="areaZipcodes" class="form-group row mb-3">
                                     <div class="col-4"
                                         *ngFor="let zipcode of supply.areaZipcodes; let j = index; trackBy zipCodeById">
