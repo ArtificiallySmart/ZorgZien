@@ -67,8 +67,8 @@ export class UsersController {
       map((tokens: string[]) => {
         res.cookie('refresh_token', tokens[1], {
           httpOnly: true,
-          // secure: true, // Uncomment this line if you're using HTTPS
-          // domain: 'your-domain.com', // Set your domain if needed
+          secure: true, // Uncomment this line if you're using HTTPS
+          domain: 'kilobryte.nl', // Set your domain if needed
           // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
         });
         return res.send({ access_token: tokens[0] });
