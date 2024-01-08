@@ -39,7 +39,7 @@ export class AuthService {
 
   login(loginForm: FormGroup) {
     return this.httpService
-      .post<LoginResponse, object>('api/users/login', loginForm.value)
+      .post<LoginResponse, object>('/api/users/login', loginForm.value)
       .pipe(
         map((res) => {
           this.setAccessToken(res.access_token);
