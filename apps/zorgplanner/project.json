@@ -62,7 +62,7 @@
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/zorgplanner/proxy.conf.json"
+        "proxyConfig": "apps/zorgplanner/proxy.conf.js"
       }
     },
     "extract-i18n": {
