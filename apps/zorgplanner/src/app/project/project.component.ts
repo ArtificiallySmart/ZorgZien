@@ -97,6 +97,15 @@ export class ProjectComponent implements OnDestroy {
     this.choroplethService.togglePostcode(target.checked);
   }
 
+  demandType() {
+    this.choroplethService.demandType.update((type) => {
+      if (type === 'clients') {
+        return 'hours';
+      }
+      return 'clients';
+    });
+  }
+
   selectList(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.careDemandService.selectCareDemandListId$.next(target.value);

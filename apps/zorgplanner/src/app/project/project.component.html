@@ -9,7 +9,7 @@
                         [ngbPopover]="popContent" [popoverTitle]="popTitle" [autoClose]="'outside'"></div>
                     <svg></svg>
                     <ng-template let-zipcodeData="zipcodeData" #popContent>
-                        <p>Zorgbehoefte: {{zipcodeData.demand ?? 0}} uur</p>
+                        <p>Zorgbehoefte: {{zipcodeData.amountOfHours ?? 0}} uur</p>
                         <p *ngIf="zipcodeData.assignedTeam">Team: {{zipcodeData.assignedTeam}}</p>
                     </ng-template>
                     <ng-template let-zipcodeData="zipcodeData" #popTitle>
@@ -27,6 +27,7 @@
                         <div class="form-group">
                             <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
                         </div>
+                        <button class="btn" (click)="demandType()">{{choroplethService.demandType()}}</button>
 
                     </div>
                     <div class="col">
