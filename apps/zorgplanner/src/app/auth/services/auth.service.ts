@@ -54,7 +54,7 @@ export class AuthService {
 
   refreshToken(): Observable<string> {
     return this.httpService
-      .post<{ access_token: string }, object>('api/users/refresh', {})
+      .post<{ access_token: string }, object>('/api/users/refresh', {})
       .pipe(
         tap((response) => {
           this.setAccessToken(response.access_token);
