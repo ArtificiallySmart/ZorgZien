@@ -8,19 +8,23 @@ export class HttpService {
   constructor(private http: HttpClient) {}
   private baseUrl = 'https://zorgplanner-production.up.railway.app';
 
+  private config = {
+    withCredentials: true,
+  };
+
   get<T>(endpoint: string) {
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`);
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`, this.config);
   }
 
   post<T, S>(endpoint: string, body: S) {
-    return this.http.post<T>(`${this.baseUrl}${endpoint}`, body);
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, body, this.config);
   }
 
   delete<T>(endpoint: string) {
-    return this.http.delete<T>(`${this.baseUrl}${endpoint}`);
+    return this.http.delete<T>(`${this.baseUrl}${endpoint}`, this.config);
   }
 
   patch<T, S>(endpoint: string, body: S) {
-    return this.http.patch<T>(`${this.baseUrl}${endpoint}`, body);
+    return this.http.patch<T>(`${this.baseUrl}${endpoint}`, body, this.config);
   }
 }

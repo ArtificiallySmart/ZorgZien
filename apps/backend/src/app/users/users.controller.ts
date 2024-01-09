@@ -36,9 +36,9 @@ export class UsersController {
       map((tokens: { access_token: string; refresh_token: string }) => {
         res.cookie('refresh_token', tokens.refresh_token, {
           httpOnly: true,
-          // secure: true, // Uncomment this line if you're using HTTPS
-          // domain: 'your-domain.com', // Set your domain if needed
-          // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
+          secure: true,
+          sameSite: 'none',
+          domain: process.env.RAILWAY_STATIC_URL,
         });
         return res.send({ access_token: tokens.access_token });
       }),
@@ -70,8 +70,6 @@ export class UsersController {
           secure: true,
           sameSite: 'none',
           domain: process.env.RAILWAY_STATIC_URL,
-          // domain: '.kilobryte.nl', // Set your domain if needed
-          // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
         });
         return res.send({ access_token: tokens[0] });
       }),
