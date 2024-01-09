@@ -69,7 +69,7 @@ export class UsersController {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
-          domain: '.kilobryte.nl', // Set your domain if needed
+          // domain: '.kilobryte.nl', // Set your domain if needed
           // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
         });
         return res.send({ access_token: tokens[0] });
