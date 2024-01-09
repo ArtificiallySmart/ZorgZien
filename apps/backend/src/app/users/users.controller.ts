@@ -69,6 +69,7 @@ export class UsersController {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
+          domain: process.env.RAILWAY_STATIC_URL,
           // domain: '.kilobryte.nl', // Set your domain if needed
           // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
         });
