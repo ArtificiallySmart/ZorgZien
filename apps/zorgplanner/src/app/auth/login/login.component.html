@@ -1,31 +1,131 @@
-<div class="d-flex align-items-center py-5">
+<ng-container *ngIf="hasAccount; else hasNoAccount">
+    <div
+        class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
 
-    <main class="form-signin w-100 m-auto">
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)">
-            <img class="mb-4" src="" alt="Add logo here" width="72" height="57">
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+                    <div class="card mb-0">
+                        <div class="card-body">
 
-            <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
-                    formControlName="email">
-                <label for="floatingInput">Email address</label>
+                            <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="https://placehold.co/180x27?text=Placeholder" width="180" alt="">
+                            </a>
+                            <p class="text-center">Placeholder tekst</p>
+
+                            <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)">
+                                <div class="mb-3">
+                                    <label for="exampleInputEmail1" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="exampleInputEmail1"
+                                        aria-describedby="emailHelp" formControlName="email">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="exampleInputPassword1" class="form-label">Wachtwoord</label>
+                                    <input type="password" class="form-control" id="exampleInputPassword1"
+                                        formControlName="password">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign
+                                    In</button>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <p class="fs-4 mb-0 fw-bold">Nog geen account?</p>
+                                    <button class="btn text-primary fw-bold ms-2" (click)="hasAccount = false">Maak een
+                                        account aan</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                    formControlName="password">
-                <label for="floatingPassword">Password</label>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #hasNoAccount>
+    <div
+        class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                <img src="https://placehold.co/180x27?text=Placeholder" width="180" alt="">
+                            </a>
+                            <p class="text-center">Placeholder tekst</p>
+                            <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister(registerForm)">
+                                <div class="mb-3">
+                                    <label for="exampleInputtext1" class="form-label">Naam</label>
+                                    <input formControlName="name" type="text" class="form-control"
+                                        id="exampleInputtext1" aria-describedby="textHelp">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="exampleInputEmail1" class="form-label">Email</label>
+                                    <input formControlName="email" type="email" class="form-control"
+                                        id="exampleInputEmail1" aria-describedby="emailHelp">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="InputPassword1" class="form-label">Wachtwoord</label>
+                                    <input formControlName="password" type="password" class="form-control"
+                                        id="InputPassword1" aria-describedby="passwordHelp" (focus)="onPasswordFocus()">
+                                    <ng-container *ngIf="passwordFieldFocused; then passwordHelp">
+                                    </ng-container>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="InputPassword" class="form-label">Bevestig wachtwoord</label>
+                                    <input formControlName="password" type="password" class="form-control"
+                                        id="InputPassword">
+                                </div>
+                                <button [disabled]="registerForm.invalid"
+                                    class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Account
+                                    aanmaken</button>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <p class="fs-4 mb-0 fw-bold">Heb je al een account?</p>
+                                    <button class="btn text-primary fw-bold ms-2"
+                                        (click)="hasAccount = true">Inloggen</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+</ng-template>
 
-            <div class="form-check text-start my-3">
-                <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                    Remember me
-                </label>
-            </div>
-            <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
-            <p class="mt-5 mb-3 text-body-secondary">Powered by MegaBryte</p>
-        </form>
-    </main>
+<ng-template #passwordHelp>
+    <div class="d-flex flex-column">
+        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('^(?=.*[A-Z])')}">
+            <small>
+                Minimaal &eacute;&eacute;n hoofdletter
+            </small>
+        </span>
 
+        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(?=.*[a-z])')}">
+            <small>
+                Minimaal &eacute;&eacute;n kleine letter
+            </small>
+        </span>
 
-</div>
+        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(.*[0-9].*)')}">
+            <small>
+                Minimaal &eacute;&eacute;n cijfer
+            </small>
+        </span>
+
+        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(?=.*[!@#$%^&*])')}">
+            <small>
+                Minimaal &eacute;&eacute;n leesteken
+            </small>
+        </span>
+
+        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('.{8,}')}">
+            <small>
+                Minimaal 8 tekens lang
+            </small>
+        </span>
+    </div>
+
+</ng-template>

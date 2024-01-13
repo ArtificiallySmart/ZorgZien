@@ -12,6 +12,8 @@ import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
+import { UserEntity } from './models/user.entity';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('users')
 export class UsersController {
@@ -20,18 +22,18 @@ export class UsersController {
     private authService: AuthService
   ) {}
 
-  // @Public()
-  // @Post()
-  // create(@Body() user: CreateUserDto) {
-  //   return this.usersService.create(user).pipe(
-  //     map((user: UserEntity) => user),
-  //     catchError((err) => of({ error: err.message }))
-  //   );
-  // }
+  @Public()
+  @Post('register')
+  create(@Body() user: CreateUserDto) {
+    return this.usersService.create(user).pipe(
+      map((user: UserEntity) => user),
+      catchError((err) => of({ error: err.message }))
+    );
+  }
 
   @Public()
   @Post('login')
-  login(@Body() user: CreateUserDto, @Res() res: Response) {
+  login(@Body() user: LoginDto, @Res() res: Response) {
     return this.usersService.login(user).pipe(
       map((tokens: { access_token: string; refresh_token: string }) => {
         res.cookie('refresh_token', tokens.refresh_token, {
@@ -42,7 +44,10 @@ export class UsersController {
         });
         return res.send({ access_token: tokens.access_token });
       }),
-      catchError((err) => of({ error: err.message }))
+      catchError((err) => {
+        console.log(err.message);
+        throw new HttpException(err.message, 400);
+      })
     );
   }
 
@@ -50,6 +55,7 @@ export class UsersController {
   @Post('refresh')
   refresh(@Res() res: Response, @Req() req: Request) {
     const oldRefreshToken = req.cookies['refresh_token'];
+    res.clearCookie('refresh_token');
     if (!oldRefreshToken) {
       // throw new Error('No refresh token provided');
       throw new HttpException('No refresh token provided', 400);
@@ -77,33 +83,12 @@ export class UsersController {
         throw err;
       })
     );
-
-    // res.cookie('refreshToken', newRefreshToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: 'strict',
-    // });
-
-    // return res.send({ accessToken: newAccessToken });
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.usersService.findOneById(id);
-  // }
-
-  // @Put(':id')
-  // update(@Param('id') id: string, @Body() user: UserEntity) {
-  //   return this.usersService.updateOne(+id, user);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.deleteOne(+id);
-  // }
+  @Public()
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('refresh_token');
+    return res.send({ message: 'Logged out' });
+  }
 }

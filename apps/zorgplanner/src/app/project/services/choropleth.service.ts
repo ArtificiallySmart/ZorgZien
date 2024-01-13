@@ -200,7 +200,7 @@ export class ChoroplethService {
         'geometries'
       ],
     });
-    this.svg = d3.select('svg');
+    this.svg = d3.select('svg.choropleth');
     this.draw();
   }
 

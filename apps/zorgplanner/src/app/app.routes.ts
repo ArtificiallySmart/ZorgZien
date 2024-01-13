@@ -5,7 +5,7 @@ export const appRoutes: Route[] = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'home',
+    redirectTo: 'project',
   },
   {
     path: 'home',
@@ -21,15 +21,18 @@ export const appRoutes: Route[] = [
   {
     path: 'project',
     loadComponent: () =>
-      import('./project/new-project/new-project.component').then(
-        (m) => m.NewProjectComponent
-      ),
+      import('./project/project.component').then((m) => m.ProjectComponent),
     canActivate: [authGuard],
   },
+
   {
     path: 'project/:id',
     loadComponent: () =>
       import('./project/project.component').then((m) => m.ProjectComponent),
     canActivate: [authGuard],
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
   },
 ];

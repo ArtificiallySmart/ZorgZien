@@ -8,7 +8,7 @@ import {
   CareDemandList,
   EditCareDemandList,
 } from '../../shared/interfaces/care-demand';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -36,7 +36,14 @@ export class DataService {
   }
 
   loadProjects() {
-    return this.httpService.get<Project[]>('/api/projects');
+    return this.httpService.get<Project[]>('/api/projects').pipe(
+      map((projects) => {
+        if (projects.length === 0) {
+          return [];
+        }
+        return projects;
+      })
+    );
   }
 
   loadProject(id: string) {

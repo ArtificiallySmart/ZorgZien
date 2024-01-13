@@ -1,6 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
-@import "bootstrap/scss/bootstrap";
+
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css");
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+
+$white: #ffffff;
+
+$theme-colors: (
+    "light":      #c5dbd8,
+    "dark":       #104847,
+    "primary":    #195061,
+    "secondary":  #70995c,
+    "info":       #da847a,
+    "success":    #1fab5b,
+    "warning":    #e9cb1e,
+    "danger":     #f60f24,
+);
+
+@import "./assets/scss/variables/variables";
+
+
+
+@import "./assets/scss/variables/theme-variables";
+@import "bootstrap/scss/bootstrap";
+
+
+@import "./assets/icons/tabler-icons/tabler-icons.css";
+
+@import "./assets/scss/layouts/sidebar";
+@import "./assets/scss/layouts/header";
+@import "./assets/scss/layouts/layouts";
+
+@import "./assets/scss/component/reboot";
+@import "./assets/scss/component/card";
+
+@import "./assets/scss/utilities/icon-size";
+@import "./assets/scss/utilities/background";
+
+
+// :root {
+//   scroll-behavior: smooth;
+// }
+
+body {
+  font-family: "Open Sans", sans-serif;
+  background: map-get($map: $theme-colors, $key: light);
+  color: #444444;
+}
 
 .input-container {
     margin-top: 3grem;
@@ -10,3 +55,4 @@
 .input-element {
     margin-bottom: 3rem;
 }
+

@@ -1,6 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable, Subject, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
@@ -19,7 +18,6 @@ export interface AuthState {
 })
 export class AuthService {
   private httpService = inject(HttpService);
-  private jwtHelper = inject(JwtHelperService);
   private router = inject(Router);
 
   constructor() {
@@ -52,6 +50,20 @@ export class AuthService {
       );
   }
 
+  register(registerForm: FormGroup) {
+    return this.httpService
+      .post<LoginResponse, object>('api/users/register', registerForm.value)
+      .pipe(
+        tap((res) => {
+          this.setAccessToken(res.access_token);
+          this.authenticate$.next(true);
+        }),
+        catchError((err) => {
+          throw err;
+        })
+      );
+  }
+
   refreshToken(): Observable<string> {
     return this.httpService
       .post<{ access_token: string }, object>('api/users/refresh', {})
@@ -67,6 +79,13 @@ export class AuthService {
           // throw new Error('No refresh token provided');
         })
       );
+  }
+
+  logout() {
+    localStorage.removeItem('access_token');
+    this.authenticate$.next(false);
+    this.router.navigate(['/login']);
+    this.httpService.post('api/users/logout', {}).subscribe();
   }
 
   setAccessToken(accessToken: string) {

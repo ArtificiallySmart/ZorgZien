@@ -1,100 +1,171 @@
-<div class="container">
-    <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
-        <li [ngbNavItem]="1">
-            <button ngbNavLink>Map</button>
-            <ng-template ngbNavContent>
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-sidebartype="full" data-sidebar-position="fixed"
+    data-header-position="fixed">
 
-                <div class="svg-container">
-                    <div class="popover" #myPopover="ngbPopover" [popperOptions]="popperOptions"
-                        [ngbPopover]="popContent" [popoverTitle]="popTitle" [autoClose]="'outside'"></div>
-                    <svg></svg>
-                    <ng-template let-zipcodeData="zipcodeData" #popContent>
-                        <p>Zorgbehoefte: {{zipcodeData.amountOfHours ?? 0}} uur</p>
-                        <p *ngIf="zipcodeData.assignedTeam">Team: {{zipcodeData.assignedTeam}}</p>
-                    </ng-template>
-                    <ng-template let-zipcodeData="zipcodeData" #popTitle>
-                        <div class="d-flex justify-content-between">
-                            <p class="d-inline mb-0">{{zipcodeData.zipcode}}</p>
-                            <button type="button" class="btn btn-close btn-sm d-inline" aria-label="Close"
-                                (click)="myPopover.close()"></button>
-                        </div>
-                    </ng-template>
+    <aside class="left-sidebar">
 
+        <div>
+            <div class="brand-logo d-flex align-items-center justify-content-between">
+                <a href="./" class="text-nowrap logo-img">
+                    <img src="https://placehold.co/180x27?text=Placeholder" width="180" alt="" />
+                </a>
+                <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                    <i class="ti ti-x fs-8"></i>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col">
-                        <div class="form-group">
-                            <input type="checkbox" (change)="onCheckboxChange($event)">Postcode
-                        </div>
-                        <button class="btn" (click)="demandType()">{{choroplethService.demandType()}}</button>
 
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-                            <select class="form-select" id="exampleFormControlSelect1"
-                                [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
+            <nav class="sidebar-nav scroll-sidebar">
 
-                                <option value="test" *ngIf="careDemand().length === 0; else lists">U heeft nog geen
-                                    zorgbehoefte lijsten
-                                    opgeslagen
-                                </option>
-                                <ng-template #lists>
-                                    <option [value]="0">Selecteer een lijst</option>
-                                    <option [value]="list.id" *ngFor="let list of careDemand()">{{list.title}}</option>
+                <ul id="sidebarnav" class="in d-block" ngbNav #nav="ngbNav" [(activeId)]="active">
+
+                    <li class="nav-small-cap">
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">Postcode kaart</span>
+                    </li>
+
+                    <li class="sidebar-item" [ngbNavItem]="'Postcode kaart'">
+                        <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                            <span>
+                                <tabler-icon name="map"></tabler-icon>
+                            </span>
+                            <span class="hide-menu">Postcode kaart</span>
+                        </a>
+                        <ng-template ngbNavContent>
+                            <zorgplanner-map></zorgplanner-map>
+                        </ng-template>
+
+                    </li>
+
+                    <li class="nav-small-cap">
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">Projecten</span>
+                    </li>
+
+                    <li class="sidebar-item" [ngbNavItem]="'Nieuw project'">
+                        <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                            <span>
+                                <tabler-icon name="plus"></tabler-icon> </span>
+                            <span class="hide-menu">Nieuw project</span>
+                        </a>
+                        <ng-template ngbNavContent>
+                            <zorgplanner-new-project></zorgplanner-new-project>
+                        </ng-template>
+
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link has-arrow" aria-expanded="false" (click)="collapse.toggle()">
+                            <span class="span-group">
+                                <span>
+                                    <tabler-icon name="book"></tabler-icon>
+                                </span>
+                                <span class="hide-menu">Kies project</span>
+                            </span>
+                            <span class="dropdown-icon">
+                                <tabler-icon name="chevron-down" class="chevron-icon"
+                                    [class.rotate]="!isCollapsed"></tabler-icon>
+                            </span>
+                        </a>
+                        <ul class="first-level" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+
+                            <li class="sidebar-item" *ngFor="let item of (projectList$ | async)">
+                                <a (click)="openProject(item.id)" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-circle"></i>
+                                    </div>
+                                    <span class="hide-menu">{{item.title}}</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                        <ng-template ngbNavContent>
+                        </ng-template>
+
+                    </li>
+
+                    <ng-container *ngIf="(projectList$ | async) as projectList">
+                        <ng-container *ngIf="projectList.length && projectsExist">
+
+
+                            <li class="nav-small-cap">
+                                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                                <span class="hide-menu">Zorgbehoefte</span>
+                            </li>
+
+                            <li class="sidebar-item" [ngbNavItem]="'Nieuwe zorgbehoefte'">
+                                <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                                    <span>
+                                        <tabler-icon name="heart-plus"></tabler-icon> </span>
+                                    <span class="hide-menu">Nieuwe zorgbehoefte</span>
+                                </a>
+                                <ng-template ngbNavContent>
+                                    <zorgplanner-care-demand [careDemandLists]="careDemand()"></zorgplanner-care-demand>
+
                                 </ng-template>
 
-                            </select>
-                        </div>
+                            </li>
+                            <li class="sidebar-item" [ngbNavItem]="'Zorgbehoefte aanpassen'">
+                                <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                                    <span>
+                                        <tabler-icon name="heart-cog"></tabler-icon> </span>
+                                    <span class="hide-menu">Zorgbehoefte aanpassen</span>
+                                </a>
+                                <ng-template ngbNavContent>
+                                    <zorgplanner-care-demand [careDemandLists]="careDemand()"
+                                        [editMode]="true"></zorgplanner-care-demand>
 
-
-                        <div class="form-group">
-                            <label for="exampleFormControlSelect2">Selecteer een Zorgbeschikbaarheid lijst:</label>
-                            <select class="form-select" id="exampleFormControlSelect2"
-                                [disabled]="(careSupply().length === 0) ? true : false"
-                                (change)="selectSupplyList($event)">
-
-                                <option value="test" *ngIf="careSupply().length === 0; else lists2">U heeft nog geen
-                                    zorgbehoefte lijsten
-                                    opgeslagen
-                                </option>
-                                <ng-template #lists2>
-                                    <option>Selecteer een lijst</option>
-                                    <option [value]="list.id" *ngFor="let list of careSupply()"
-                                        [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
-                                        {{list.title}}</option>
                                 </ng-template>
 
-                            </select>
-                        </div>
-                    </div>
+                            </li>
+
+                            <li class="nav-small-cap">
+                                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                                <span class="hide-menu">Zorgaanbod</span>
+                            </li>
+
+                            <li class="sidebar-item" [ngbNavItem]="'Nieuw zorgaanbod'">
+                                <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                                    <span>
+                                        <tabler-icon name="home-plus"></tabler-icon> </span>
+                                    <span class="hide-menu">Nieuw zorgaanbod</span>
+
+                                </a>
+                                <ng-template ngbNavContent>
+                                    <zorgplanner-care-supply [careSupplyLists]="careSupply()"></zorgplanner-care-supply>
+                                </ng-template>
+
+                            </li>
+                            <li class="sidebar-item" [ngbNavItem]="'Zorgaanbod aanpassen'">
+                                <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                                    <span>
+                                        <tabler-icon name="home-cog"></tabler-icon> </span>
+                                    <span class="hide-menu">Zorgaanbod aanpassen</span>
+
+                                </a>
+                                <ng-template ngbNavContent>
+                                    <zorgplanner-care-supply [careSupplyLists]="careSupply()"
+                                        [editMode]="true"></zorgplanner-care-supply>
+                                </ng-template>
+
+                            </li>
+                        </ng-container>
+                    </ng-container>
 
 
+                </ul>
 
-                </div>
+            </nav>
 
+        </div>
 
-            </ng-template>
-        </li>
-        <li [ngbNavItem]="2">
+    </aside>
 
-            <button ngbNavLink>Zorgbehoefte</button>
-            <ng-template ngbNavContent>
-                <zorgplanner-care-demand [careDemandLists]="careDemand()"></zorgplanner-care-demand>
+    <div class="body-wrapper">
 
-            </ng-template>
-        </li>
-        <li [ngbNavItem]="3">
-            <button ngbNavLink>Zorgbeschikbaarheid</button>
-            <ng-template ngbNavContent>
-                <zorgplanner-care-supply [careSupplyLists]="careSupply()"></zorgplanner-care-supply>
-            </ng-template>
-        </li>
-    </ul>
+        <zorgplanner-header [headerTitle]="active"></zorgplanner-header>
 
-    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+        <div class="container-fluid">
+            <div [ngbNavOutlet]="nav"></div>
+        </div>
 
-
-
+    </div>
 </div>
