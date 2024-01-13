@@ -114,10 +114,11 @@ export class CareDemandService {
       });
 
     this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
-      this.state.update((state) => ({
-        ...state,
+      this.state.update(() => ({
         careDemandLists: [],
+        selectedCareDemandList: null,
         loaded: false,
+        error: null,
       }))
     );
 

@@ -73,6 +73,9 @@ export class ProjectComponent implements OnDestroy {
   }
 
   openProject(projectId: number) {
+    this.projectService.clear$.next();
+    this.careDemandService.clear$.next();
+    this.careSupplyService.clear$.next();
     this.router.navigate(['/project', projectId]);
     this.active = 'Postcode kaart';
   }

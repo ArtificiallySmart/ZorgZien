@@ -126,17 +126,17 @@ export class CareSupplyService {
       });
 
     this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
-      this.state.update((state) => ({
-        ...state,
+      this.state.update(() => ({
         careSupplyLists: [],
+        selectedCareSupplyList: null,
         loaded: false,
+        error: null,
       }))
     );
 
     effect(() => {
       if (this.project().id) {
         this.loadCareSupplyLists(this.project().id);
-        return;
       }
     });
   }

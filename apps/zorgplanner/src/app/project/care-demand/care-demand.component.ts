@@ -34,14 +34,11 @@ export class CareDemandComponent {
   title = '';
 
   addList() {
-    const data = this.parserService.parse(this.zorgUren);
-    if (data.message) {
-      alert(data.message);
-      return;
-    }
+    const demandValues = this.parserService.parse(this.zorgUren);
+    console.log(demandValues);
     this.careDemandService.addCareDemandList({
       title: this.title,
-      careDemand: data.demandValues,
+      careDemand: demandValues,
     });
     this.title = this.zorgUren = '';
   }

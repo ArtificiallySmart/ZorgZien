@@ -45,6 +45,7 @@ export class ChoroplethService {
 
   constructor() {
     effect(() => {
+      console.log(this.zipcodeDataService.currentZipcodeData());
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
       this.createLegend(this.zipcodeDataService.currentZipcodeData());
     });
@@ -152,7 +153,6 @@ export class ChoroplethService {
       const color = element.attr(`data-${this.demandType()}`);
 
       if (!color) return;
-      console.log(color);
       element.attr('fill', color);
     });
   }

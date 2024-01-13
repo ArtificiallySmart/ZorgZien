@@ -29,15 +29,6 @@
   padding: $sidebar-spacing-x;
 }
 
-.unlimited-access {
-  padding: 18px 22px 25px;
-  margin: 0 -5px;
-
-  .unlimited-access-img {
-    margin: -35px -5px 0 -43px;
-  }
-}
-
 .nav-small-cap {
   margin-top: 24px;
   color: $dark;
@@ -64,7 +55,6 @@
         display: flex;
         font-size: 14px;
         white-space: nowrap;
-        align-items: center;
         line-height: 25px;
         position: relative;
         margin: 0px 0px 2px;
