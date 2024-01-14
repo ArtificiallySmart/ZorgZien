@@ -8,7 +8,7 @@ import {
   CareDemandList,
   EditCareDemandList,
 } from '../../shared/interfaces/care-demand';
-import { Observable, map } from 'rxjs';
+import { Observable, map, share } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -42,7 +42,8 @@ export class DataService {
           return [];
         }
         return projects;
-      })
+      }),
+      share()
     );
   }
 

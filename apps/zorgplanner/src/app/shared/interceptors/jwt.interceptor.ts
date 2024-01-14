@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap } from 'rxjs';
+import { catchError, share, switchMap } from 'rxjs';
 import { AuthService } from '../../auth/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -33,7 +33,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
           catchError((err) => {
             router.navigate(['/login']);
             throw err;
-          })
+          }),
+          share()
         );
       }
 
