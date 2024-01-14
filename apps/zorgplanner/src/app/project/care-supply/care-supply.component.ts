@@ -24,6 +24,7 @@ import { CareSupplyService } from './services/care-supply.service';
 })
 export class CareSupplyComponent {
   @Input() careSupplyLists: CareSupplyList[] = [];
+  @Input() editMode = false;
 
   private careSupplyService = inject(CareSupplyService);
 

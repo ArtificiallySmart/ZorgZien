@@ -38,6 +38,8 @@ export class ProjectService {
   remove$ = new Subject<RemoveProject>();
   clear$ = new Subject<void>();
 
+  projectList$ = this.dataService.loadProjects();
+
   constructor() {
     this.load$.subscribe((result) => {
       if (result instanceof HttpErrorResponse) {

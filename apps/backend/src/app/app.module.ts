@@ -16,6 +16,7 @@ import { UsersModule } from './users/users.module';
 import { UserEntity } from './users/models/user.entity';
 import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 import { CareDemandEntry } from './care-demand/entities/care-demand-entry.entity';
+import { UserWhitelistEntity } from './users/models/user-whitelist.entity';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CareDemandEntry } from './care-demand/entities/care-demand-entry.entity
         CareSupplyList,
         UserEntity,
         TokenBlacklistEntity,
+        UserWhitelistEntity,
       ],
       synchronize: true,
     }),

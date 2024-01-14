@@ -40,8 +40,6 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
 
   careDemandService = inject(CareDemandService);
 
-  editingEnabled = false;
-
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
@@ -55,11 +53,6 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   resetValues(event: Event) {
     (event.target as HTMLElement).focus();
     this.careDemandListBS.next(this.selectedCareDemandList);
-    this.toggleEditing();
-  }
-
-  toggleEditing() {
-    this.editingEnabled = !this.editingEnabled;
   }
 
   groupedCareDemand$ = this.careDemandList$.pipe(
@@ -86,7 +79,6 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   );
 
   deleteDemand(zipcode: number) {
-    if (!this.editingEnabled) return;
     const oldCareDemand = this.careDemandListBS.value;
 
     this.careDemandListBS.next({
@@ -100,16 +92,16 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   }
 
   addDemand(zipcode: number, amountClient: number, amountHours: number) {
-    if (!this.editingEnabled) return;
     const newEntry: CareDemandEntry = {
       zipcode,
       clients: amountClient,
       hours: amountHours,
       careDemandListId: this.selectedCareDemandList.id,
     };
+    const oldCareDemand = this.careDemandListBS.value;
     this.careDemandListBS.next({
-      ...this.selectedCareDemandList,
-      careDemand: [...this.selectedCareDemandList.careDemand, newEntry],
+      ...oldCareDemand,
+      careDemand: [...oldCareDemand.careDemand, newEntry],
     });
   }
 
@@ -133,7 +125,5 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
     const id = this.careDemandListBS.value.id;
     const data = this.careDemandListBS.value;
     this.careDemandService.updateCareDemandList({ id, data });
-
-    this.toggleEditing();
   }
 }
