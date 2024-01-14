@@ -45,7 +45,6 @@ export class ChoroplethService {
 
   constructor() {
     effect(() => {
-      console.log(this.zipcodeDataService.currentZipcodeData());
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
       this.createLegend(this.zipcodeDataService.currentZipcodeData());
     });

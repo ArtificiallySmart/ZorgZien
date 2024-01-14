@@ -1,16 +1,19 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable, Subject, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
+import { User } from '../../shared/interfaces/user';
 
 interface LoginResponse {
   access_token: string;
+  user: User;
   // Include other properties if there are any
 }
 
 export interface AuthState {
   isAuthenticated: boolean;
+  user: User | null;
 }
 
 @Injectable({
@@ -31,7 +34,10 @@ export class AuthService {
 
   public authState = signal<AuthState>({
     isAuthenticated: false,
+    user: null,
   });
+
+  public user = computed(() => this.authState().user);
 
   authenticate$ = new Subject<boolean>();
 
@@ -41,7 +47,10 @@ export class AuthService {
       .pipe(
         map((res) => {
           this.setAccessToken(res.access_token);
-          this.authenticate$.next(true);
+          this.authState.update(() => ({
+            isAuthenticated: true,
+            user: res.user,
+          }));
           return res;
         }),
         catchError((err) => {
@@ -66,15 +75,24 @@ export class AuthService {
 
   refreshToken(): Observable<string> {
     return this.httpService
-      .post<{ access_token: string }, object>('api/users/refresh', {})
+      .post<{ access_token: string; user: User }, object>(
+        'api/users/refresh',
+        {}
+      )
       .pipe(
-        tap((response) => {
-          this.setAccessToken(response.access_token);
-          this.authenticate$.next(true);
+        tap((res) => {
+          this.setAccessToken(res.access_token);
+          this.authState.update(() => ({
+            isAuthenticated: true,
+            user: res.user,
+          }));
         }),
-        map((response) => response.access_token),
+        map((res) => res.access_token),
         catchError(() => {
-          this.authenticate$.next(false);
+          this.authState.update(() => ({
+            isAuthenticated: false,
+            user: null,
+          }));
           return '';
           // throw new Error('No refresh token provided');
         })
@@ -83,7 +101,10 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('access_token');
-    this.authenticate$.next(false);
+    this.authState.update(() => ({
+      isAuthenticated: false,
+      user: null,
+    }));
     this.router.navigate(['/login']);
     this.httpService.post('api/users/logout', {}).subscribe();
   }

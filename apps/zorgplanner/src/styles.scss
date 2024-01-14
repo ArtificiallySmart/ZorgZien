@@ -4,16 +4,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
 
 $white: #ffffff;
+$dark: #110a4a;
+$primary: #0330a8;
+$secondary: #d43c7d;
+$info: #fe6551;
+$success: #03a25e;
+$warning: #e1cb03;
+$danger: #f01c01;
 
 $theme-colors: (
-    "light":      #c5dbd8,
-    "dark":       #104847,
-    "primary":    #195061,
-    "secondary":  #70995c,
-    "info":       #da847a,
-    "success":    #1fab5b,
-    "warning":    #e9cb1e,
-    "danger":     #f60f24,
+    "light":      #cadbf0,
+    "dark":       #110a4a,
+    "primary":    #0330a8,
+    "secondary":  #d43c7d,
+    "info":       #fe6551,
+    "success":    #03a25e,
+    "warning":    #e1cb03,
+    "danger":     #f01c01,
 );
 
 @import "./assets/scss/variables/variables";
@@ -37,22 +44,9 @@ $theme-colors: (
 @import "./assets/scss/utilities/background";
 
 
-// :root {
-//   scroll-behavior: smooth;
-// }
-
 body {
-  font-family: "Open Sans", sans-serif;
-  background: map-get($map: $theme-colors, $key: light);
-  color: #444444;
-}
-
-.input-container {
-    margin-top: 3grem;
-    width: 60%;
-}
-
-.input-element {
-    margin-bottom: 3rem;
+  //font-family: "Open Sans", sans-serif;
+  background: $light;
+  color: $dark;
 }
 

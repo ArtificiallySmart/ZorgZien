@@ -51,7 +51,8 @@
         transition: none;
       }
       .sidebar-link {
-        color: $sidebar-text;
+        // color: $sidebar-text;
+        color: $dark;
         display: flex;
         font-size: 14px;
         white-space: nowrap;

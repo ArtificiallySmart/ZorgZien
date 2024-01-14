@@ -16,9 +16,7 @@ export class HeaderComponent {
   @Input() headerTitle!: string;
   notifications: number = 0;
 
-  user = {
-    name: 'John Doe',
-  };
+  user = this.authService.user();
 
   logout() {
     this.authService.logout();

@@ -146,6 +146,7 @@ export class UsersService {
             return {
               access_token: jwtArray[0],
               refresh_token: jwtArray[1],
+              user: user,
             };
           })
         );

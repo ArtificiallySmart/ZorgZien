@@ -35,15 +35,24 @@ export class UsersController {
   @Post('login')
   login(@Body() user: LoginDto, @Res() res: Response) {
     return this.usersService.login(user).pipe(
-      map((tokens: { access_token: string; refresh_token: string }) => {
-        res.cookie('refresh_token', tokens.refresh_token, {
-          httpOnly: true,
-          // secure: true, // Uncomment this line if you're using HTTPS
-          // domain: 'your-domain.com', // Set your domain if needed
-          // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
-        });
-        return res.send({ access_token: tokens.access_token });
-      }),
+      map(
+        (tokens: {
+          access_token: string;
+          refresh_token: string;
+          user: UserEntity;
+        }) => {
+          res.cookie('refresh_token', tokens.refresh_token, {
+            httpOnly: true,
+            // secure: true, // Uncomment this line if you're using HTTPS
+            // domain: 'your-domain.com', // Set your domain if needed
+            // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
+          });
+          return res.send({
+            access_token: tokens.access_token,
+            user: tokens.user,
+          });
+        }
+      ),
       catchError((err) => {
         console.log(err.message);
         throw new HttpException(err.message, 400);
@@ -77,7 +86,7 @@ export class UsersController {
           // domain: 'your-domain.com', // Set your domain if needed
           // maxAge: 7 * 24 * 60 * 60 * 1000, // Set the cookie expiration time if needed
         });
-        return res.send({ access_token: tokens[0] });
+        return res.send({ access_token: tokens[0], user: user });
       }),
       catchError((err) => {
         throw err;
