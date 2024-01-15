@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -16,7 +17,7 @@ class UpdateCareSupplyEntryDto {
   @IsOptional()
   name?: string;
 
-  @IsInt()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsOptional()
   amount?: number;
 

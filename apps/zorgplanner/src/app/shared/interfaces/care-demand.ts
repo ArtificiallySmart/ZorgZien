@@ -1,22 +1,32 @@
 export interface CareDemandList {
   id: string;
   title: string;
-  careDemand: [number, number][];
+  careDemand: CareDemandEntry[];
   projectId: number;
 }
 
-export type AddCareDemandList = Omit<CareDemandList, 'id'>;
+export type AddCareDemandList = {
+  title: string;
+  careDemand: AddCareDemandEntry[];
+  projectId: number;
+};
 
 export type EditCareDemandList = {
   id: CareDemandList['id'];
-  data: AddCareDemandList;
+  data: Omit<CareDemandList, 'id'>;
 };
 
 export type RemoveCareDemandList = CareDemandList['id'];
 
-export interface ApiCareDemandList {
-  id: string;
-  title: string;
-  careDemand: [number, number][];
-  projectId: number;
+export interface CareDemandEntry {
+  id?: string;
+  zipcode: number;
+  clients?: number;
+  hours?: number;
+  careDemandListId: string;
 }
+
+export type AddCareDemandEntry = Omit<
+  CareDemandEntry,
+  'id' | 'careDemandListId'
+>;

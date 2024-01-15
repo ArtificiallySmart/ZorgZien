@@ -5,11 +5,10 @@ import { Objects } from 'topojson-specification';
 import { AddProject, Project } from '../../shared/interfaces/project';
 import {
   AddCareDemandList,
-  ApiCareDemandList,
   CareDemandList,
   EditCareDemandList,
 } from '../../shared/interfaces/care-demand';
-import { Observable } from 'rxjs';
+import { Observable, map, share } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -37,7 +36,15 @@ export class DataService {
   }
 
   loadProjects() {
-    return this.httpService.get<Project[]>('/api/projects');
+    return this.httpService.get<Project[]>('/api/projects').pipe(
+      map((projects) => {
+        if (projects.length === 0) {
+          return [];
+        }
+        return projects;
+      }),
+      share()
+    );
   }
 
   loadProject(id: string) {
@@ -45,7 +52,7 @@ export class DataService {
   }
 
   loadCareDemandLists(projectId: number): Observable<CareDemandList[]> {
-    return this.httpService.get<ApiCareDemandList[]>(
+    return this.httpService.get<CareDemandList[]>(
       `/api/care-demand/${projectId}`
     );
     // .pipe(
@@ -65,7 +72,7 @@ export class DataService {
   }
 
   addCareDemandList(careDemandList: AddCareDemandList) {
-    return this.httpService.post<ApiCareDemandList, AddCareDemandList>(
+    return this.httpService.post<CareDemandList, AddCareDemandList>(
       `/api/care-demand`,
       careDemandList
     );

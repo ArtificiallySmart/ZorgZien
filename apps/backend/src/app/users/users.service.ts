@@ -1,17 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from './models/user.entity';
+import { Observable, catchError, forkJoin, from, map, switchMap } from 'rxjs';
 import { DataSource } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from '../auth/auth.service';
-import {
-  Observable,
-  catchError,
-  forkJoin,
-  from,
-  map,
-  of,
-  switchMap,
-} from 'rxjs';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserWhitelistEntity } from './models/user-whitelist.entity';
+import { UserEntity } from './models/user.entity';
 import { User } from './models/user.interface';
 
 type FailedLoginResponse = {
@@ -30,28 +23,67 @@ export class UsersService {
   constructor(
     private dataSource: DataSource,
     private authService: AuthService
-  ) {}
+  ) {
+    this.seedWhitelist();
+  }
 
   userRepository = this.dataSource.getRepository(UserEntity);
+  userWhitelistRepository = this.dataSource.getRepository(UserWhitelistEntity);
+
+  async seedWhitelist() {
+    const count = await this.userWhitelistRepository.count();
+    if (count === 0) {
+      const firstUser = process.env.ADMIN_EMAIL;
+      this.userWhitelistRepository.create({ email: firstUser });
+      this.userWhitelistRepository.save({ email: firstUser });
+    }
+  }
+
+  // async findOne(email: string): Promise<User | undefined> {
+  //   return this.users.find((user) => user.email === email);
+  // }
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
-    return this.authService.hashPassword(createUserDto.password).pipe(
-      switchMap((passwordHash: string) => {
-        const newUser = new UserEntity();
-        newUser.email = createUserDto.email;
-        newUser.password = passwordHash;
-        return from(this.userRepository.save(newUser)).pipe(
-          map((user: User) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { password, ...result } = user;
-            return result;
-          }),
-          catchError((err) => {
-            throw err;
+    return from(
+      this.userWhitelistRepository.exist({
+        where: {
+          email: createUserDto.email,
+        },
+      })
+    ).pipe(
+      switchMap((exist: boolean) => {
+        if (!exist) {
+          throw new Error('Email not whitelisted');
+        }
+        return this.findOne(createUserDto.email).pipe(
+          switchMap((user: User) => {
+            if (user) {
+              throw new Error('User already exists');
+            }
+            return this.authService.hashPassword(createUserDto.password).pipe(
+              switchMap((passwordHash: string) => {
+                const newUser = new UserEntity();
+                newUser.name = createUserDto.name;
+                newUser.email = createUserDto.email;
+                newUser.password = passwordHash;
+                return from(this.userRepository.save(newUser)).pipe(
+                  map((user: User) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { password, ...result } = user;
+                    return result;
+                  }),
+                  catchError((err) => {
+                    throw err;
+                  })
+                );
+              })
+            );
           })
         );
       })
     );
+
+    // return this.userRepository.save(createUserDto);
   }
 
   findAll() {
@@ -100,12 +132,9 @@ export class UsersService {
     return this.userRepository.update(id, user);
   }
 
-  login(user: Omit<User, 'id'>): Observable<LoginResponse> {
+  login(user: Omit<User, 'id' | 'name'>): Observable<LoginResponse> {
     return this.validateUser(user.email, user.password).pipe(
       switchMap((user: Omit<User, 'password'>) => {
-        if (!user) {
-          return of({ error: 'Wrong Credentials' });
-        }
         const accessToken$ = this.authService
           .createAccessToken(user)
           .pipe(map((jwt: string) => jwt));
@@ -117,6 +146,7 @@ export class UsersService {
             return {
               access_token: jwtArray[0],
               refresh_token: jwtArray[1],
+              user: user,
             };
           })
         );
@@ -129,8 +159,11 @@ export class UsersService {
     password: string
   ): Observable<Omit<User, 'password'> | null> {
     return this.findOne(email).pipe(
-      switchMap((user: User) =>
-        this.authService.comparePasswords(password, user.password).pipe(
+      switchMap((user: User) => {
+        if (!user) {
+          throw new Error('Wrong credentials');
+        }
+        return this.authService.comparePasswords(password, user.password).pipe(
           map((match: boolean) => {
             if (match) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -140,8 +173,8 @@ export class UsersService {
               return null;
             }
           })
-        )
-      )
+        );
+      })
     );
   }
 }

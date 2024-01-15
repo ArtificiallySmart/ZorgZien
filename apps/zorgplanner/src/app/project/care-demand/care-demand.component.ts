@@ -6,6 +6,7 @@ import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { ParserService } from '../services/parser.service';
 import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.component';
 import { CareDemandService } from './services/care-demand.service';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
   selector: 'zorgplanner-care-demand',
@@ -15,15 +16,17 @@ import { CareDemandService } from './services/care-demand.service';
     FormsModule,
     NgbCollapseModule,
     EditCareDemandComponent,
+    TablerIconsModule,
   ],
   templateUrl: './care-demand.component.html',
-  styleUrl: './care-demand.component.css',
+  styleUrl: './care-demand.component.scss',
 })
 export class CareDemandComponent {
   private parserService = inject(ParserService);
   private careDemandService = inject(CareDemandService);
 
   @Input() careDemandLists: CareDemandList[] = [];
+  @Input() editMode = false;
 
   selectedList: CareDemandList | undefined;
   isCollapsed = true;
@@ -31,14 +34,10 @@ export class CareDemandComponent {
   title = '';
 
   addList() {
-    const data = this.parserService.parse(this.zorgUren);
-    if (data.message) {
-      alert(data.message);
-      return;
-    }
+    const demandValues = this.parserService.parse(this.zorgUren);
     this.careDemandService.addCareDemandList({
       title: this.title,
-      careDemand: data.arr,
+      careDemand: demandValues,
     });
     this.title = this.zorgUren = '';
   }

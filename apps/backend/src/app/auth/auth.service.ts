@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { from, map, switchMap } from 'rxjs';
-import { DataSource } from 'typeorm';
+import { catchError, from, of, switchMap, throwError } from 'rxjs';
+import { Connection, DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/models/user.interface';
 import { TokenBlacklistEntity } from './models/token-blacklist.entity';
@@ -17,7 +17,11 @@ export type DecodedToken = {
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private dataSource: DataSource) {}
+  constructor(
+    private jwtService: JwtService,
+    private dataSource: DataSource,
+    private connection: Connection
+  ) {}
 
   tokenRepository = this.dataSource.getRepository(TokenBlacklistEntity);
 
@@ -81,22 +85,29 @@ export class AuthService {
     return from(
       this.tokenRepository.exist({ where: { token: oldTokenId } })
     ).pipe(
-      switchMap((exists: boolean) => {
+      switchMap((exists) => {
         if (exists) {
-          throw new UnauthorizedException('Invalid refresh token');
-        } else {
-          const newToken = this.tokenRepository.create({ token: oldTokenId });
-          try {
-            this.tokenRepository.save(newToken);
-          } catch (error) {
-            console.log(error);
-            throw new UnauthorizedException('Invalid refresh token');
-          }
-          return this.createRefreshToken(user);
+          return throwError(
+            () => new UnauthorizedException('Invalid refresh token')
+          );
         }
+        return from(
+          this.dataSource.transaction(async (transactionalEntityManager) => {
+            const tokenRepository =
+              transactionalEntityManager.getRepository(TokenBlacklistEntity);
+
+            const usedToken = tokenRepository.create({ token: oldTokenId });
+            await tokenRepository.save(usedToken);
+          })
+        ).pipe(switchMap(() => this.createRefreshToken(user)));
       }),
-      map((token: string) => {
-        return token;
+      catchError((error) => {
+        if (error.code === '23505') {
+          // Handle the unique constraint violation
+          console.warn('Attempted to blacklist an already blacklisted token.');
+          return of(null); // Return a neutral response or a specific value if needed
+        }
+        throw error;
       })
     );
   }

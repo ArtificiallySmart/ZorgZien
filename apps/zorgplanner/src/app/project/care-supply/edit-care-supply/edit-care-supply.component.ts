@@ -19,7 +19,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { zipcodeValidator } from '../../../shared/validators/zipcode.directive';
 import { areaZipcodeValidator } from '../../../shared/validators/area-zip-code.directive';
-import { CareSupplyService } from '../../services/care-supply.service';
+import { CareSupplyService } from '../services/care-supply.service';
 import { ColorPickerModule } from 'ngx-color-picker';
 
 @Component({
@@ -137,7 +137,7 @@ export class EditCareSupplyComponent implements OnInit {
 
   onSubmit() {
     if (this.careSupplyListForm.invalid) {
-      console.log(this.careSupplyListForm.errors);
+      console.log(this.careSupplyListForm);
       return;
     }
     const projectId = this.careSupplyList.projectId;

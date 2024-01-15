@@ -1,44 +1,94 @@
-<div class="input-container">
+<div class="row" *ngIf="!editMode">
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Nieuwe lijst aanmaken</h5>
+                <div class="card">
+                    <div class="card-body">
 
-    <div class="input-element">
+                        <div class="form-group mb-3">
+                            <label for="uren-lijst-titel" class="form-label">Titel van de zorgbehoefte lijst:</label>
+                            <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="title">
+                        </div>
 
-        <h2>Nieuwe zorgbehoefte lijst</h2>
+                        <div class="form-group mb-3">
+                            <label for="exampleFormControlTextarea1" class="form-label">Plak hier de zorgbehoefte lijst
+                                <tabler-icon name="help" class="help-icon"></tabler-icon>
+                            </label>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
+                                [(ngModel)]="zorgUren"></textarea>
+                        </div>
+                        <button class="btn btn-success" (click)="addList()"> submit</button>
 
-        <div class="form-group">
-            <label for="uren-lijst-titel">Titel van de zorgbehoefte lijst:</label>
-            <input type="text" class="form-control" id="uren-lijst-titel" [(ngModel)]="title">
-        </div>
-        <div class="form-group">
-            <label for="exampleFormControlTextarea1">Plak hier de zorgbehoefte lijst</label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="zorgUren"></textarea>
-        </div>
-        <button class="btn btn-success" (click)="addList()"> submit</button>
-
-    </div>
-
-    <div class="input-element">
-        <h2>Bestaande zorgbehoefte lijsten</h2>
-
-        <div class="form-group">
-            <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
-            <select class="form-select" id="exampleFormControlSelect1" [disabled]="careDemandLists.length === 0"
-                (change)="selectList($event)">
-
-                <option *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
-                    opgeslagen
-                </option>
-                <ng-template #lists>
-                    <option>Selecteer een lijst</option>
-                    <option [value]="list.id" *ngFor="let list of careDemandLists">{{list.title}}</option>
-                </ng-template>
-
-            </select>
-        </div>
-
-        <div *ngIf="selectedList">
-            <zorgplanner-edit-care-demand [selectedCareDemandList]="selectedList"
-                (clearSelectedCareDemandList)="clearSelectedCareDemandList()"></zorgplanner-edit-care-demand>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
+
+
+<div class="row" *ngIf="editMode">
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Zorgbehoefte lijsten aanpassen</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+
+                            <label for="careDemandSelect" class="form-label">Selecteer een zorgbehoefte lijst:</label>
+                            <select class="form-select" id="careDemandSelect" [disabled]="careDemandLists.length === 0"
+                                (change)="selectList($event)">
+
+                                <option *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte
+                                    lijsten
+                                    opgeslagen
+                                </option>
+                                <ng-template #lists>
+                                    <option>Selecteer een lijst</option>
+                                    <option [value]="list.id" *ngFor="let list of careDemandLists">{{list.title}}
+                                    </option>
+                                </ng-template>
+
+                            </select>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <ng-container *ngIf="selectedList">
+                    <zorgplanner-edit-care-demand [selectedCareDemandList]="selectedList"
+                        (clearSelectedCareDemandList)="clearSelectedCareDemandList()"></zorgplanner-edit-care-demand>
+                </ng-container>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <h2>Bestaande zorgbehoefte lijsten</h2>
+
+<div class="form-group">
+    <label for="exampleFormControlSelect1">Selecteer een zorgbehoefte lijst:</label>
+    <select class="form-select" id="exampleFormControlSelect1" [disabled]="careDemandLists.length === 0"
+        (change)="selectList($event)">
+
+        <option *ngIf="careDemandLists.length === 0; else lists">U heeft nog geen zorgbehoefte lijsten
+            opgeslagen
+        </option>
+        <ng-template #lists>
+            <option>Selecteer een lijst</option>
+            <option [value]="list.id" *ngFor="let list of careDemandLists">{{list.title}}</option>
+        </ng-template>
+
+    </select>
+</div>
+
+<div *ngIf="selectedList">
+    <zorgplanner-edit-care-demand [selectedCareDemandList]="selectedList"
+        (clearSelectedCareDemandList)="clearSelectedCareDemandList()"></zorgplanner-edit-care-demand>
+</div> -->
+
+
+<!-- </div> -->

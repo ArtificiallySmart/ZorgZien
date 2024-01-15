@@ -8,7 +8,7 @@ import {
   RemoveCareSupplyList,
 } from '../../shared/interfaces/care-supply';
 import { EditCareSupplyComponent } from './edit-care-supply/edit-care-supply.component';
-import { CareSupplyService } from '../services/care-supply.service';
+import { CareSupplyService } from './services/care-supply.service';
 
 @Component({
   selector: 'zorgplanner-care-supply',
@@ -24,6 +24,7 @@ import { CareSupplyService } from '../services/care-supply.service';
 })
 export class CareSupplyComponent {
   @Input() careSupplyLists: CareSupplyList[] = [];
+  @Input() editMode = false;
 
   private careSupplyService = inject(CareSupplyService);
 

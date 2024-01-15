@@ -10,6 +10,7 @@ import {
 import { CareDemandService } from './care-demand.service';
 import { CreateCareDemandDto } from './dto/create-care-demand.dto';
 import { UpdateCareDemandDto } from './dto/update-care-demand.dto';
+import { CareDemandList } from './entities/care-demand-list.entity';
 
 @Controller('care-demand')
 export class CareDemandController {
@@ -21,8 +22,9 @@ export class CareDemandController {
   }
 
   @Get(':projectId')
-  findOne(@Param('projectId') projectId: string) {
-    return this.careDemandService.findAll(+projectId);
+  async findOne(@Param('projectId') projectId: string) {
+    const test = await this.careDemandService.findAll(+projectId);
+    return test as CareDemandList[];
   }
 
   @Patch(':id')

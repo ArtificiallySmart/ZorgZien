@@ -11,7 +11,10 @@ import {
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, map } from 'rxjs';
-import { CareDemandList } from '../../../shared/interfaces/care-demand';
+import {
+  CareDemandList,
+  CareDemandEntry,
+} from '../../../shared/interfaces/care-demand';
 import { ZipcodeRangePipe } from '../../../shared/pipes/zipcode-range.pipe';
 import { CareDemandService } from '../services/care-demand.service';
 
@@ -37,8 +40,6 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
 
   careDemandService = inject(CareDemandService);
 
-  editingEnabled = false;
-
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
@@ -52,21 +53,17 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   resetValues(event: Event) {
     (event.target as HTMLElement).focus();
     this.careDemandListBS.next(this.selectedCareDemandList);
-    this.toggleEditing();
-  }
-
-  toggleEditing() {
-    this.editingEnabled = !this.editingEnabled;
   }
 
   groupedCareDemand$ = this.careDemandList$.pipe(
     map((careDemandList) => {
       const range = this.makeRangeValues(
-        careDemandList.careDemand.map((careDemand) => careDemand[0])
+        careDemandList.careDemand.map((careDemand) => careDemand.zipcode)
       );
       return range.map((range) => {
         const group = careDemandList.careDemand.filter(
-          (careDemand) => careDemand[0] >= range && careDemand[0] < range + 100
+          (careDemand) =>
+            careDemand.zipcode >= range && careDemand.zipcode < range + 100
         );
         return group.sort();
       });
@@ -76,33 +73,35 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   zipcodeRange$ = this.careDemandList$.pipe(
     map((careDemandList) => {
       return this.makeRangeValues(
-        careDemandList.careDemand.map((careDemand) => careDemand[0])
+        careDemandList.careDemand.map((careDemand) => careDemand.zipcode)
       );
     })
   );
 
   deleteDemand(zipcode: number) {
-    if (!this.editingEnabled) return;
     const oldCareDemand = this.careDemandListBS.value;
 
     this.careDemandListBS.next({
       ...this.selectedCareDemandList,
       careDemand: [
         ...oldCareDemand.careDemand.filter(
-          (careDemand) => careDemand[0] !== zipcode
+          (careDemand) => careDemand.zipcode !== zipcode
         ),
       ],
     });
   }
 
-  addDemand(zipcode: number, amount: number) {
-    if (!this.editingEnabled) return;
+  addDemand(zipcode: number, amountClient: number, amountHours: number) {
+    const newEntry: CareDemandEntry = {
+      zipcode,
+      clients: amountClient,
+      hours: amountHours,
+      careDemandListId: this.selectedCareDemandList.id,
+    };
+    const oldCareDemand = this.careDemandListBS.value;
     this.careDemandListBS.next({
-      ...this.selectedCareDemandList,
-      careDemand: [
-        ...this.selectedCareDemandList.careDemand,
-        [zipcode, amount],
-      ],
+      ...oldCareDemand,
+      careDemand: [...oldCareDemand.careDemand, newEntry],
     });
   }
 
@@ -126,7 +125,5 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
     const id = this.careDemandListBS.value.id;
     const data = this.careDemandListBS.value;
     this.careDemandService.updateCareDemandList({ id, data });
-
-    this.toggleEditing();
   }
 }

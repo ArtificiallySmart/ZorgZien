@@ -5,18 +5,10 @@ import { FeatureCollection, GeoJsonProperties } from 'geojson';
 import * as topojson from 'topojson';
 import { Objects } from 'topojson-specification';
 
-import { CareDemandList } from '../../shared/interfaces/care-demand';
-import { CareSupplyList } from '../../shared/interfaces/care-supply';
-import { CareDemandService } from '../care-demand/services/care-demand.service';
-import { CareSupplyService } from './care-supply.service';
 import { DataService } from './data.service';
+import { ZipcodeData, ZipcodeDataService } from './zipcode-data.service';
 
-export interface ZipcodeData {
-  zipcode: string;
-  demand: number | null;
-  assignedTeam: string | null;
-  color: string | null;
-}
+import * as utils from '../../shared/utils/hsl-hsla.util';
 
 export interface PopoverLocationState {
   x: number;
@@ -29,8 +21,7 @@ export interface PopoverLocationState {
 })
 export class ChoroplethService {
   private dataService = inject(DataService);
-  private careDemandService = inject(CareDemandService);
-  private careSupplyService = inject(CareSupplyService);
+  private zipcodeDataService = inject(ZipcodeDataService);
 
   private centerGroningen: [number, number] = [6.4, 53.259];
 
@@ -40,37 +31,23 @@ export class ChoroplethService {
   path = d3.geoPath(this.projection);
   transform: d3.ZoomTransform | null = null;
 
-  demandZipcodeData: ZipcodeData[] = [];
-  supplyZipcodeData: ZipcodeData[] = [];
-
   clickLocation = signal<PopoverLocationState>({
     x: 0,
     y: 0,
     zipcodeData: {} as ZipcodeData,
   });
 
-  unassignedColor = 'hsla(0, 100%, 0%, 1)';
-
-  // clickLocation = signal<[number, number]>([0, 0]);
+  demandType = signal<'hours' | 'clients'>('hours');
 
   constructor() {
     effect(() => {
-      if (this.careDemandService.loaded()) {
-        this.demandZipcodeData = this.convertDemandList(
-          this.careDemandService.selectedCareDemandList()
-        );
-        this.combineZipcodeData();
-      }
+      this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
+      this.createLegend(this.zipcodeDataService.currentZipcodeData());
     });
 
     effect(() => {
-      if (this.careSupplyService.loaded()) {
-        this.supplyZipcodeData = this.convertSupplyList(
-          this.careSupplyService.selectedCareSupplyList()
-        );
-        this.combineZipcodeData();
-        //this.createLegend(this.careSupplyService.selectedCareSupplyList());
-      }
+      this.demandType();
+      this.fillZipcodeData();
     });
   }
 
@@ -88,69 +65,27 @@ export class ChoroplethService {
     return `hsla(0, 100%, 0%, ${alpha})`;
   }
 
-  convertDemandList(demandList: CareDemandList | null) {
-    if (demandList === null) {
-      return [];
-    }
-    const data: ZipcodeData[] = [];
-    demandList.careDemand.forEach((entry) => {
-      data.push({
-        zipcode: entry[0].toString(),
-        demand: entry[1],
-        assignedTeam: 'Niet toegewezen',
-        color: null,
-      });
-    });
-    return data;
-  }
-
-  convertSupplyList(supplyList: CareSupplyList | null) {
-    if (supplyList === null) {
-      return [];
-    }
-    const data: ZipcodeData[] = [];
-    supplyList.careSupply.forEach((entry) => {
-      entry.areaZipcodes?.forEach((zipcode) => {
-        data.push({
-          zipcode: zipcode,
-          demand: null,
-          assignedTeam: entry.name,
-          color: entry.color,
-        });
-      });
-    });
-    return data;
-  }
-
-  combineZipcodeData() {
-    const list1 = this.demandZipcodeData.map((entry) => ({ ...entry }));
-    const list2 = this.supplyZipcodeData.map((entry) => ({ ...entry }));
-
-    list2.forEach((entry) => {
-      const index = list1.findIndex((el) => el.zipcode === entry.zipcode);
-      if (index !== -1) {
-        list1[index].assignedTeam = entry.assignedTeam ?? null;
-        list1[index].color = entry.color ?? null;
-      } else {
-        list1.push(entry);
-      }
-    });
-    this.plotZipcodeData(list1);
-    this.createLegend(list1);
-  }
-
   plotZipcodeData(data: ZipcodeData[]) {
     const svg = this.svg;
     const path = this.path;
 
     if (!this.svg) return;
-    svg.selectAll('.zipcode-data').remove();
 
+    svg.selectAll('.zipcode-data').remove();
+    if (!data.length) return;
     const filteredMapFeatures = this.filterMapFeatures(data);
-    const maxDemand = d3.max(data, (d) => d.demand);
-    const logScale = d3.scaleLog().domain([1, maxDemand || 1]);
-    const alphaValue = (value: number) => {
-      return value !== null ? logScale(value) * 0.8 + 0.2 : 1;
+
+    const minHours = d3.min(data, (d) => d.amountOfHours);
+    const maxHours = d3.max(data, (d) => d.amountOfHours);
+    const hourLogScale = d3.scaleLog().domain([minHours || 1, maxHours || 1]);
+    const hourAlphaValue = (value: number) => {
+      return value !== null ? hourLogScale(value) * 0.8 + 0.2 : 1;
+    };
+
+    const maxClients = d3.max(data, (d) => d.amountOfClients);
+    const clientLogScale = d3.scaleLog().domain([1, maxClients || 1]);
+    const clientAlphaValue = (value: number) => {
+      return value !== null ? clientLogScale(value) * 0.8 + 0.2 : 1;
     };
 
     svg
@@ -160,19 +95,34 @@ export class ChoroplethService {
       .data(filteredMapFeatures)
       .join('path')
       .attr('d', path)
-      .attr('fill', (d) => {
+      .attr('data-hours', (d) => {
         const index = data.findIndex(
           (entry) => entry.zipcode === d.properties!['postcode4']
         );
         if (index === -1) {
           return 'grey';
         }
-        const alpha = alphaValue(data[index].demand!).toString();
+        const alpha = hourAlphaValue(data[index].amountOfHours!).toString();
 
         if (data[index].color === null) {
           return this.getUnassignedColor(+alpha);
         }
-        data[index].color = this.hslToHsla(data[index].color!, +alpha);
+        data[index].color = utils.hslToHsla(data[index].color!, +alpha);
+        return data[index].color;
+      })
+      .attr('data-clients', (d) => {
+        const index = data.findIndex(
+          (entry) => entry.zipcode === d.properties!['postcode4']
+        );
+        if (index === -1) {
+          return 'grey';
+        }
+        const alpha = clientAlphaValue(data[index].amountOfClients!).toString();
+
+        if (data[index].color === null) {
+          return this.getUnassignedColor(+alpha);
+        }
+        data[index].color = utils.hslToHsla(data[index].color!, +alpha);
         return data[index].color;
       })
       .attr('transform', this.transform?.toString() ?? null)
@@ -188,27 +138,22 @@ export class ChoroplethService {
 
     this.addMouseOver();
     this.addClick(data);
+    this.fillZipcodeData();
   }
 
-  hslToHsla(hsl: string, alpha: number) {
-    if (hsl.startsWith('hsla')) {
-      return hsl;
-    }
-    const hsla = hsl.replace(')', `, ${alpha})`).replace('hsl(', 'hsla(');
-    return hsla;
-  }
+  fillZipcodeData() {
+    const svgElements = d3.selectAll('path');
+    svgElements.each((_, i, nodes) => {
+      const element = d3.select(nodes[i] as SVGElement);
+      const color = element.attr(`data-${this.demandType()}`);
 
-  hslaToHsl(hsla: string) {
-    if (hsla.startsWith('hsl(')) {
-      return hsla;
-    }
-    const hsl = hsla.replace(/, [0-9.]+\)/, ')').replace('hsla(', 'hsl(');
-    return hsl;
+      if (!color) return;
+      element.attr('fill', color);
+    });
   }
 
   addMouseOver() {
     const svg = this.svg;
-    //const path = this.path;
     svg
       .selectAll('path')
       .on('mouseover', function () {
@@ -222,35 +167,48 @@ export class ChoroplethService {
   addClick(data: ZipcodeData[]) {
     const svg = this.svg;
 
-    svg.selectAll('path').on('click', (event) => {
-      const index = data.findIndex(
-        (entry) =>
-          entry.zipcode == event.target.__data__.properties!['postcode4']
-      );
-      let zipcodeData: ZipcodeData = {} as ZipcodeData;
-      zipcodeData = {
-        ...data[index],
-        zipcode: event.target.__data__.properties!['postcode4'],
-      };
+    svg
+      // .selectAll('path')
+      .on('click', (event) => {
+        if (event.target.nodeName !== 'path') {
+          this.clickLocation.update(() => {
+            return {
+              x: event.offsetX,
+              y: event.offsetY,
+              zipcodeData: {} as ZipcodeData,
+            };
+          });
+          return;
+        }
+        const index = data.findIndex(
+          (entry) =>
+            entry.zipcode == event.target.__data__.properties!['postcode4']
+        );
 
-      this.clickLocation.update(() => {
-        return {
-          x: event.offsetX,
-          y: event.offsetY,
-          zipcodeData: zipcodeData,
+        let zipcodeData: ZipcodeData = {} as ZipcodeData;
+        zipcodeData = {
+          ...data[index],
+          zipcode: event.target.__data__.properties!['postcode4'],
         };
+
+        this.clickLocation.update(() => {
+          return {
+            x: event.offsetX,
+            y: event.offsetY,
+            zipcodeData: zipcodeData,
+          };
+        });
       });
-    });
   }
 
-  makeFeatures(geoData2: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
-    this.mapFeatures = topojson.feature(geoData2, {
+  makeFeatures(geoData: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
+    this.mapFeatures = topojson.feature(geoData, {
       type: 'GeometryCollection',
-      geometries: (geoData2.objects['groningen'] as GeoJsonProperties)![
+      geometries: (geoData.objects['groningen'] as GeoJsonProperties)![
         'geometries'
       ],
     });
-    this.svg = d3.select('svg');
+    this.svg = d3.select('svg.choropleth');
     this.draw();
   }
 
@@ -301,7 +259,7 @@ export class ChoroplethService {
     } catch (error) {
       return;
     }
-
+    if (!zipcodeData.length) return;
     const keyvalue: { [key: string]: string } = {};
 
     zipcodeData.forEach((entry) => {
@@ -309,7 +267,7 @@ export class ChoroplethService {
         keyvalue[entry.assignedTeam!] = this.getUnassignedColor(1, true);
         return;
       }
-      keyvalue[entry.assignedTeam!] = this.hslaToHsl(entry.color!);
+      keyvalue[entry.assignedTeam!] = utils.hslaToHsl(entry.color!);
     });
 
     const legend = {
@@ -360,7 +318,6 @@ export class ChoroplethService {
       .attr('y', function (_, i) {
         return legend.text.centerY(i);
       })
-      .style('fill', (d: string) => keyvalue[d] as string)
       .text(function (d) {
         return Object.keys(keyvalue).find((key) => key === d) as string;
       })
