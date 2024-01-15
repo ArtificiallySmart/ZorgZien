@@ -33,22 +33,6 @@ export class UsersService {
   ) {}
 
   userRepository = this.dataSource.getRepository(UserEntity);
-  // private readonly users = [
-  //   {
-  //     id: 1,
-  //     email: 'test@example.com',
-  //     password: 'changeme',
-  //   },
-  //   {
-  //     id: 2,
-  //     email: 'test2@example.com',
-  //     password: 'guess',
-  //   },
-  // ];
-
-  // async findOne(email: string): Promise<User | undefined> {
-  //   return this.users.find((user) => user.email === email);
-  // }
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
     return this.authService.hashPassword(createUserDto.password).pipe(
@@ -68,7 +52,6 @@ export class UsersService {
         );
       })
     );
-    // return this.userRepository.save(createUserDto);
   }
 
   findAll() {

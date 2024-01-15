@@ -12,6 +12,7 @@ import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
+import { CookieOptions } from 'express-serve-static-core';
 
 @Controller('users')
 export class UsersController {
@@ -19,6 +20,20 @@ export class UsersController {
     private readonly usersService: UsersService,
     private authService: AuthService
   ) {}
+
+  get cookieOptions() {
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        httpOnly: true,
+      } as CookieOptions;
+    }
+    return {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: process.env.RAILWAY_STATIC_URL,
+    } as CookieOptions;
+  }
 
   // @Public()
   // @Post()
@@ -34,12 +49,7 @@ export class UsersController {
   login(@Body() user: CreateUserDto, @Res() res: Response) {
     return this.usersService.login(user).pipe(
       map((tokens: { access_token: string; refresh_token: string }) => {
-        res.cookie('refresh_token', tokens.refresh_token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: process.env.RAILWAY_STATIC_URL,
-        });
+        res.cookie('refresh_token', tokens.refresh_token, this.cookieOptions);
         return res.send({ access_token: tokens.access_token });
       }),
       catchError((err) => of({ error: err.message }))
@@ -51,11 +61,10 @@ export class UsersController {
   refresh(@Res() res: Response, @Req() req: Request) {
     const oldRefreshToken = req.cookies['refresh_token'];
     if (!oldRefreshToken) {
-      // throw new Error('No refresh token provided');
       throw new HttpException('No refresh token provided', 400);
     }
     const decodedToken = this.authService.decodeRefreshToken(oldRefreshToken);
-    // Validate old refresh token, if invalid, throw an error.
+
     const user = decodedToken.user;
     const newAccessToken = this.authService.createAccessToken(user);
     const newRefreshToken = this.authService.replaceRefreshToken(
@@ -65,26 +74,13 @@ export class UsersController {
 
     return forkJoin([newAccessToken, newRefreshToken]).pipe(
       map((tokens: string[]) => {
-        res.cookie('refresh_token', tokens[1], {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: process.env.RAILWAY_STATIC_URL,
-        });
+        res.cookie('refresh_token', tokens[1], this.cookieOptions);
         return res.send({ access_token: tokens[0] });
       }),
       catchError((err) => {
         throw err;
       })
     );
-
-    // res.cookie('refreshToken', newRefreshToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: 'strict',
-    // });
-
-    // return res.send({ accessToken: newAccessToken });
   }
 
   // @Get()

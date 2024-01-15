@@ -30,7 +30,7 @@ import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
         UserEntity,
         TokenBlacklistEntity,
       ],
-      // synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
     CareDemandModule,
     CareSupplyModule,
