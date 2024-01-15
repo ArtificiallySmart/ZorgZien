@@ -11,6 +11,4 @@ import { HeaderComponent } from './header/header.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-  myContext = { $implicit: 'World', localSk: 'Svet' };
-}
+export class AppComponent {}
