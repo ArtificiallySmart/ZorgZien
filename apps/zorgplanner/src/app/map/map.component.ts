@@ -38,7 +38,7 @@ export class MapComponent {
   project = this.projectService.project;
   isCollapsed = false;
 
-  demandVsSupply = this.zipcodeDataService.hoursDemandandSupply;
+  //demandVsSupply = this.zipcodeDataService.hoursDemandandSupply;
   constructor() {
     this.choroplethService.init();
 

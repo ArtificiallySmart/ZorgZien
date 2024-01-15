@@ -36,6 +36,19 @@
 
                     </li>
 
+                    <li class="sidebar-item" [ngbNavItem]="'Data overzicht'">
+                        <a class="sidebar-link" href="" aria-expanded="false" ngbNavLink>
+                            <span>
+                                <tabler-icon name="table"></tabler-icon>
+                            </span>
+                            <span class="hide-menu">Data overzicht</span>
+                        </a>
+                        <ng-template ngbNavContent>
+                            <zorgplanner-data-view></zorgplanner-data-view>
+                        </ng-template>
+
+                    </li>
+
                     <li class="nav-small-cap">
                         <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                         <span class="hide-menu">Projecten</span>

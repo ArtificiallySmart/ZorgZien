@@ -58,7 +58,8 @@
                                     </option>
                                     <ng-template #lists>
                                         <option [value]="0">Selecteer een lijst</option>
-                                        <option [value]="list.id" *ngFor="let list of careDemand()">
+                                        <option [value]="list.id" *ngFor="let list of careDemand()"
+                                            [attr.selected]="careDemandService.selectedCareDemandList() && careDemandService.selectedCareDemandList()!.id === list.id">
                                             {{list.title}}
                                         </option>
                                     </ng-template>
@@ -118,7 +119,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
+            <!-- <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-inline-flex justify-content-start">
@@ -133,7 +134,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

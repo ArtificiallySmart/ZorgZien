@@ -1,0 +1,117 @@
+<div class="row">
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">hoi</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Organisatie</th>
+                                    <th scope="col">Postcodegebieden</th>
+                                    <th scope="col">Zorgvraag</th>
+                                    <th scope="col">Zorgaanbod</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let organisation of selectedCareSupplyList()?.careSupply">
+                                    <tr *ngFor="let zipcode of organisation.areaZipcodes; let first = first">
+                                        <td [attr.rowspan]="organisation.areaZipcodes?.length" *ngIf="first">O</td>
+                                        <td [attr.rowspan]="organisation.areaZipcodes?.length" *ngIf="first">
+                                            {{organisation.name}}</td>
+                                        <td>{{zipcode}}</td>
+                                        <td>Otto</td>
+                                        <td>!mdo</td>
+                                    </tr>
+                                </ng-container>
+
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-inline-flex justify-content-start">
+                    <h5 class="card-title fw-semibold mb-4">Opties</h5>
+                </div>
+                <div>
+
+                    <div class="form-group mb-3">
+                        <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
+                            lijst:</label>
+                        <select class="form-select" id="exampleFormControlSelect1"
+                            [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
+
+                            <option value="test" *ngIf="careDemand().length === 0; else lists">U
+                                heeft
+                                nog
+                                geen
+                                zorgbehoefte lijsten
+                                opgeslagen
+                            </option>
+                            <ng-template #lists>
+                                <option [value]="0">Selecteer een lijst</option>
+                                <option [value]="list.id" *ngFor="let list of careDemand()"
+                                    [attr.selected]="careDemandService.selectedCareDemandList() && careDemandService.selectedCareDemandList()!.id === list.id">
+                                    {{list.title}}
+                                </option>
+                            </ng-template>
+
+                        </select>
+                    </div>
+
+
+                    <div class="form-group mb-3">
+                        <label for="exampleFormControlSelect2" class="form-label">Selecteer een
+                            Zorgbeschikbaarheid
+                            lijst:</label>
+                        <select class="form-select" id="exampleFormControlSelect2"
+                            [disabled]="(careSupply().length === 0) ? true : false" (change)="selectSupplyList($event)">
+
+                            <option value="test" *ngIf="careSupply().length === 0; else lists2">U
+                                heeft
+                                nog
+                                geen
+                                zorgbehoefte lijsten
+                                opgeslagen
+                            </option>
+                            <ng-template #lists2>
+                                <option>Selecteer een lijst</option>
+                                <option [value]="list.id" *ngFor="let list of careSupply()"
+                                    [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
+                                    {{list.title}}</option>
+                            </ng-template>
+
+                        </select>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <pre>
+        {{combinedDemandSupply() | json}}
+    </pre>
+    </div>
+    <!-- <div class="col-6">
+        <pre>
+        {{selectedCareSupplyList() | json}}
+    </pre>
+    </div> -->
+
+
+</div>

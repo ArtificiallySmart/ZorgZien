@@ -133,7 +133,9 @@ export class ChoroplethService {
         if (index === -1) {
           return 'unassigned';
         }
-        return `${data[index].assignedTeam?.replace(/ /g, '').toLowerCase()}`;
+        return `${data[index].assignedTeamName
+          ?.replace(/ /g, '')
+          .toLowerCase()}`;
       });
 
     this.addMouseOver();
@@ -264,10 +266,10 @@ export class ChoroplethService {
 
     zipcodeData.forEach((entry) => {
       if (entry.color === null) {
-        keyvalue[entry.assignedTeam!] = this.getUnassignedColor(1, true);
+        keyvalue[entry.assignedTeamName!] = this.getUnassignedColor(1, true);
         return;
       }
-      keyvalue[entry.assignedTeam!] = utils.hslaToHsl(entry.color!);
+      keyvalue[entry.assignedTeamName!] = utils.hslaToHsl(entry.color!);
     });
 
     const legend = {
