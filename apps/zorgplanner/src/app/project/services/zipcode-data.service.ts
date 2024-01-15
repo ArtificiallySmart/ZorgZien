@@ -13,12 +13,43 @@ export interface ZipcodeData {
   color: string | null;
 }
 
+export interface DemandVsSupply {
+  organisationName: string;
+  demand: number;
+  supply: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ZipcodeDataService {
   private careDemandService = inject(CareDemandService);
   private careSupplyService = inject(CareSupplyService);
+
+  hoursDemandandSupply: Signal<DemandVsSupply[]> = computed(() => {
+    const demandList = this.careDemandService.selectedCareDemandList();
+    const supplyList = this.careSupplyService.selectedCareSupplyList();
+    const data: DemandVsSupply[] = [];
+    if (demandList && supplyList) {
+      supplyList.careSupply.forEach((supply) => {
+        let demand = 0;
+        supply.areaZipcodes?.forEach((zipcode) => {
+          const demandEntry = demandList.careDemand.find(
+            (entry) => entry.zipcode === parseInt(zipcode)
+          );
+          if (demandEntry) {
+            demandEntry.hours && (demand += demandEntry.hours);
+          }
+        });
+        data.push({
+          organisationName: supply.name,
+          demand: Math.round(demand * 100) / 100,
+          supply: (supply.amount ?? 0) * 36,
+        });
+      });
+    }
+    return data;
+  });
 
   demandZipcodeData: Signal<ZipcodeData[]> = computed(() => {
     if (this.careDemandService.loaded()) {

@@ -33,82 +33,105 @@
         </div>
     </div>
     <div class="col-lg-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-inline-flex justify-content-start">
-                    <h5 class="card-title fw-semibold mb-4">Opties</h5>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-inline-flex justify-content-start">
+                            <h5 class="card-title fw-semibold mb-4">Opties</h5>
+                        </div>
+                        <div>
+
+                            <div class="form-group mb-3">
+                                <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
+                                    lijst:</label>
+                                <select class="form-select" id="exampleFormControlSelect1"
+                                    [disabled]="(careDemand().length === 0) ? true : false"
+                                    (change)="selectList($event)">
+
+                                    <option value="test" *ngIf="careDemand().length === 0; else lists">U
+                                        heeft
+                                        nog
+                                        geen
+                                        zorgbehoefte lijsten
+                                        opgeslagen
+                                    </option>
+                                    <ng-template #lists>
+                                        <option [value]="0">Selecteer een lijst</option>
+                                        <option [value]="list.id" *ngFor="let list of careDemand()">
+                                            {{list.title}}
+                                        </option>
+                                    </ng-template>
+
+                                </select>
+                            </div>
+
+
+                            <div class="form-group mb-3">
+                                <label for="exampleFormControlSelect2" class="form-label">Selecteer een
+                                    Zorgbeschikbaarheid
+                                    lijst:</label>
+                                <select class="form-select" id="exampleFormControlSelect2"
+                                    [disabled]="(careSupply().length === 0) ? true : false"
+                                    (change)="selectSupplyList($event)">
+
+                                    <option value="test" *ngIf="careSupply().length === 0; else lists2">U
+                                        heeft
+                                        nog
+                                        geen
+                                        zorgbehoefte lijsten
+                                        opgeslagen
+                                    </option>
+                                    <ng-template #lists2>
+                                        <option>Selecteer een lijst</option>
+                                        <option [value]="list.id" *ngFor="let list of careSupply()"
+                                            [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
+                                            {{list.title}}</option>
+                                    </ng-template>
+
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1"
+                                    (change)="onCheckboxChange($event)">
+                                <label class="form-check-label" for="exampleCheck1">Toon postcodes</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadios" id="demandRadio1"
+                                    value="option1" checked (change)="changeDemandType('hours')">
+                                <label class="form-check-label" for="demandRadio1">
+                                    Toon zorgbehoefte in uren
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadios" id="demandRadio2"
+                                    value="option2" (change)="changeDemandType('clients')">
+                                <label class="form-check-label" for="demandRadio2">
+                                    Toon zorgbehoefte in aantal cli&#235;nten
+                                </label>
+                            </div>
+
+
+
+                        </div>
+                    </div>
                 </div>
-                <div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-inline-flex justify-content-start">
+                            <h5 class="card-title fw-semibold mb-4">Opties</h5>
 
-                    <div class="form-group mb-3">
-                        <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
-                            lijst:</label>
-                        <select class="form-select" id="exampleFormControlSelect1"
-                            [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
-
-                            <option value="test" *ngIf="careDemand().length === 0; else lists">U
-                                heeft
-                                nog
-                                geen
-                                zorgbehoefte lijsten
-                                opgeslagen
-                            </option>
-                            <ng-template #lists>
-                                <option [value]="0">Selecteer een lijst</option>
-                                <option [value]="list.id" *ngFor="let list of careDemand()">
-                                    {{list.title}}
-                                </option>
-                            </ng-template>
-
-                        </select>
+                        </div>
+                        <div *ngFor="let demSup of demandVsSupply()">
+                            <p class="mb-0">
+                                {{demSup.organisationName}}:
+                            </p>
+                            <p>{{demSup.demand}}/{{demSup.supply}}</p>
+                        </div>
                     </div>
-
-
-                    <div class="form-group mb-3">
-                        <label for="exampleFormControlSelect2" class="form-label">Selecteer een Zorgbeschikbaarheid
-                            lijst:</label>
-                        <select class="form-select" id="exampleFormControlSelect2"
-                            [disabled]="(careSupply().length === 0) ? true : false" (change)="selectSupplyList($event)">
-
-                            <option value="test" *ngIf="careSupply().length === 0; else lists2">U
-                                heeft
-                                nog
-                                geen
-                                zorgbehoefte lijsten
-                                opgeslagen
-                            </option>
-                            <ng-template #lists2>
-                                <option>Selecteer een lijst</option>
-                                <option [value]="list.id" *ngFor="let list of careSupply()"
-                                    [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
-                                    {{list.title}}</option>
-                            </ng-template>
-
-                        </select>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1"
-                            (change)="onCheckboxChange($event)">
-                        <label class="form-check-label" for="exampleCheck1">Toon postcodes</label>
-                    </div>
-
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="demandRadio1"
-                            value="option1" checked (change)="changeDemandType('hours')">
-                        <label class="form-check-label" for="demandRadio1">
-                            Toon zorgbehoefte in uren
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="exampleRadios" id="demandRadio2"
-                            value="option2" (change)="changeDemandType('clients')">
-                        <label class="form-check-label" for="demandRadio2">
-                            Toon zorgbehoefte in aantal cli&#235;nten
-                        </label>
-                    </div>
-
-                    <!-- <button class="btn" (click)="demandType()">{{choroplethService.demandType()}}</button> -->
-
                 </div>
             </div>
         </div>
