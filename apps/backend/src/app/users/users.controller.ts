@@ -10,11 +10,11 @@ import { Request, Response } from 'express';
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UserEntity } from './models/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { CookieOptions } from 'express-serve-static-core';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -37,14 +37,14 @@ export class UsersController {
     } as CookieOptions;
   }
 
-  // @Public()
-  // @Post()
-  // create(@Body() user: CreateUserDto) {
-  //   return this.usersService.create(user).pipe(
-  //     map((user: UserEntity) => user),
-  //     catchError((err) => of({ error: err.message }))
-  //   );
-  // }
+  @Public()
+  @Post()
+  create(@Body() user: CreateUserDto) {
+    return this.usersService.create(user).pipe(
+      map((user: UserEntity) => user),
+      catchError((err) => of({ error: err.message }))
+    );
+  }
 
   @Public()
   @Post('login')
