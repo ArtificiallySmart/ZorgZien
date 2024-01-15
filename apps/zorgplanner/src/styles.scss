@@ -23,25 +23,23 @@ $theme-colors: (
     "danger":     #f01c01,
 );
 
-@import "./assets/scss/variables/variables";
+@import "./styles/variables/variables";
 
-
-
-@import "./assets/scss/variables/theme-variables";
+@import "./styles/variables/theme-variables";
 @import "bootstrap/scss/bootstrap";
 
 
 @import "./assets/icons/tabler-icons/tabler-icons.css";
 
-@import "./assets/scss/layouts/sidebar";
-@import "./assets/scss/layouts/header";
-@import "./assets/scss/layouts/layouts";
+@import "./styles/layouts/sidebar";
+@import "./styles/layouts/header";
+@import "./styles/layouts/layouts";
 
-@import "./assets/scss/component/reboot";
-@import "./assets/scss/component/card";
+@import "./styles/component/reboot";
+@import "./styles/component/card";
 
-@import "./assets/scss/utilities/icon-size";
-@import "./assets/scss/utilities/background";
+@import "./styles/utilities/icon-size";
+@import "./styles/utilities/background";
 
 
 body {

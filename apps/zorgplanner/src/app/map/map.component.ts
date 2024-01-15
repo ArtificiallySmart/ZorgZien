@@ -41,7 +41,7 @@ export class MapComponent {
     effect(() => {
       const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
 
-      this.myPopover.close();
+      this.myPopover.close(false);
 
       if (!zipcodeData.zipcode) {
         return;

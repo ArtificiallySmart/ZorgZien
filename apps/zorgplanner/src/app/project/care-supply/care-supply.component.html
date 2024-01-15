@@ -27,8 +27,8 @@
                             <input id="teamColor" class="form-control w-25"
                                 [(colorPicker)]="colorList[careSupplyEntries.length]"
                                 [style.background]="colorList[careSupplyEntries.length]" [cpAlphaChannel]="'disabled'"
-                                [cpOutputFormat]="'hsla'" [cpOKButton]="true"
-                                (colorPickerSelect)="changeColor($event)" />
+                                [cpOutputFormat]="'hsla'" [cpOKButton]="true" (colorPickerSelect)="changeColor($event)"
+                                [cpPresetColors]="colorList" />
                         </div>
                         <button class="btn btn-primary me-3" (click)="submitEntry()">toevoegen</button>
                         <button type="button" class="btn btn-success" [disabled]="!careSupplyEntries.length"
