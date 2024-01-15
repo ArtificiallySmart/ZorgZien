@@ -38,7 +38,7 @@ export class UsersController {
   }
 
   @Public()
-  @Post()
+  @Post('register')
   create(@Body() user: CreateUserDto) {
     return this.usersService.create(user).pipe(
       map((user: UserEntity) => user),

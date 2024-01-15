@@ -61,7 +61,7 @@ export class AuthService {
 
   register(registerForm: FormGroup) {
     return this.httpService
-      .post<LoginResponse, object>('api/users/register', registerForm.value)
+      .post<LoginResponse, object>('/api/users/register', registerForm.value)
       .pipe(
         tap((res) => {
           this.setAccessToken(res.access_token);
@@ -76,7 +76,7 @@ export class AuthService {
   refreshToken(): Observable<string> {
     return this.httpService
       .post<{ access_token: string; user: User }, object>(
-        'api/users/refresh',
+        '/api/users/refresh',
         {}
       )
       .pipe(
@@ -106,7 +106,7 @@ export class AuthService {
       user: null,
     }));
     this.router.navigate(['/login']);
-    this.httpService.post('api/users/logout', {}).subscribe();
+    this.httpService.post('/api/users/logout', {}).subscribe();
   }
 
   setAccessToken(accessToken: string) {
