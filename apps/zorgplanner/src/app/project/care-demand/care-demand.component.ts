@@ -35,7 +35,6 @@ export class CareDemandComponent {
 
   addList() {
     const demandValues = this.parserService.parse(this.zorgUren);
-    console.log(demandValues);
     this.careDemandService.addCareDemandList({
       title: this.title,
       careDemand: demandValues,

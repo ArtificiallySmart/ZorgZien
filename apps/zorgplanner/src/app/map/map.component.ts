@@ -39,15 +39,19 @@ export class MapComponent {
     this.choroplethService.init();
 
     effect(() => {
+      const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
+
+      this.myPopover.close();
+
+      if (!zipcodeData.zipcode) {
+        return;
+      }
       if (this.choroplethService.clickLocation().x !== 0) {
-        if (this.myPopover.isOpen()) {
-          this.myPopover.close();
-        }
         this.setPopperOptions([
           this.choroplethService.clickLocation().x,
           this.choroplethService.clickLocation().y,
         ]);
-        const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
+
         setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
       }
     });

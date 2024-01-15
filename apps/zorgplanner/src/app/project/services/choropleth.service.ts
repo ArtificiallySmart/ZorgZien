@@ -39,10 +39,6 @@ export class ChoroplethService {
 
   demandType = signal<'hours' | 'clients'>('hours');
 
-  // unassignedColor = 'hsla(0, 100%, 0%, 1)';
-
-  // clickLocation = signal<[number, number]>([0, 0]);
-
   constructor() {
     effect(() => {
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
@@ -171,25 +167,38 @@ export class ChoroplethService {
   addClick(data: ZipcodeData[]) {
     const svg = this.svg;
 
-    svg.selectAll('path').on('click', (event) => {
-      const index = data.findIndex(
-        (entry) =>
-          entry.zipcode == event.target.__data__.properties!['postcode4']
-      );
-      let zipcodeData: ZipcodeData = {} as ZipcodeData;
-      zipcodeData = {
-        ...data[index],
-        zipcode: event.target.__data__.properties!['postcode4'],
-      };
+    svg
+      // .selectAll('path')
+      .on('click', (event) => {
+        if (event.target.nodeName !== 'path') {
+          this.clickLocation.update(() => {
+            return {
+              x: event.offsetX,
+              y: event.offsetY,
+              zipcodeData: {} as ZipcodeData,
+            };
+          });
+          return;
+        }
+        const index = data.findIndex(
+          (entry) =>
+            entry.zipcode == event.target.__data__.properties!['postcode4']
+        );
 
-      this.clickLocation.update(() => {
-        return {
-          x: event.offsetX,
-          y: event.offsetY,
-          zipcodeData: zipcodeData,
+        let zipcodeData: ZipcodeData = {} as ZipcodeData;
+        zipcodeData = {
+          ...data[index],
+          zipcode: event.target.__data__.properties!['postcode4'],
         };
+
+        this.clickLocation.update(() => {
+          return {
+            x: event.offsetX,
+            y: event.offsetY,
+            zipcodeData: zipcodeData,
+          };
+        });
       });
-    });
   }
 
   makeFeatures(geoData: TopoJSON.Topology<Objects<GeoJsonProperties>>) {

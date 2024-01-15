@@ -54,7 +54,7 @@ export class UsersController {
         }
       ),
       catchError((err) => {
-        console.log(err.message);
+        //console.log(err.message);
         throw new HttpException(err.message, 400);
       })
     );
