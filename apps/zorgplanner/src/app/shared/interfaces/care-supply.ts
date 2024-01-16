@@ -12,6 +12,20 @@ export interface CareSupplyEntry {
   areaZipcodes?: string[];
 }
 
+export interface CombinedDemandSupply {
+  organisationName: string;
+  totalDemandClients: number;
+  totalDemandHours: number;
+  totalSupplyHours: number;
+  zipcodes: ZipcodeEntry[];
+}
+
+export interface ZipcodeEntry {
+  zipcode: string;
+  demandClients: number;
+  demandHours: number;
+}
+
 export type AddCareSupplyList = Omit<CareSupplyList, 'id'>;
 
 export type EditCareSupplyList = {

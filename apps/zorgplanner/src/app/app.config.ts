@@ -17,6 +17,7 @@ import {
   IconChevronDown,
   IconBook,
   IconCircle,
+  IconTable,
 } from 'angular-tabler-icons/icons';
 
 const icons = {
@@ -31,6 +32,7 @@ const icons = {
   IconChevronDown,
   IconBook,
   IconCircle,
+  IconTable,
 };
 
 export const appConfig: ApplicationConfig = {

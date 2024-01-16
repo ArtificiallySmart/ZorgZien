@@ -11,6 +11,7 @@ import { CareDemandService } from '../project/care-demand/services/care-demand.s
 import { CareSupplyService } from '../project/care-supply/services/care-supply.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ProjectService } from '../project/services/project.service';
+import { ZipcodeDataService } from '../project/services/zipcode-data.service';
 
 @Component({
   selector: 'zorgplanner-map',
@@ -30,11 +31,14 @@ export class MapComponent {
   careDemandService = inject(CareDemandService);
   careSupplyService = inject(CareSupplyService);
   projectService = inject(ProjectService);
+  zipcodeDataService = inject(ZipcodeDataService);
 
   careDemand = this.careDemandService.careDemandLists;
   careSupply = this.careSupplyService.careSupplyLists;
   project = this.projectService.project;
   isCollapsed = false;
+
+  //demandVsSupply = this.zipcodeDataService.hoursDemandandSupply;
   constructor() {
     this.choroplethService.init();
 

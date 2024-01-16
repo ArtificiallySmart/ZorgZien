@@ -1,7 +1,7 @@
 <ng-container *ngIf="(careDemandList$ | async) as careDemandList">
 
     <div class="row">
-        <div class="col-lg-5 d-flex align-items-strech">
+        <div class="col-lg-6 d-flex align-items-strech">
             <div class="card w-100">
                 <div class="card-body">
                     <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
@@ -15,7 +15,7 @@
                             *ngFor="let demandGroup of (groupedCareDemand$ | async); let last = last; let i = index; trackBy demandByIndex">
                             <div ngbAccordionItem #accItem="ngbAccordionItem" *ngIf="demandGroup.length">
                                 <div ngbAccordionHeader class="d-flex justify-content-between align-items-center">
-                                    <h5 class="my-1">{{(zipcodeRange$ | async)![i] | zipcodeRange:100:last}}</h5>
+                                    <h5 class="my-1 mx-3">{{(zipcodeRange$ | async)![i] | zipcodeRange:100:last}}</h5>
                                     <button ngbAccordionToggle type="button" class="btn">
                                         <i *ngIf="accItem.collapsed" class="bi bi-chevron-down"></i>
                                         <i *ngIf="!accItem.collapsed" class="bi bi-chevron-up"></i>
@@ -59,7 +59,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 d-flex align-items-strech">
+        <div class="col-lg-6 d-flex align-items-strech">
             <div class="card w-100">
                 <div class="card-body">
                     <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">

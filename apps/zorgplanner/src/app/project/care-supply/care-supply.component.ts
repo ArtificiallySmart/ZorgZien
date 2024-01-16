@@ -35,6 +35,7 @@ export class CareSupplyComponent {
   newTeamName = '';
   areaZipcodes = '';
   color = '';
+  availableFTES = 0;
 
   //Blue, BlueViolet, DarkGreen, Gold, LawnGreen, Orange, Sienna
   //#0000FF, #8A2BE2, #006400, #FFD700, #7CFC00, #FFA500, #A0522D
@@ -78,6 +79,7 @@ export class CareSupplyComponent {
       name: this.newTeamName,
       areaZipcodes: this.areaZipcodes.split(','),
       color: color,
+      amount: this.availableFTES,
     });
     this.newTeamName = this.areaZipcodes = this.color = '';
   }
