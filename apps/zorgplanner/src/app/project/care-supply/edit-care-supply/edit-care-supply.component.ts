@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -37,6 +44,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 })
 export class EditCareSupplyComponent implements OnInit {
   @Input() careSupplyList!: CareSupplyList;
+  @Output() deleteSupplyList = new EventEmitter<string>();
 
   careSupplyService = inject(CareSupplyService);
   careSupplyListForm!: FormGroup;
@@ -78,7 +86,7 @@ export class EditCareSupplyComponent implements OnInit {
     this.careSupplyList.careSupply.forEach((supplyEntry) =>
       this.createCareSupplyEntryForm(supplyEntry)
     );
-    this.careSupplyListForm.disable();
+    //this.careSupplyListForm.disable();
   }
 
   get careSupply() {
@@ -86,8 +94,11 @@ export class EditCareSupplyComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.careSupplyListForm.reset();
-    this.careSupplyListForm.disable();
+    this.initForm();
+  }
+
+  deleteList() {
+    this.deleteSupplyList.emit(this.careSupplyList.id);
   }
 
   supplyById(index: number, supply: CareSupplyEntry) {

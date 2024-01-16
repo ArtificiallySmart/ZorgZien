@@ -5,30 +5,92 @@
                 <h5 class="card-title fw-semibold mb-4">hoi</h5>
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-sm table-striped">
+
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col">Organisatie</th>
-                                    <th scope="col">Postcodegebieden</th>
-                                    <th scope="col">Zorgvraag</th>
-                                    <th scope="col">Zorgaanbod</th>
+                                    <th>Organisatie</th>
+                                    <th>Zorgaanbod in uren</th>
+                                    <th>Zorgvraag in uren</th>
+                                    <th>Aantal cli&#235;nten</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <ng-container *ngFor="let organisation of selectedCareSupplyList()?.careSupply">
-                                    <tr *ngFor="let zipcode of organisation.areaZipcodes; let first = first">
-                                        <td [attr.rowspan]="organisation.areaZipcodes?.length" *ngIf="first">O</td>
-                                        <td [attr.rowspan]="organisation.areaZipcodes?.length" *ngIf="first">
-                                            {{organisation.name}}</td>
-                                        <td>{{zipcode}}</td>
-                                        <td>Otto</td>
-                                        <td>!mdo</td>
-                                    </tr>
-                                </ng-container>
+                                <ng-container *ngFor="let item of combinedDemandSupplyTable()">
 
+                                    <tr (click)="item.isCollapsed = !item.isCollapsed">
+                                        <td>{{ item.organisationName }}</td>
+                                        <td>{{ item.totalSupplyHours }}</td>
+                                        <td>{{ item.totalDemandHours | number:'1.1-2'}}</td>
+                                        <td>{{ item.totalDemandClients }}</td>
+                                        <td><i-tabler name="chevron-down" class="chevron-icon"
+                                                [class.rotate]="!item.isCollapsed"></i-tabler>
+                                        </td>
+                                    </tr>
+
+                                    <tr [ngbCollapse]="item.isCollapsed" #collapse="ngbCollapse">
+                                        <th></th>
+                                        <th>Postcode</th>
+                                        <th>Aantal uren</th>
+                                        <th>Aantal cli&#235;nten</th>
+                                    </tr>
+
+                                    <tr *ngFor="let zipcode of item.zipcodes" [ngbCollapse]="item.isCollapsed">
+                                        <td></td>
+                                        <td>{{ zipcode.zipcode }}</td>
+                                        <td>{{ zipcode.demandHours | number:'1.1-2'}}</td>
+                                        <td>{{ zipcode.demandClients }}</td>
+                                    </tr>
+
+
+
+
+                                </ng-container>
                             </tbody>
                         </table>
+                        <!-- <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Organisatie</th>
+                                    <th>Zorgaanbod in uren</th>
+                                    <th>Zorgvraag in uren</th>
+                                    <th>Aantal cli&#235;nten</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let item of combinedDemandSupplyTable()">
+                                    
+                                    <tr (click)="item.isCollapsed = !item.isCollapsed">
+                                        <td>{{ item.organisationName }}</td>
+                                        <td>{{ item.totalSupplyHours }}</td>
+                                        <td>{{ item.totalDemandHours }}</td>
+                                        <td>{{ item.totalDemandClients }}</td>
+                                    </tr>
+                                    
+                                    <tr [ngbCollapse]="item.isCollapsed">
+                                        <td colspan="3">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Zipcode</th>
+                                                        <th>Demand Clients</th>
+                                                        <th>Demand Hours</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let zipcode of item.zipcodes">
+                                                        <td>{{ zipcode.zipcode }}</td>
+                                                        <td>{{ zipcode.demandClients }}</td>
+                                                        <td>{{ zipcode.demandHours }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table> -->
 
 
                     </div>
@@ -100,18 +162,4 @@
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-6">
-        <pre>
-        {{combinedDemandSupply() | json}}
-    </pre>
-    </div>
-    <!-- <div class="col-6">
-        <pre>
-        {{selectedCareSupplyList() | json}}
-    </pre>
-    </div> -->
-
-
 </div>
