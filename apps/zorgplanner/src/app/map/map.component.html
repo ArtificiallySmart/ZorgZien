@@ -15,9 +15,10 @@
                         <p class="mb-0">uur: {{zipcodeData.amountOfHours ?? 0}}</p>
                         <p>clienten: {{zipcodeData.amountOfClients ?? 0}}</p>
 
-                        <ng-container *ngIf="zipcodeData.assignedTeam">
+                        <ng-container *ngIf="zipcodeData.assignedTeamName">
                             <p class="mb-0 fw-semibold">Organisatie: </p>
-                            <p>{{zipcodeData.assignedTeam}}</p>
+                            <p>{{zipcodeData.assignedTeamName}}</p>
+                            <button class="btn btn-outline-primary">Toewijzen aan andere organisatie</button>
                         </ng-container>
                     </ng-template>
                     <ng-template let-zipcodeData="zipcodeData" #popTitle>
@@ -119,22 +120,24 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="col-lg-12">
+            <div class="col-lg-12" *ngIf="organisationNames()?.length">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-inline-flex justify-content-start">
-                            <h5 class="card-title fw-semibold mb-4">Opties</h5>
+                            <h5 class="card-title fw-semibold mb-4">Organisaties aanpassen</h5>
+                        </div>
+                        <ul>
+                            <li *ngFor="let name of organisationNames()">
+                                <button class="btn" [class.btn-primary]="selectedOrganisationName === name"
+                                    (click)="selectedOrganisationName = name">{{name}}</button>
 
-                        </div>
-                        <div *ngFor="let demSup of demandVsSupply()">
-                            <p class="mb-0">
-                                {{demSup.organisationName}}:
-                            </p>
-                            <p>{{demSup.demand}}/{{demSup.supply}}</p>
-                        </div>
+                            </li>
+                        </ul>
+                        <button class="btn btn-primary"
+                            (click)="assignZipcodes = !assignZipcodes">{{assignZipcodes}}</button>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 </div>

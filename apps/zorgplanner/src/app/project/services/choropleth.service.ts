@@ -186,13 +186,11 @@ export class ChoroplethService {
           (entry) =>
             entry.zipcode == event.target.__data__.properties!['postcode4']
         );
-
         let zipcodeData: ZipcodeData = {} as ZipcodeData;
         zipcodeData = {
           ...data[index],
           zipcode: event.target.__data__.properties!['postcode4'],
         };
-
         this.clickLocation.update(() => {
           return {
             x: event.offsetX,
@@ -328,6 +326,16 @@ export class ChoroplethService {
       .style('cursor', 'pointer');
 
     this.addLegendMouseOver();
+    this.addLegendClick();
+  }
+
+  addLegendClick() {
+    const svg = this.svg;
+    svg.selectAll('.legend').on('click', function (_, d) {
+      console.log(d);
+      // const className = (d as string).replace(/ /g, '').toLowerCase();
+      // d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
+    });
   }
 
   addLegendMouseOver() {

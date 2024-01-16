@@ -1,6 +1,6 @@
 export function hslToHsla(hsl: string, alpha: number) {
   if (hsl.startsWith('hsla')) {
-    return hsl;
+    hsl = hslaToHsl(hsl);
   }
   const hsla = hsl.replace(')', `, ${alpha})`).replace('hsl(', 'hsla(');
   return hsla;
