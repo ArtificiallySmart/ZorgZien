@@ -1,12 +1,13 @@
 import { Injectable, Signal, computed, inject } from '@angular/core';
-import { CareDemandService } from '../care-demand/services/care-demand.service';
-import { CareSupplyService } from '../care-supply/services/care-supply.service';
+import { CareDemandService } from '../../project/care-demand/services/care-demand.service';
+import { CareSupplyService } from '../../project/care-supply/services/care-supply.service';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import {
   CareSupplyList,
   CombinedDemandSupply,
   ZipcodeEntry,
 } from '../../shared/interfaces/care-supply';
+import { environment } from '../../../environments/environment';
 
 export interface ZipcodeData {
   zipcode: string;
@@ -17,18 +18,13 @@ export interface ZipcodeData {
   color: string | null;
 }
 
-export interface DemandVsSupply {
-  organisationName: string;
-  demand: number;
-  supply: number;
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class ZipcodeDataService {
   private careDemandService = inject(CareDemandService);
   private careSupplyService = inject(CareSupplyService);
+  hoursInFTE = environment.hoursInFTE;
 
   demandZipcodeData: Signal<ZipcodeData[]> = computed(() => {
     if (this.careDemandService.loaded()) {
@@ -57,17 +53,18 @@ export class ZipcodeDataService {
       this.careDemandService.selectedCareDemandList()?.careDemand;
     const supplyListEntries =
       this.careSupplyService.selectedCareSupplyList()?.careSupply;
-    if (!demandListEntries || !supplyListEntries)
-      return [] as CombinedDemandSupply[];
+    if (!supplyListEntries) return [] as CombinedDemandSupply[];
 
     const zipcodes: ZipcodeEntry[] = [];
-    demandListEntries.forEach((entry) => {
-      zipcodes.push({
-        zipcode: entry.zipcode.toString(),
-        demandClients: entry.clients ?? 0,
-        demandHours: entry.hours ?? 0,
+    if (demandListEntries) {
+      demandListEntries.forEach((entry) => {
+        zipcodes.push({
+          zipcode: entry.zipcode.toString(),
+          demandClients: entry.clients ?? 0,
+          demandHours: entry.hours ?? 0,
+        });
       });
-    });
+    }
 
     const combined: CombinedDemandSupply[] = [];
     supplyListEntries.forEach((entry) => {
@@ -75,7 +72,7 @@ export class ZipcodeDataService {
         organisationName: entry.name,
         totalDemandClients: 0,
         totalDemandHours: 0,
-        totalSupplyHours: 0,
+        totalSupplyHours: entry.amount ?? 0,
         zipcodes: [],
       };
       entry.areaZipcodes?.forEach((zipcode) => {
@@ -87,6 +84,8 @@ export class ZipcodeDataService {
           zipcodes.splice(index, 1);
         }
       });
+      org.totalSupplyHours *= this.hoursInFTE;
+      org.totalDemandHours = Math.round(org.totalDemandHours * 100) / 100;
       combined.push(org);
     });
     if (zipcodes.length === 0) return combined;

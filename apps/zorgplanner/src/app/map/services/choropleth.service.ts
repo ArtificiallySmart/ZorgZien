@@ -5,7 +5,7 @@ import { FeatureCollection, GeoJsonProperties } from 'geojson';
 import * as topojson from 'topojson';
 import { Objects } from 'topojson-specification';
 
-import { DataService } from './data.service';
+import { DataService } from '../../project/services/data.service';
 import { ZipcodeData, ZipcodeDataService } from './zipcode-data.service';
 
 import * as utils from '../../shared/utils/hsl-hsla.util';
@@ -136,6 +136,30 @@ export class ChoroplethService {
         return `${data[index].assignedTeamName
           ?.replace(/ /g, '')
           .toLowerCase()}`;
+      })
+      .append('title')
+      .text((d) => {
+        const index = data.findIndex(
+          (entry) => entry.zipcode === d.properties!['postcode4']
+        );
+        if (index === -1) {
+          return '';
+        }
+        const clients = data[index].amountOfClients;
+        const hours = data[index].amountOfHours;
+        const assignedTeamName = data[index].assignedTeamName;
+        let text = `Postcode: ${data[index].zipcode}\n`;
+        if (assignedTeamName !== null) {
+          text += `Team: ${assignedTeamName}\n`;
+        }
+        if (clients !== null) {
+          text += `Aantal cliënten: ${clients}\n`;
+        }
+        if (hours !== null) {
+          text += `Aantal uren: ${hours}`;
+        }
+
+        return text;
       });
 
     this.addMouseOver();
@@ -217,6 +241,7 @@ export class ChoroplethService {
     const path = this.path;
     svg
       .append('g')
+      .attr('class', 'map-group')
       .selectAll('path')
       .data(this.mapFeatures.features)
       .join('path')
@@ -224,9 +249,10 @@ export class ChoroplethService {
       .attr('fill', 'white')
       .attr('stroke', 'grey');
 
+    console.log(svg.select('.map-group'));
     const zoom = d3
       .zoom<SVGElement, unknown>()
-      .scaleExtent([1, 8])
+      .scaleExtent([1, 1])
       .on('zoom', this.zoomed);
 
     svg.call(zoom);
@@ -255,12 +281,14 @@ export class ChoroplethService {
 
   createLegend(zipcodeData: ZipcodeData[]) {
     try {
-      this.svg.selectAll('.legend').remove();
+      this.svg.selectAll('.legend-group').remove();
     } catch (error) {
       return;
     }
+
     if (!zipcodeData.length) return;
     const keyvalue: { [key: string]: string } = {};
+    const combinedDemandSupply = this.zipcodeDataService.combinedDemandSupply();
 
     zipcodeData.forEach((entry) => {
       if (entry.color === null) {
@@ -273,7 +301,7 @@ export class ChoroplethService {
     const legend = {
       dots: {
         centerX: 25,
-        firstCenterY: 40,
+        firstCenterY: 100,
         radius: 7,
         spaceBetween: 25,
         centerY: (i: number) => {
@@ -296,6 +324,8 @@ export class ChoroplethService {
     };
 
     this.svg
+      .append('g')
+      .attr('class', 'legend-group')
       .selectAll('circles')
       .data(Object.keys(keyvalue).sort())
       .enter()
@@ -309,6 +339,7 @@ export class ChoroplethService {
       .style('fill', (d: string) => keyvalue[d] as string);
 
     this.svg
+      .select('g.legend-group')
       .selectAll('labels')
       .data(Object.keys(keyvalue).sort())
       .enter()
@@ -323,20 +354,45 @@ export class ChoroplethService {
       })
       .attr('text-anchor', 'left')
       .style('alignment-baseline', 'middle')
-      .style('cursor', 'pointer');
+      .style('cursor', 'pointer')
+      .append('title')
+      .text((d) => {
+        const index = combinedDemandSupply.findIndex(
+          (entry) => entry.organisationName === d
+        );
+        if (index === -1) {
+          return '';
+        }
+        const totalDemandClients =
+          combinedDemandSupply[index].totalDemandClients;
+        const totalDemandHours = combinedDemandSupply[index].totalDemandHours;
+        const totalSupplyHours = combinedDemandSupply[index].totalSupplyHours;
+        let text = `Organisatie: ${d}\n`;
+        if (totalSupplyHours !== null) {
+          text += `Aantal uren aanbod: ${totalSupplyHours}\n`;
+        }
+        if (totalDemandHours !== null) {
+          text += `Aantal uren vraag: ${totalDemandHours}\n`;
+        }
+        if (totalDemandClients !== null) {
+          text += `Aantal cliënten: ${totalDemandClients}`;
+        }
+        return text;
+      });
 
     this.addLegendMouseOver();
-    this.addLegendClick();
+
+    //this.addLegendClick();
   }
 
-  addLegendClick() {
-    const svg = this.svg;
-    svg.selectAll('.legend').on('click', function (_, d) {
-      console.log(d);
-      // const className = (d as string).replace(/ /g, '').toLowerCase();
-      // d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
-    });
-  }
+  // addLegendClick() {
+  //   const svg = this.svg;
+  //   svg.selectAll('.legend').on('click', function (_, d) {
+  //     console.log(d);
+  //     // const className = (d as string).replace(/ /g, '').toLowerCase();
+  //     // d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
+  //   });
+  // }
 
   addLegendMouseOver() {
     const svg = this.svg;

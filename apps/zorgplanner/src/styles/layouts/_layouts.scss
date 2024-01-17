@@ -55,7 +55,7 @@
   }
 }
 
-@include media-breakpoint-up(xl) {
+@include media-breakpoint-up(xxl) {
   #main-wrapper[data-layout="vertical"] {
 
     // Fixed Header + Minisidebar
@@ -85,10 +85,9 @@
 //
 // Responsive view (below desktop view)
 //
-@media (max-width: 1199px) {
+@media (max-width: 1599px) {
   #main-wrapper[data-layout="vertical"] {
 
-    &[data-sidebartype="mini-sidebar"],
     &[data-sidebartype="full"] {
       .left-sidebar {
         left: -$sidebar-width-full;

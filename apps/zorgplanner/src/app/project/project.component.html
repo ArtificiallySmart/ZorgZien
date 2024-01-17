@@ -1,5 +1,5 @@
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-sidebartype="full" data-sidebar-position="fixed"
-    data-header-position="fixed">
+    data-header-position="fixed" [class.show-sidebar]="showSidebar">
 
     <aside class="left-sidebar">
 
@@ -8,7 +8,8 @@
                 <a href="./" class="text-nowrap logo-img">
                     <img src="https://placehold.co/180x27?text=Placeholder" width="180" alt="" />
                 </a>
-                <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                <div class="close-btn d-xxl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse"
+                    (click)="showSidebar = false">
                     <i class="ti ti-x fs-8"></i>
                 </div>
             </div>
@@ -174,7 +175,7 @@
 
     <div class="body-wrapper">
 
-        <zorgplanner-header [headerTitle]="active"></zorgplanner-header>
+        <zorgplanner-header [headerTitle]="active" (toggleSidebar)="toggleSidebar()"></zorgplanner-header>
 
         <div class="container-fluid">
             <div [ngbNavOutlet]="nav"></div>

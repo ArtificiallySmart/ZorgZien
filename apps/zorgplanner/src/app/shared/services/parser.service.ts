@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CareDemandEntry } from '../../shared/interfaces/care-demand';
+import { CareDemandEntry } from '../interfaces/care-demand';
 
 @Injectable({
   providedIn: 'root',

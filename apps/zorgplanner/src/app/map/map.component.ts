@@ -6,7 +6,7 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
-import { ChoroplethService } from '../project/services/choropleth.service';
+import { ChoroplethService } from './services/choropleth.service';
 import { CareDemandService } from '../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../project/care-supply/services/care-supply.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -14,7 +14,7 @@ import { ProjectService } from '../project/services/project.service';
 import {
   ZipcodeData,
   ZipcodeDataService,
-} from '../project/services/zipcode-data.service';
+} from './services/zipcode-data.service';
 
 @Component({
   selector: 'zorgplanner-map',
@@ -55,17 +55,16 @@ export class MapComponent {
 
     effect(
       () => {
-        console.log('effect');
         const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
         this.assignZipcodes
-          ? this.reassingZipcode(zipcodeData)
+          ? this.reassignZipcode(zipcodeData)
           : this.togglePopover(zipcodeData);
       },
       { allowSignalWrites: true }
     );
   }
 
-  reassingZipcode(zipcodeData: ZipcodeData) {
+  reassignZipcode(zipcodeData: ZipcodeData) {
     const oldOrganisationName = zipcodeData.assignedTeamName;
     const newOrganisationName = this.selectedOrganisationName;
     if (oldOrganisationName === newOrganisationName || !zipcodeData.zipcode) {
@@ -93,6 +92,18 @@ export class MapComponent {
 
       setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
     }
+  }
+
+  toggleAssign(event: Event) {
+    this.assignZipcodes = (event.target as HTMLInputElement).checked;
+  }
+
+  selectOrganisationName(name: string) {
+    if (this.selectedOrganisationName === name) {
+      this.selectedOrganisationName = '';
+      return;
+    }
+    this.selectedOrganisationName = name;
   }
 
   popperOptions = (options: Partial<Options>) => {
