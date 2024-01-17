@@ -1,41 +1,40 @@
 <div class="row">
-    <div class="col align-items-stretch">
-        <div class="card w-100">
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">{{project().title}}</h5>
+    <div class="col-xxl-9 align-items-stretch">
+        <div class="card">
+            <div class="card-body p-0">
+                <h5 class="card-title fw-semibold floating-title my-4 mx-4">{{project().title}}</h5>
                 <div class="popover" #myPopover="ngbPopover" [popperOptions]="popperOptions" [ngbPopover]="popContent"
                     [popoverTitle]="popTitle" [autoClose]="'outside'">
                 </div>
-                <div class="svg-container">
+                <!-- <div class="svg-container"> -->
 
-                    <svg class="choropleth"></svg>
+                <svg class="choropleth"></svg>
 
-                    <ng-template let-zipcodeData="zipcodeData" #popContent>
-                        <p class="mb-0 fw-semibold">Zorgbehoefte:</p>
-                        <p class="mb-0">uur: {{zipcodeData.amountOfHours ?? 0}}</p>
-                        <p>clienten: {{zipcodeData.amountOfClients ?? 0}}</p>
+                <ng-template let-zipcodeData="zipcodeData" #popContent>
+                    <p class="mb-0 fw-semibold">Zorgbehoefte:</p>
+                    <p class="mb-0">uur: {{zipcodeData.amountOfHours ?? 0}}</p>
+                    <p>clienten: {{zipcodeData.amountOfClients ?? 0}}</p>
 
-                        <ng-container *ngIf="zipcodeData.assignedTeamName">
-                            <p class="mb-0 fw-semibold">Organisatie: </p>
-                            <p>{{zipcodeData.assignedTeamName}}</p>
-                            <button class="btn btn-outline-primary">Toewijzen aan andere organisatie</button>
-                        </ng-container>
-                    </ng-template>
-                    <ng-template let-zipcodeData="zipcodeData" #popTitle>
-                        <div class="d-flex justify-content-between">
-                            <p class="d-inline mb-0">{{zipcodeData.zipcode}}</p>
-                            <button type="button" class="btn btn-close btn-sm d-inline" aria-label="Close"
-                                (click)="myPopover.close()"></button>
-                        </div>
-                    </ng-template>
+                    <ng-container *ngIf="zipcodeData.assignedTeamName">
+                        <p class="mb-0 fw-semibold">Organisatie: </p>
+                        <p>{{zipcodeData.assignedTeamName}}</p>
+                    </ng-container>
+                </ng-template>
+                <ng-template let-zipcodeData="zipcodeData" #popTitle>
+                    <div class="d-flex justify-content-between">
+                        <p class="d-inline mb-0">{{zipcodeData.zipcode}}</p>
+                        <button type="button" class="btn btn-close btn-sm d-inline" aria-label="Close"
+                            (click)="myPopover.close()"></button>
+                    </div>
+                </ng-template>
 
-                </div>
+                <!-- </div> -->
             </div>
         </div>
     </div>
-    <div class="col-lg-3">
+    <div class="col-lg-12 col-xxl-3">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-6 col-xxl-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-inline-flex justify-content-start">
@@ -120,21 +119,27 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12" *ngIf="organisationNames()?.length">
+            <div class="col-lg-6 col-xxl-12" *ngIf="organisationNames()?.length">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-inline-flex justify-content-start">
-                            <h5 class="card-title fw-semibold mb-4">Organisaties aanpassen</h5>
+                            <h5 class="card-title fw-semibold mb-4">Organisaties herverdelen</h5>
                         </div>
                         <ul>
                             <li *ngFor="let name of organisationNames()">
                                 <button class="btn" [class.btn-primary]="selectedOrganisationName === name"
-                                    (click)="selectedOrganisationName = name">{{name}}</button>
+                                    (click)="selectOrganisationName(name)"
+                                    [disabled]="!assignZipcodes">{{name}}</button>
 
                             </li>
                         </ul>
-                        <button class="btn btn-primary"
-                            (click)="assignZipcodes = !assignZipcodes">{{assignZipcodes}}</button>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                                (change)="toggleAssign($event)">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Organisaties
+                                herverdelen</label>
+                        </div>
                     </div>
                 </div>
             </div>

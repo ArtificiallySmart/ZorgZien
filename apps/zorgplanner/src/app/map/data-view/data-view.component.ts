@@ -2,15 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { CareDemandService } from '../../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../../project/care-supply/services/care-supply.service';
-import { ZipcodeDataService } from '../../project/services/zipcode-data.service';
+import { ZipcodeDataService } from '../services/zipcode-data.service';
 import { CombinedDemandSupply } from '../../shared/interfaces/care-supply';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { FteToHoursPipe } from '../../shared/pipes/fte-to-hours.pipe';
 
 @Component({
   selector: 'zorgplanner-data-view',
   standalone: true,
-  imports: [CommonModule, NgbCollapseModule, TablerIconsModule],
+  imports: [CommonModule, NgbCollapseModule, TablerIconsModule, FteToHoursPipe],
   templateUrl: './data-view.component.html',
   styleUrl: './data-view.component.scss',
 })

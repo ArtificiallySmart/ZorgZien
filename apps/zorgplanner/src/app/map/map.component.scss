@@ -1,9 +1,16 @@
+.floating-title {
+    position: absolute;
+}
+
 svg {
     width: 100%;
+    //width: 1100px;
     height: 80vh;
+    min-height: 800px;
     // border: 1px solid black;
 }
 .popover {
     width: 0;
     height: 0;
 }
+
