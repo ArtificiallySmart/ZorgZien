@@ -3,7 +3,7 @@ import { Component, Input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
-import { ParserService } from '../services/parser.service';
+import { ParserService } from '../../shared/services/parser.service';
 import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.component';
 import { CareDemandService } from './services/care-demand.service';
 import { TablerIconsModule } from 'angular-tabler-icons';

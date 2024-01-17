@@ -18,6 +18,16 @@ import { CareSupplyComponent } from './care-supply/care-supply.component';
 import { CareSupplyService } from './care-supply/services/care-supply.service';
 import { NewProjectComponent } from './new-project/new-project.component';
 import { ProjectService } from './services/project.service';
+import { DataViewComponent } from '../map/data-view/data-view.component';
+
+const components = [
+  CareDemandComponent,
+  CareSupplyComponent,
+  HeaderComponent,
+  NewProjectComponent,
+  MapComponent,
+  DataViewComponent,
+];
 
 @Component({
   selector: 'zorgplanner-project',
@@ -26,15 +36,11 @@ import { ProjectService } from './services/project.service';
     CommonModule,
     FormsModule,
     NgbNavModule,
-    CareDemandComponent,
-    CareSupplyComponent,
     NgbPopoverModule,
-    HeaderComponent,
     TablerIconsModule,
-    NewProjectComponent,
-    MapComponent,
     NgbCollapseModule,
     RouterModule,
+    ...components,
   ],
   providers: [NgbNavConfig],
   templateUrl: './project.component.html',
@@ -57,6 +63,7 @@ export class ProjectComponent implements OnDestroy {
   projectsExist = true;
 
   active = 'Postcode kaart';
+  showSidebar = false;
 
   isCollapsed = true;
 
@@ -70,6 +77,10 @@ export class ProjectComponent implements OnDestroy {
         this.projectService.loadProject(params['id']);
       }
     });
+  }
+
+  toggleSidebar() {
+    this.showSidebar = true;
   }
 
   openProject(projectId: number) {

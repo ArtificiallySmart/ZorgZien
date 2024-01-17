@@ -1,0 +1,136 @@
+<div class="row">
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">
+                    <ng-container *ngIf="combinedDemandSupplyTable().length; else generic">
+                        {{selectedCareDemandList() ? selectedCareDemandList()!.title + ' &' : ''}}
+                        {{selectedCareSupplyList()!.title}}
+                    </ng-container>
+                    <ng-template #generic>
+                        Data overzicht
+                    </ng-template>
+                </h5>
+                <div class="card">
+                    <div class="card-body">
+
+                        <table class="table" *ngIf="combinedDemandSupplyTable().length; else explanation">
+                            <thead>
+                                <tr>
+                                    <th>Organisatie</th>
+                                    <th>Zorgaanbod in uren</th>
+                                    <th>Zorgvraag in uren</th>
+                                    <th>Aantal cli&#235;nten</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let item of combinedDemandSupplyTable(); let even = even">
+
+                                    <tr (click)="item.isCollapsed = !item.isCollapsed" [class.add-bg]="even">
+                                        <td>{{ item.organisationName }}</td>
+                                        <td>{{ item.totalSupplyHours | fteToHours}}</td>
+                                        <td>{{ item.totalDemandHours | number:'1.1-2'}}</td>
+                                        <td>{{ item.totalDemandClients }}</td>
+                                        <td><i-tabler name="chevron-down" class="chevron-icon"
+                                                [class.rotate]="!item.isCollapsed"></i-tabler>
+                                        </td>
+                                    </tr>
+
+                                    <tr [ngbCollapse]="item.isCollapsed" #collapse="ngbCollapse">
+                                        <th></th>
+                                        <th>Postcode</th>
+                                        <th>Aantal uren</th>
+                                        <th>Aantal cli&#235;nten</th>
+                                    </tr>
+
+                                    <tr *ngFor="let zipcode of item.zipcodes; let even = even"
+                                        [ngbCollapse]="item.isCollapsed" [class.add-bg]="even">
+                                        <td></td>
+                                        <td>{{ zipcode.zipcode }}</td>
+                                        <td>{{ zipcode.demandHours | number:'1.1-2'}}</td>
+                                        <td>{{ zipcode.demandClients }}</td>
+                                    </tr>
+
+
+
+
+                                </ng-container>
+                            </tbody>
+                        </table>
+                        <ng-template #explanation>
+                            Selecteer een zorgbehoefte- en zorgbeschikbaarheids lijst om een overzicht te krijgen van de
+                            zorg vraag en aanbod van de organisaties.
+                        </ng-template>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-inline-flex justify-content-start">
+                    <h5 class="card-title fw-semibold mb-4">Opties</h5>
+                </div>
+                <div>
+
+                    <div class="form-group mb-3">
+                        <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
+                            lijst:</label>
+                        <select class="form-select" id="exampleFormControlSelect1"
+                            [disabled]="(careDemand().length === 0) ? true : false" (change)="selectList($event)">
+
+                            <option value="test" *ngIf="careDemand().length === 0; else lists">U
+                                heeft
+                                nog
+                                geen
+                                zorgbehoefte lijsten
+                                opgeslagen
+                            </option>
+                            <ng-template #lists>
+                                <option [value]="0">Selecteer een lijst</option>
+                                <option [value]="list.id" *ngFor="let list of careDemand()"
+                                    [attr.selected]="careDemandService.selectedCareDemandList() && careDemandService.selectedCareDemandList()!.id === list.id">
+                                    {{list.title}}
+                                </option>
+                            </ng-template>
+
+                        </select>
+                    </div>
+
+
+                    <div class="form-group mb-3">
+                        <label for="exampleFormControlSelect2" class="form-label">Selecteer een
+                            Zorgbeschikbaarheid
+                            lijst:</label>
+                        <select class="form-select" id="exampleFormControlSelect2"
+                            [disabled]="(careSupply().length === 0) ? true : false" (change)="selectSupplyList($event)">
+
+                            <option value="test" *ngIf="careSupply().length === 0; else lists2">U
+                                heeft
+                                nog
+                                geen
+                                zorgbehoefte lijsten
+                                opgeslagen
+                            </option>
+                            <ng-template #lists2>
+                                <option>Selecteer een lijst</option>
+                                <option [value]="list.id" *ngFor="let list of careSupply()"
+                                    [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
+                                    {{list.title}}</option>
+                            </ng-template>
+
+                        </select>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

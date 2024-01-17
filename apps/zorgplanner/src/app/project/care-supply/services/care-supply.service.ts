@@ -43,12 +43,54 @@ export class CareSupplyService {
   //sources
   careSupplyListsLoaded$ = new Subject<CareSupplyList[]>();
   selectCareSupplyListId$ = new Subject<string>();
+
+  changeZipcodeForOrganisation$ = new Subject<{
+    zipcode: string;
+    oldOrganisationName: string | null;
+    newOrganisationName: string | null;
+  }>();
+
   add$ = new Subject<CareSupplyList>();
   edit$ = new Subject<EditCareSupplyList>();
   remove$ = new Subject<RemoveCareSupplyList>();
   clear$ = new Subject<void>();
 
   constructor() {
+    this.changeZipcodeForOrganisation$.pipe(takeUntilDestroyed()).subscribe({
+      next: ({ zipcode, oldOrganisationName, newOrganisationName }) => {
+        console.log('check');
+        //update the selectedCareSupplyList in the state
+        this.state.update((state) => ({
+          ...state,
+          selectedCareSupplyList: {
+            ...state.selectedCareSupplyList,
+            id: state.selectedCareSupplyList?.id || '',
+            title: state.selectedCareSupplyList?.title || '',
+            projectId: state.selectedCareSupplyList?.projectId || 0,
+            careSupply:
+              state.selectedCareSupplyList?.careSupply.map((careSupply) =>
+                careSupply.name === oldOrganisationName
+                  ? {
+                      ...careSupply,
+                      areaZipcodes: careSupply.areaZipcodes?.filter(
+                        (areaZipcode) => areaZipcode !== zipcode
+                      ),
+                    }
+                  : careSupply.name === newOrganisationName
+                  ? {
+                      ...careSupply,
+                      areaZipcodes: [
+                        ...(careSupply.areaZipcodes || []),
+                        zipcode,
+                      ],
+                    }
+                  : careSupply
+              ) || [],
+          },
+        }));
+      },
+    });
+
     this.careSupplyListsLoaded$.pipe(takeUntilDestroyed()).subscribe({
       next: (careSupplyLists) =>
         this.state.update((state) => ({

@@ -23,6 +23,11 @@
                         </div>
 
                         <div class="form-group mb-3">
+                            <label for="teamZipcodes" class="form-label">Aantal beschikbare FTE's:</label>
+                            <input type="number" id="teamftes" class="form-control" [(ngModel)]=availableFTES>
+                        </div>
+
+                        <div class="form-group mb-3">
                             <label for="teamColor" class="form-label">Kleur voor de organisatie:</label>
                             <input id="teamColor" class="form-control w-25"
                                 [(colorPicker)]="colorList[careSupplyEntries.length]"
@@ -89,9 +94,8 @@
 
                 <ng-container *ngIf="selectedList">
 
-                    <zorgplanner-edit-care-supply [careSupplyList]="selectedList"></zorgplanner-edit-care-supply>
-
-                    <button class="btn btn-danger" (click)="removeList(selectedList.id)">Verwijder lijst</button>
+                    <zorgplanner-edit-care-supply [careSupplyList]="selectedList"
+                        (deleteSupplyList)="removeList($event)"></zorgplanner-edit-care-supply>
 
                 </ng-container>
             </div>

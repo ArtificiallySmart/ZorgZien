@@ -1,4 +1,4 @@
-import { Component, ViewChild, effect, inject } from '@angular/core';
+import { Component, ViewChild, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgbCollapseModule,
@@ -6,11 +6,15 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
-import { ChoroplethService } from '../project/services/choropleth.service';
+import { ChoroplethService } from './services/choropleth.service';
 import { CareDemandService } from '../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../project/care-supply/services/care-supply.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ProjectService } from '../project/services/project.service';
+import {
+  ZipcodeData,
+  ZipcodeDataService,
+} from './services/zipcode-data.service';
 
 @Component({
   selector: 'zorgplanner-map',
@@ -30,31 +34,76 @@ export class MapComponent {
   careDemandService = inject(CareDemandService);
   careSupplyService = inject(CareSupplyService);
   projectService = inject(ProjectService);
+  zipcodeDataService = inject(ZipcodeDataService);
 
   careDemand = this.careDemandService.careDemandLists;
   careSupply = this.careSupplyService.careSupplyLists;
   project = this.projectService.project;
   isCollapsed = false;
+
+  organisationNames = computed(() => {
+    return this.careSupplyService
+      .selectedCareSupplyList()
+      ?.careSupply.map((careSupply) => careSupply.name);
+  });
+
+  assignZipcodes = false;
+  selectedOrganisationName = '';
+
   constructor() {
     this.choroplethService.init();
 
-    effect(() => {
-      const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
+    effect(
+      () => {
+        const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
+        this.assignZipcodes
+          ? this.reassignZipcode(zipcodeData)
+          : this.togglePopover(zipcodeData);
+      },
+      { allowSignalWrites: true }
+    );
+  }
 
-      this.myPopover.close(false);
-
-      if (!zipcodeData.zipcode) {
-        return;
-      }
-      if (this.choroplethService.clickLocation().x !== 0) {
-        this.setPopperOptions([
-          this.choroplethService.clickLocation().x,
-          this.choroplethService.clickLocation().y,
-        ]);
-
-        setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
-      }
+  reassignZipcode(zipcodeData: ZipcodeData) {
+    const oldOrganisationName = zipcodeData.assignedTeamName;
+    const newOrganisationName = this.selectedOrganisationName;
+    if (oldOrganisationName === newOrganisationName || !zipcodeData.zipcode) {
+      return;
+    }
+    this.careSupplyService.changeZipcodeForOrganisation$.next({
+      zipcode: zipcodeData.zipcode,
+      oldOrganisationName,
+      newOrganisationName,
     });
+    console.log(oldOrganisationName, newOrganisationName, zipcodeData.zipcode);
+  }
+
+  togglePopover(zipcodeData: ZipcodeData) {
+    this.myPopover.close(false);
+
+    if (!zipcodeData.zipcode) {
+      return;
+    }
+    if (this.choroplethService.clickLocation().x !== 0) {
+      this.setPopperOptions([
+        this.choroplethService.clickLocation().x,
+        this.choroplethService.clickLocation().y,
+      ]);
+
+      setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
+    }
+  }
+
+  toggleAssign(event: Event) {
+    this.assignZipcodes = (event.target as HTMLInputElement).checked;
+  }
+
+  selectOrganisationName(name: string) {
+    if (this.selectedOrganisationName === name) {
+      this.selectedOrganisationName = '';
+      return;
+    }
+    this.selectedOrganisationName = name;
   }
 
   popperOptions = (options: Partial<Options>) => {
@@ -82,15 +131,6 @@ export class MapComponent {
   onCheckboxChange(event: Event) {
     const target = event.target as HTMLInputElement;
     this.choroplethService.togglePostcode(target.checked);
-  }
-
-  demandType() {
-    this.choroplethService.demandType.update((type) => {
-      if (type === 'clients') {
-        return 'hours';
-      }
-      return 'clients';
-    });
   }
 
   changeDemandType(type: 'clients' | 'hours') {

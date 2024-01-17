@@ -48,3 +48,18 @@ body {
   color: $dark;
 }
 
+.card {
+    background-color: (rgba($color: $white, $alpha: 0.8));
+}
+
+.chevron-icon {
+    transition: transform 0.3s ease;
+}
+.rotate {
+    transform: rotate(-180deg);
+    transition: transform 0.3s ease;
+}
+
+tr.add-bg{
+    background-color: $light;
+}

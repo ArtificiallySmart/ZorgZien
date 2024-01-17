@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
   constructor(private http: HttpClient) {}
-  private baseUrl = 'https://zorgplanner-production.up.railway.app';
+  private baseUrl = environment.apiBaseUrl;
 
   private config = {
     withCredentials: true,
