@@ -2,11 +2,19 @@
     <div class="col-xl-9">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">hoi</h5>
+                <h5 class="card-title fw-semibold mb-4">
+                    <ng-container *ngIf="combinedDemandSupplyTable().length; else generic">
+                        {{selectedCareDemandList() ? selectedCareDemandList()!.title + ' &' : ''}}
+                        {{selectedCareSupplyList()!.title}}
+                    </ng-container>
+                    <ng-template #generic>
+                        Data overzicht
+                    </ng-template>
+                </h5>
                 <div class="card">
                     <div class="card-body">
 
-                        <table class="table">
+                        <table class="table" *ngIf="combinedDemandSupplyTable().length; else explanation">
                             <thead>
                                 <tr>
                                     <th>Organisatie</th>
@@ -17,11 +25,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <ng-container *ngFor="let item of combinedDemandSupplyTable()">
+                                <ng-container *ngFor="let item of combinedDemandSupplyTable(); let even = even">
 
-                                    <tr (click)="item.isCollapsed = !item.isCollapsed">
+                                    <tr (click)="item.isCollapsed = !item.isCollapsed" [class.add-bg]="even">
                                         <td>{{ item.organisationName }}</td>
-                                        <td>{{ item.totalSupplyHours }}</td>
+                                        <td>{{ item.totalSupplyHours | fteToHours}}</td>
                                         <td>{{ item.totalDemandHours | number:'1.1-2'}}</td>
                                         <td>{{ item.totalDemandClients }}</td>
                                         <td><i-tabler name="chevron-down" class="chevron-icon"
@@ -36,7 +44,8 @@
                                         <th>Aantal cli&#235;nten</th>
                                     </tr>
 
-                                    <tr *ngFor="let zipcode of item.zipcodes" [ngbCollapse]="item.isCollapsed">
+                                    <tr *ngFor="let zipcode of item.zipcodes; let even = even"
+                                        [ngbCollapse]="item.isCollapsed" [class.add-bg]="even">
                                         <td></td>
                                         <td>{{ zipcode.zipcode }}</td>
                                         <td>{{ zipcode.demandHours | number:'1.1-2'}}</td>
@@ -49,48 +58,10 @@
                                 </ng-container>
                             </tbody>
                         </table>
-                        <!-- <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Organisatie</th>
-                                    <th>Zorgaanbod in uren</th>
-                                    <th>Zorgvraag in uren</th>
-                                    <th>Aantal cli&#235;nten</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <ng-container *ngFor="let item of combinedDemandSupplyTable()">
-                                    
-                                    <tr (click)="item.isCollapsed = !item.isCollapsed">
-                                        <td>{{ item.organisationName }}</td>
-                                        <td>{{ item.totalSupplyHours }}</td>
-                                        <td>{{ item.totalDemandHours }}</td>
-                                        <td>{{ item.totalDemandClients }}</td>
-                                    </tr>
-                                    
-                                    <tr [ngbCollapse]="item.isCollapsed">
-                                        <td colspan="3">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Zipcode</th>
-                                                        <th>Demand Clients</th>
-                                                        <th>Demand Hours</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr *ngFor="let zipcode of item.zipcodes">
-                                                        <td>{{ zipcode.zipcode }}</td>
-                                                        <td>{{ zipcode.demandClients }}</td>
-                                                        <td>{{ zipcode.demandHours }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                            </tbody>
-                        </table> -->
+                        <ng-template #explanation>
+                            Selecteer een zorgbehoefte- en zorgbeschikbaarheids lijst om een overzicht te krijgen van de
+                            zorg vraag en aanbod van de organisaties.
+                        </ng-template>
 
 
                     </div>

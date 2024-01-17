@@ -63,6 +63,7 @@ export class ProjectComponent implements OnDestroy {
   projectsExist = true;
 
   active = 'Postcode kaart';
+  showSidebar = false;
 
   isCollapsed = true;
 
@@ -76,6 +77,10 @@ export class ProjectComponent implements OnDestroy {
         this.projectService.loadProject(params['id']);
       }
     });
+  }
+
+  toggleSidebar() {
+    this.showSidebar = true;
   }
 
   openProject(projectId: number) {

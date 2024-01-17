@@ -181,6 +181,7 @@ $table-th-font-weight: 600 !default;
 $table-striped-bg: $gray-200 !default;
 $table-hover-bg: $gray-100 !default;
 $table-border-color: $border-color !default;
+$table-bg: none;
 
 
 // Input
@@ -219,3 +220,13 @@ $navbar-light-color: rgba($gray-600, 1) !default;
 $navbar-light-hover-color: rgba($primary, 1) !default;
 $navbar-dark-color: rgba($gray-300, 1) !default;
 $navbar-dark-hover-color: rgba($primary, 1) !default;
+
+//breakpoints
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1600px
+);
