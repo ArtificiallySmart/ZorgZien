@@ -150,7 +150,7 @@ export class EditCareSupplyComponent implements OnInit {
 
   onSubmit() {
     if (this.careSupplyListForm.invalid) {
-      console.log(this.careSupplyListForm);
+      //console.log(this.careSupplyListForm);
       return;
     }
     const projectId = this.careSupplyList.projectId;

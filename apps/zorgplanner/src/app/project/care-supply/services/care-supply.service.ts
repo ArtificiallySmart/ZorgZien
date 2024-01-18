@@ -60,7 +60,6 @@ export class CareSupplyService {
   constructor() {
     this.changeZipcodeForOrganisation$.pipe(takeUntilDestroyed()).subscribe({
       next: ({ zipcode, oldOrganisationName, newOrganisationName }) => {
-        console.log('check');
         //update the selectedCareSupplyList in the state
         this.state.update((state) => ({
           ...state,
