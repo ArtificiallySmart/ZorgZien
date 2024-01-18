@@ -83,6 +83,10 @@ export class ProjectComponent implements OnDestroy {
     this.showSidebar = true;
   }
 
+  goToMapview() {
+    this.active = 'Postcode kaart';
+  }
+
   openProject(projectId: number) {
     this.projectService.clear$.next();
     this.careDemandService.clear$.next();

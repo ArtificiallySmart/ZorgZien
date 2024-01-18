@@ -5,9 +5,10 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, forkJoin, map } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
 import { UsersService } from './users.service';
@@ -42,7 +43,9 @@ export class UsersController {
   create(@Body() user: CreateUserDto) {
     return this.usersService.create(user).pipe(
       map((user: UserEntity) => user),
-      catchError((err) => of({ error: err.message }))
+      catchError((err) => {
+        throw err;
+      })
     );
   }
 
@@ -63,9 +66,8 @@ export class UsersController {
           });
         }
       ),
-      catchError((err) => {
-        //console.log(err.message);
-        throw new HttpException(err.message, 400);
+      catchError(() => {
+        throw new UnauthorizedException('Invalid credentials');
       })
     );
   }

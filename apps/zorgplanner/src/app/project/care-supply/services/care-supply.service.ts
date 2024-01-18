@@ -9,6 +9,7 @@ import { DataService } from '../../services/data.service';
 import { ProjectService } from '../../services/project.service';
 import { Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ToastService } from '../../../shared/services/toast.service';
 
 export interface CareSupplyState {
   careSupplyLists: CareSupplyList[];
@@ -23,6 +24,7 @@ export interface CareSupplyState {
 export class CareSupplyService {
   private dataService = inject(DataService);
   private projectService = inject(ProjectService);
+  private toastService = inject(ToastService);
 
   project = this.projectService.project;
 
@@ -199,21 +201,30 @@ export class CareSupplyService {
     };
 
     this.dataService.addCareSupplyList(addCareSupplyList).subscribe({
-      next: (careSupplyList) => this.add$.next(careSupplyList),
+      next: (careSupplyList) => {
+        this.add$.next(careSupplyList);
+        this.toastService.show('Zorgaanbod toegevoegd', 'success');
+      },
       error: (err) => this.add$.error(err),
     });
   }
 
   editCareSupplyList({ id, data }: EditCareSupplyList) {
     this.dataService.editCareSupplyList({ id, data }).subscribe({
-      next: () => this.edit$.next({ id, data }),
+      next: () => {
+        this.edit$.next({ id, data });
+        this.toastService.show('Wijzigingen opgeslagen', 'success');
+      },
       error: (err) => this.edit$.error(err),
     });
   }
 
   removeCareSupplyList(id: RemoveCareSupplyList) {
     this.dataService.removeCareSupplyList(id).subscribe({
-      next: () => this.remove$.next(id),
+      next: () => {
+        this.remove$.next(id);
+        this.toastService.show('Zorgaanbod verwijderd', 'success');
+      },
       error: (err) => this.remove$.error(err),
     });
   }

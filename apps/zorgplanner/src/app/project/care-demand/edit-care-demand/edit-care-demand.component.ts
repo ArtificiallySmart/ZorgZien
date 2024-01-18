@@ -17,6 +17,7 @@ import {
 } from '../../../shared/interfaces/care-demand';
 import { ZipcodeRangePipe } from '../../../shared/pipes/zipcode-range.pipe';
 import { CareDemandService } from '../services/care-demand.service';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'zorgplanner-edit-care-demand',
@@ -39,6 +40,7 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   careDemandList$ = this.careDemandListBS.asObservable();
 
   careDemandService = inject(CareDemandService);
+  toastService = inject(ToastService);
 
   constructor(private fb: FormBuilder) {}
 
@@ -53,6 +55,7 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
   resetValues(event: Event) {
     (event.target as HTMLElement).focus();
     this.careDemandListBS.next(this.selectedCareDemandList);
+    this.toastService.show('Wijzigingen ongedaan gemaakt', 'success');
   }
 
   groupedCareDemand$ = this.careDemandList$.pipe(
@@ -91,13 +94,26 @@ export class EditCareDemandComponent implements OnInit, OnChanges {
     });
   }
 
-  addDemand(zipcode: number, amountClient: number, amountHours: number) {
+  addDemand(
+    zipcode: HTMLInputElement,
+    amountClient: HTMLInputElement,
+    amountHours: HTMLInputElement
+  ) {
     const newEntry: CareDemandEntry = {
-      zipcode,
-      clients: amountClient,
-      hours: amountHours,
+      zipcode: +zipcode.value,
+      clients: +amountClient.value,
+      hours: +amountHours.value,
       careDemandListId: this.selectedCareDemandList.id,
     };
+    zipcode.value = amountClient.value = amountHours.value = '';
+    if (
+      this.careDemandListBS.value.careDemand.find(
+        (careDemand) => careDemand.zipcode === newEntry.zipcode
+      )
+    ) {
+      this.toastService.show('Postcode bestaat al', 'warning');
+      return;
+    }
     const oldCareDemand = this.careDemandListBS.value;
     this.careDemandListBS.next({
       ...oldCareDemand,

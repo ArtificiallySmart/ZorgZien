@@ -37,9 +37,6 @@ export class CareSupplyComponent {
   color = '';
   availableFTES = 0;
 
-  //Blue, BlueViolet, DarkGreen, Gold, LawnGreen, Orange, Sienna
-  //#0000FF, #8A2BE2, #006400, #FFD700, #7CFC00, #FFA500, #A0522D
-
   colorList = [
     'hsl(345,80%,50%)',
     'hsl(128,50%,47%)',
@@ -74,7 +71,6 @@ export class CareSupplyComponent {
 
   submitEntry() {
     const color = this.color || this.colorList[this.careSupplyEntries.length];
-    //color = color.replace('hsl(', 'hsla(').replace(')', ',ALPHA)');
     this.careSupplyEntries.push({
       name: this.newTeamName,
       areaZipcodes: this.areaZipcodes.split(','),
@@ -82,6 +78,7 @@ export class CareSupplyComponent {
       amount: this.availableFTES,
     });
     this.newTeamName = this.areaZipcodes = this.color = '';
+    this.availableFTES = 0;
   }
 
   submitList() {
@@ -96,9 +93,5 @@ export class CareSupplyComponent {
   removeList(listId: RemoveCareSupplyList) {
     this.careSupplyService.removeCareSupplyList(listId);
     this.selectedList = undefined;
-  }
-
-  convertColor(color: string) {
-    return color.replace('hsla(', 'hsl(').replace(',ALPHA)', ')');
   }
 }

@@ -7,7 +7,6 @@ import { CareDemandEntry } from '../interfaces/care-demand';
 export class ParserService {
   constructor() {}
 
-  //todo: make this a bit more robust
   parse(data: string): Omit<CareDemandEntry, 'id' | 'careDemandListId'>[] {
     const demandValues: Omit<CareDemandEntry, 'id' | 'careDemandListId'>[] = [];
 

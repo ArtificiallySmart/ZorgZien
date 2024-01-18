@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
 import { ParserService } from '../../shared/services/parser.service';
 import { EditCareDemandComponent } from './edit-care-demand/edit-care-demand.component';
@@ -22,8 +29,10 @@ import { TablerIconsModule } from 'angular-tabler-icons';
   styleUrl: './care-demand.component.scss',
 })
 export class CareDemandComponent {
+  @Output() demandAdded = new EventEmitter();
   private parserService = inject(ParserService);
   private careDemandService = inject(CareDemandService);
+  private modalService = inject(NgbModal);
 
   @Input() careDemandLists: CareDemandList[] = [];
   @Input() editMode = false;
@@ -40,6 +49,7 @@ export class CareDemandComponent {
       careDemand: demandValues,
     });
     this.title = this.zorgUren = '';
+    this.demandAdded.emit();
   }
 
   selectList(event: Event) {
@@ -50,5 +60,9 @@ export class CareDemandComponent {
 
   clearSelectedCareDemandList() {
     this.selectedList = undefined;
+  }
+
+  open(content: TemplateRef<string>) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
   }
 }
