@@ -103,7 +103,7 @@ export class UsersController {
   @Public()
   @Post('logout')
   logout(@Res() res: Response) {
-    res.clearCookie('refresh_token');
+    res.clearCookie('refresh_token', this.cookieOptions);
     return res.send({ message: 'Logged out' });
   }
 }
