@@ -8,6 +8,8 @@ import {
 import { Subject } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DataService } from './data.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { Router } from '@angular/router';
 
 export interface ProjectState {
   project: Project;
@@ -20,6 +22,8 @@ export interface ProjectState {
 })
 export class ProjectService {
   dataService = inject(DataService);
+  toastService = inject(ToastService);
+  private router = inject(Router);
   //state
   public state = signal<ProjectState>({
     project: {} as Project,
@@ -93,8 +97,12 @@ export class ProjectService {
   }
 
   addProject(project: AddProject) {
-    this.dataService.addProject(project).subscribe({
-      next: (project) => this.load$.next(project),
+    return this.dataService.addProject(project).subscribe({
+      next: (project) => {
+        this.load$.next(project);
+        this.router.navigate(['project', project.id]);
+        this.toastService.success('Project aangemaakt');
+      },
       error: (err) => this.load$.next(err),
     });
   }

@@ -69,18 +69,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="zip-input" class="form-label">Postcode</label>
-                        <input type="text" class="form-control" id="zip-input" #zipInput>
+                        <input type="number" class="form-control" id="zip-input" #zipInput>
                     </div>
                     <div class="mb-3">
                         <label for="client-amt" class="form-label">Aantal clienten</label>
-                        <input type="text" class="form-control" id="client-amt" #clientAmt>
+                        <input type="number" class="form-control" id="client-amt" #clientAmt>
                     </div>
                     <div class="mb-3">
                         <label for="hour-amt" class="form-label">Aantal uur</label>
-                        <input type="text" class="form-control" id="hour-amt" #hourAmt>
+                        <input type="number" class="form-control" id="hour-amt" #hourAmt>
                     </div>
-                    <button class="btn btn-success"
-                        (click)="addDemand(+zipInput.value, +clientAmt.value, +hourAmt.value)">Toevoegen</button>
+                    <button class="btn btn-success" (click)="addDemand(zipInput, clientAmt, hourAmt)">Toevoegen</button>
                 </div>
             </div>
         </div>

@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AddProject } from '../../shared/interfaces/project';
 import { DataService } from '../services/data.service';
 import { ProjectService } from '../services/project.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'zorgplanner-new-project',
@@ -14,20 +13,14 @@ import { Router } from '@angular/router';
   styleUrl: './new-project.component.scss',
 })
 export class NewProjectComponent {
+  @Output() projectAdded = new EventEmitter();
   dataService = inject(DataService);
   projectService = inject(ProjectService);
-  private router = inject(Router);
   projectTitle = '';
   projectDescription = '';
   projectProvinces = ['groningen'];
 
-  constructor() {
-    effect(() => {
-      if (this.projectService.loaded()) {
-        this.router.navigate(['project', this.projectService.project().id]);
-      }
-    });
-  }
+  constructor() {}
 
   initiateProject() {
     const project = {
@@ -37,5 +30,6 @@ export class NewProjectComponent {
     } as AddProject;
     this.projectService.addProject(project);
     this.projectTitle = this.projectDescription = '';
+    this.projectAdded.emit();
   }
 }

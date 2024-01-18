@@ -28,6 +28,7 @@ import { zipcodeValidator } from '../../../shared/validators/zipcode.directive';
 import { areaZipcodeValidator } from '../../../shared/validators/area-zip-code.directive';
 import { CareSupplyService } from '../services/care-supply.service';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'zorgplanner-edit-care-supply',
@@ -47,6 +48,7 @@ export class EditCareSupplyComponent implements OnInit {
   @Output() deleteSupplyList = new EventEmitter<string>();
 
   careSupplyService = inject(CareSupplyService);
+  toastService = inject(ToastService);
   careSupplyListForm!: FormGroup;
 
   colorArray = [
@@ -86,7 +88,6 @@ export class EditCareSupplyComponent implements OnInit {
     this.careSupplyList.careSupply.forEach((supplyEntry) =>
       this.createCareSupplyEntryForm(supplyEntry)
     );
-    //this.careSupplyListForm.disable();
   }
 
   get careSupply() {
@@ -95,6 +96,7 @@ export class EditCareSupplyComponent implements OnInit {
 
   cancelEdit() {
     this.initForm();
+    this.toastService.show('Wijzigingen geannuleerd', 'success');
   }
 
   deleteList() {
@@ -148,7 +150,7 @@ export class EditCareSupplyComponent implements OnInit {
 
   onSubmit() {
     if (this.careSupplyListForm.invalid) {
-      console.log(this.careSupplyListForm);
+      //console.log(this.careSupplyListForm);
       return;
     }
     const projectId = this.careSupplyList.projectId;

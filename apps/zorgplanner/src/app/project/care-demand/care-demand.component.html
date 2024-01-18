@@ -13,13 +13,13 @@
 
                         <div class="form-group mb-3">
                             <label for="exampleFormControlTextarea1" class="form-label">Plak hier de zorgbehoefte lijst
-                                <tabler-icon name="help" class="help-icon"></tabler-icon>
+
                             </label>
+                            <tabler-icon name="help" class="help-icon" (click)="open(content)"></tabler-icon>
                             <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
                                 [(ngModel)]="zorgUren"></textarea>
                         </div>
-                        <button class="btn btn-success" (click)="addList()"> submit</button>
-
+                        <button class="btn btn-success" (click)="addList()">Opslaan</button>
                     </div>
                 </div>
             </div>
@@ -67,6 +67,19 @@
         </div>
     </div>
 </div>
+
+<ng-template #content let-modal>
+    <div class="card mb-0">
+        <img src="../../../assets/images/careDemandHelp.png" class="card-img-top" alt="...">
+        <div class="card-body">
+            <p class="card-text mb-0">
+                Kopieer de waardes vanuit Excel, Let goed op de volgorde van de kolommen.</p>
+            <p class="card-text">Kopieer de titels niet, alleen de waardes.</p>
+            <p class="">Plak de waardes in het tekstveld en druk op "opslaan"</p>
+            <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Sluiten</button>
+        </div>
+    </div>
+</ng-template>
 <!-- <h2>Bestaande zorgbehoefte lijsten</h2>
 
 <div class="form-group">

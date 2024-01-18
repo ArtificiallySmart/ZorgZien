@@ -62,7 +62,7 @@
                             <span class="hide-menu">Nieuw project</span>
                         </a>
                         <ng-template ngbNavContent>
-                            <zorgplanner-new-project></zorgplanner-new-project>
+                            <zorgplanner-new-project (projectAdded)="goToMapview()"></zorgplanner-new-project>
                         </ng-template>
 
                     </li>
@@ -112,7 +112,8 @@
                                     <span class="hide-menu">Nieuwe zorgbehoefte</span>
                                 </a>
                                 <ng-template ngbNavContent>
-                                    <zorgplanner-care-demand [careDemandLists]="careDemand()"></zorgplanner-care-demand>
+                                    <zorgplanner-care-demand [careDemandLists]="careDemand()"
+                                        (demandAdded)="goToMapview()"></zorgplanner-care-demand>
 
                                 </ng-template>
 

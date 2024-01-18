@@ -4,6 +4,7 @@ import { Observable, Subject, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/interfaces/user';
+import { ToastService } from '../../shared/services/toast.service';
 
 interface LoginResponse {
   access_token: string;
@@ -22,6 +23,7 @@ export interface AuthState {
 export class AuthService {
   private httpService = inject(HttpService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   constructor() {
     this.authenticate$.subscribe((isAuthenticated) => {
@@ -54,7 +56,12 @@ export class AuthService {
           return res;
         }),
         catchError((err) => {
-          throw err;
+          if (err.status === 401) {
+            this.authenticate$.next(false);
+            this.toastService.error('onjuiste gegevens');
+            throw err;
+          }
+          return of(null);
         })
       );
   }
@@ -63,12 +70,17 @@ export class AuthService {
     return this.httpService
       .post<LoginResponse, object>('/api/users/register', registerForm.value)
       .pipe(
-        tap((res) => {
-          this.setAccessToken(res.access_token);
-          this.authenticate$.next(true);
+        tap(() => {
+          this.toastService.success(
+            `Gebruiker aangemaakt \n U kunt nu inloggen`
+          );
         }),
         catchError((err) => {
-          throw err;
+          if (err.status === 403) {
+            this.toastService.error('Gebruiker niet toegestaan');
+            throw err;
+          }
+          return of(null);
         })
       );
   }
@@ -113,13 +125,13 @@ export class AuthService {
     localStorage.setItem('access_token', accessToken);
   }
 
-  canActivate(): Observable<boolean> {
-    return this.refreshToken().pipe(
-      map(() => true),
-      catchError(() => {
-        this.router.navigate(['/login']);
-        return of(false);
-      })
-    );
-  }
+  // canActivate(): Observable<boolean> {
+  //   return this.refreshToken().pipe(
+  //     map(() => true),
+  //     catchError(() => {
+  //       this.router.navigate(['/login']);
+  //       return of(false);
+  //     })
+  //   );
+  // }
 }
