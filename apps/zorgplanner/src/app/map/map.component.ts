@@ -75,7 +75,6 @@ export class MapComponent {
       oldOrganisationName,
       newOrganisationName,
     });
-    console.log(oldOrganisationName, newOrganisationName, zipcodeData.zipcode);
   }
 
   togglePopover(zipcodeData: ZipcodeData) {

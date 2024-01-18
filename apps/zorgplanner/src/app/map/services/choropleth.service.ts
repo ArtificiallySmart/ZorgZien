@@ -249,7 +249,6 @@ export class ChoroplethService {
       .attr('fill', 'white')
       .attr('stroke', 'grey');
 
-    console.log(svg.select('.map-group'));
     const zoom = d3
       .zoom<SVGElement, unknown>()
       .scaleExtent([1, 1])

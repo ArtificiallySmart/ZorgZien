@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { catchError, from, of, switchMap, throwError } from 'rxjs';
-import { Connection, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/models/user.interface';
 import { TokenBlacklistEntity } from './models/token-blacklist.entity';
@@ -17,11 +17,7 @@ export type DecodedToken = {
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService,
-    private dataSource: DataSource,
-    private connection: Connection
-  ) {}
+  constructor(private jwtService: JwtService, private dataSource: DataSource) {}
 
   tokenRepository = this.dataSource.getRepository(TokenBlacklistEntity);
 

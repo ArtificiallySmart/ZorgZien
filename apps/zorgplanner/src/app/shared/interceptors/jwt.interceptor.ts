@@ -14,6 +14,10 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`,
     },
   });
+  if (req.url.includes('/login')) {
+    return next(req);
+  }
+
   return next(req).pipe(
     catchError((err) => {
       if (err.status === 400) {

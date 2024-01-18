@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Observable, catchError, forkJoin, from, map, switchMap } from 'rxjs';
 import { DataSource } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
@@ -53,12 +57,12 @@ export class UsersService {
     ).pipe(
       switchMap((exist: boolean) => {
         if (!exist) {
-          throw new Error('Email not whitelisted');
+          throw new ForbiddenException('User not whitelisted');
         }
         return this.findOne(createUserDto.email).pipe(
           switchMap((user: User) => {
             if (user) {
-              throw new Error('User already exists');
+              throw new ForbiddenException('User already exists');
             }
             return this.authService.hashPassword(createUserDto.password).pipe(
               switchMap((passwordHash: string) => {
@@ -82,8 +86,6 @@ export class UsersService {
         );
       })
     );
-
-    // return this.userRepository.save(createUserDto);
   }
 
   findAll() {
@@ -161,7 +163,7 @@ export class UsersService {
     return this.findOne(email).pipe(
       switchMap((user: User) => {
         if (!user) {
-          throw new Error('Wrong credentials');
+          throw new UnauthorizedException('Invalid credentials');
         }
         return this.authService.comparePasswords(password, user.password).pipe(
           map((match: boolean) => {

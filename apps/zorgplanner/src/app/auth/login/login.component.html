@@ -55,6 +55,7 @@
                                 <img src="https://placehold.co/180x27?text=Placeholder" width="180" alt="">
                             </a>
                             <p class="text-center">Placeholder tekst</p>
+
                             <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister(registerForm)">
                                 <div class="mb-3">
                                     <label for="exampleInputtext1" class="form-label">Naam</label>
@@ -75,8 +76,10 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="InputPassword" class="form-label">Bevestig wachtwoord</label>
-                                    <input formControlName="password" type="password" class="form-control"
-                                        id="InputPassword">
+                                    <input formControlName="passwordConfirm" type="password" class="form-control"
+                                        id="InputPassword" (focus)="onPasswordConfirmFocus()">
+                                    <ng-container *ngIf="passwordConfirmFieldFocused; then confirmPasswordHelp">
+                                    </ng-container>
                                 </div>
                                 <button [disabled]="registerForm.invalid"
                                     class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Account
@@ -95,37 +98,66 @@
     </div>
 </ng-template>
 
+<ng-template #confirmPasswordHelp>
+    <div class="d-flex flex-column">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.valid && passwordConfirmFormField?.value === passwordFormField?.value; then checkIcon; else crossIcon"></ng-container>
+            <small>
+                Moet hetzelfde zijn als het wachtwoord hierboven
+            </small>
+        </span>
+    </div>
+</ng-template>
+
 <ng-template #passwordHelp>
     <div class="d-flex flex-column">
-        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('^(?=.*[A-Z])')}">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.value?.match('^(?=.*[A-Z])'); then checkIcon; else crossIcon "></ng-container>
             <small>
                 Minimaal &eacute;&eacute;n hoofdletter
             </small>
         </span>
 
-        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(?=.*[a-z])')}">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.value?.match('(?=.*[a-z])'); then checkIcon; else crossIcon "></ng-container>
             <small>
                 Minimaal &eacute;&eacute;n kleine letter
             </small>
         </span>
 
-        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(.*[0-9].*)')}">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.value?.match('(.*[0-9].*)'); then checkIcon; else crossIcon "></ng-container>
             <small>
                 Minimaal &eacute;&eacute;n cijfer
             </small>
         </span>
 
-        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('(?=.*[!@#$%^&*])')}">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.value?.match('(?=.*[!@#$%^&*])'); then checkIcon; else crossIcon "></ng-container>
             <small>
                 Minimaal &eacute;&eacute;n leesteken
             </small>
         </span>
 
-        <span [ngClass]="{'text-decoration-line-through': passwordFormField?.value?.match('.{8,}')}">
+        <span>
+            <ng-container
+                *ngIf="passwordFormField?.value?.match('.{8,}'); then checkIcon; else crossIcon "></ng-container>
             <small>
                 Minimaal 8 tekens lang
             </small>
         </span>
     </div>
 
+</ng-template>
+
+<ng-template #crossIcon>
+    <i-tabler name="x" class="pass-icon"></i-tabler>
+</ng-template>
+<ng-template #checkIcon>
+    <i-tabler name="check" class="pass-icon"></i-tabler>
 </ng-template>

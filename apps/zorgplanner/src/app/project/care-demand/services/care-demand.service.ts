@@ -10,6 +10,7 @@ import {
 } from '../../../shared/interfaces/care-demand';
 import { ProjectService } from '../../services/project.service';
 import { DataService } from '../../services/data.service';
+import { ToastService } from '../../../shared/services/toast.service';
 
 export interface CareDemandState {
   careDemandLists: CareDemandList[];
@@ -24,6 +25,7 @@ export interface CareDemandState {
 export class CareDemandService {
   private dataService = inject(DataService);
   private projectService = inject(ProjectService);
+  private toastService = inject(ToastService);
 
   project = this.projectService.project;
 
@@ -134,6 +136,7 @@ export class CareDemandService {
     this.dataService.editCareDemandList(update).subscribe({
       next: () => {
         this.edit$.next(update);
+        this.toastService.show('Wijzigingen opgeslagen', 'success');
       },
       error: (err) => this.edit$.next(err),
     });
@@ -157,6 +160,7 @@ export class CareDemandService {
     this.dataService.addCareDemandList(addCareDemandList).subscribe({
       next: (careDemandList) => {
         this.add$.next(careDemandList);
+        this.toastService.success('Zorgbehoefte lijst opgeslagen');
       },
       error: (err) => this.add$.next(err),
     });
@@ -166,6 +170,7 @@ export class CareDemandService {
     this.dataService.removeCareDemandList(id).subscribe({
       next: (res) => {
         this.remove$.next(res.id);
+        this.toastService.show('Zorgbehoefte lijst verwijderd', 'success');
       },
       error: (err) => this.remove$.next(err),
     });

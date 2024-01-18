@@ -38,12 +38,10 @@ $theme-colors: (
 @import "./styles/component/reboot";
 @import "./styles/component/card";
 
-@import "./styles/utilities/icon-size";
 @import "./styles/utilities/background";
 
 
 body {
-  //font-family: "Open Sans", sans-serif;
   background: $light;
   color: $dark;
 }
