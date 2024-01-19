@@ -152,6 +152,9 @@ export class UsersService {
             };
           })
         );
+      }),
+      catchError((err) => {
+        throw err;
       })
     );
   }
@@ -172,6 +175,7 @@ export class UsersService {
               const { password, ...result } = user;
               return result;
             } else {
+              throw new UnauthorizedException('Invalid credentials');
               return null;
             }
           })
