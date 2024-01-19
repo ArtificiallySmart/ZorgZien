@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../auth/services/auth.service';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
   selector: 'zorgplanner-header',
   standalone: true,
-  imports: [CommonModule, NgbDropdownModule],
+  imports: [CommonModule, NgbDropdownModule, TablerIconsModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

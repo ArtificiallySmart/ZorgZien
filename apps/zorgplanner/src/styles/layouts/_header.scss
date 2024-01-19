@@ -24,13 +24,13 @@
       .nav-item {
         .nav-link {
           padding: $navlink-padding;
-          line-height: $header-height;
+          //line-height: $header-height;
           height: $header-height;
           display: flex;
           align-items: center;
           position: relative;
 
-          font-size: 20px;
+          //font-size: 20px;
           z-index: 2;
         }
       }
