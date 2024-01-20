@@ -10,7 +10,6 @@ import { jwtDecode } from 'jwt-decode';
 interface LoginResponse {
   access_token: string;
   user: User;
-  // Include other properties if there are any
 }
 
 interface AuthenticatedState {
