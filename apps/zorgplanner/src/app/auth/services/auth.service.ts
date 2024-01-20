@@ -1,10 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Observable, Subject, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
 import { User } from '../../shared/interfaces/user';
 import { ToastService } from '../../shared/services/toast.service';
+import { jwtDecode } from 'jwt-decode';
 
 interface LoginResponse {
   access_token: string;
@@ -12,10 +13,18 @@ interface LoginResponse {
   // Include other properties if there are any
 }
 
-export interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
+interface AuthenticatedState {
+  isAuthenticated: true;
+  user: User;
+  tokenExpiration: number;
 }
+interface UnauthenticatedState {
+  isAuthenticated: false;
+  user: null;
+  tokenExpiration: null;
+}
+
+type AuthState = AuthenticatedState | UnauthenticatedState;
 
 @Injectable({
   providedIn: 'root',
@@ -26,22 +35,18 @@ export class AuthService {
   private toastService = inject(ToastService);
 
   constructor() {
-    this.authenticate$.subscribe((isAuthenticated) => {
-      this.authState.update((state) => ({
-        ...state,
-        isAuthenticated,
-      }));
-    });
+    this.checkForToken();
   }
 
   public authState = signal<AuthState>({
     isAuthenticated: false,
     user: null,
+    tokenExpiration: null,
   });
 
   public user = computed(() => this.authState().user);
 
-  authenticate$ = new Subject<boolean>();
+  // authenticate$ = new Subject<boolean>();
 
   login(loginForm: FormGroup) {
     return this.httpService
@@ -49,15 +54,21 @@ export class AuthService {
       .pipe(
         map((res) => {
           this.setAccessToken(res.access_token);
+          const { exp } = jwtDecode<{ exp: number }>(res.access_token);
           this.authState.update(() => ({
             isAuthenticated: true,
             user: res.user,
+            tokenExpiration: exp * 1000,
           }));
           return res;
         }),
         catchError((err) => {
           if (err.status === 401) {
-            this.authenticate$.next(false);
+            this.authState.update(() => ({
+              isAuthenticated: false,
+              user: null,
+              tokenExpiration: null,
+            }));
             this.toastService.error('onjuiste gegevens');
             throw err;
           }
@@ -85,6 +96,24 @@ export class AuthService {
       );
   }
 
+  checkForToken() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      this.refreshToken().subscribe();
+      return;
+    }
+    const { exp, user } = jwtDecode<{ exp: number; user: User }>(token);
+    if (Date.now() >= exp * 1000) {
+      this.refreshToken().subscribe();
+      return;
+    }
+    this.authState.update(() => ({
+      isAuthenticated: true,
+      user,
+      tokenExpiration: exp * 1000,
+    }));
+  }
+
   refreshToken(): Observable<string> {
     return this.httpService
       .post<{ access_token: string; user: User }, object>(
@@ -94,9 +123,11 @@ export class AuthService {
       .pipe(
         tap((res) => {
           this.setAccessToken(res.access_token);
+          const { exp } = jwtDecode<{ exp: number }>(res.access_token);
           this.authState.update(() => ({
             isAuthenticated: true,
             user: res.user,
+            tokenExpiration: exp * 1000,
           }));
         }),
         map((res) => res.access_token),
@@ -104,6 +135,7 @@ export class AuthService {
           this.authState.update(() => ({
             isAuthenticated: false,
             user: null,
+            tokenExpiration: null,
           }));
           return '';
           // throw new Error('No refresh token provided');
@@ -116,6 +148,7 @@ export class AuthService {
     this.authState.update(() => ({
       isAuthenticated: false,
       user: null,
+      tokenExpiration: null,
     }));
     this.router.navigate(['/login']);
     this.httpService.post('/api/users/logout', {}).subscribe();
@@ -124,14 +157,4 @@ export class AuthService {
   setAccessToken(accessToken: string) {
     localStorage.setItem('access_token', accessToken);
   }
-
-  // canActivate(): Observable<boolean> {
-  //   return this.refreshToken().pipe(
-  //     map(() => true),
-  //     catchError(() => {
-  //       this.router.navigate(['/login']);
-  //       return of(false);
-  //     })
-  //   );
-  // }
 }

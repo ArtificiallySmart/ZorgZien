@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+
   const token = localStorage.getItem('access_token');
 
   req = req.clone({
@@ -14,6 +15,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`,
     },
   });
+
   if (req.url.includes('/login')) {
     return next(req);
   }
