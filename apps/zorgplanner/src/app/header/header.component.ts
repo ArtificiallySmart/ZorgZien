@@ -18,7 +18,7 @@ export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
   notifications: number = 0;
 
-  user = this.authService.user();
+  user = this.authService.user;
 
   logout() {
     this.authService.logout();
