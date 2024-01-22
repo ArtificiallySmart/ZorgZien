@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { from } from 'rxjs';
-import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/models/user.interface';
 
@@ -15,33 +14,7 @@ export type DecodedToken = {
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private dataSource: DataSource) {}
-
-  // tokenRepository = this.dataSource.getRepository(TokenBlacklistEntity);
-
-  // removeExpiredRefreshTokens = CronJob.from({
-  //   cronTime: '0 0 * * *',
-  //   onTick: async () => {
-  //     const toRemove = await this.tokenRepository
-  //       .createQueryBuilder('token')
-  //       .where('token.expires < :now', { now: new Date(Date.now()) })
-  //       .getMany();
-  //     if (process.env.NODE_ENV !== 'production') {
-  //       console.log(
-  //         toRemove.length > 0
-  //           ? `Removed ${toRemove.length} expired refresh tokens`
-  //           : 'No expired refresh tokens to remove'
-  //       );
-  //     }
-  //     try {
-  //       await this.tokenRepository.remove(toRemove);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   },
-  //   start: true,
-  //   runOnInit: process.env.NODE_ENV !== 'production',
-  // });
+  constructor(private jwtService: JwtService) {}
 
   createAccessToken(user: Omit<User, 'password'>) {
     return from(this.jwtService.signAsync({ user }));
@@ -78,36 +51,5 @@ export class AuthService {
 
   replaceRefreshToken(user: Omit<User, 'password'>) {
     return this.createRefreshToken(user);
-    //   return from(
-    //     this.tokenRepository.exist({ where: { token: oldTokenId } })
-    //   ).pipe(
-    //     switchMap((exists) => {
-    //       if (exists) {
-    //         return throwError(
-    //           () =>
-    //             new UnauthorizedException(
-    //               'Invalid refresh token, it already has been used'
-    //             )
-    //         );
-    //       }
-    //       return from(
-    //         this.dataSource.transaction(async (transactionalEntityManager) => {
-    //           const tokenRepository =
-    //             transactionalEntityManager.getRepository(TokenBlacklistEntity);
-
-    //           const usedToken = tokenRepository.create({ token: oldTokenId });
-    //           await tokenRepository.save(usedToken);
-    //         })
-    //       ).pipe(switchMap(() => this.createRefreshToken(user)));
-    //     }),
-    //     catchError((error) => {
-    //       if (error.code === '23505') {
-    //         // Handle the unique constraint violation
-    //         console.warn('Attempted to blacklist an already blacklisted token.');
-    //         return of(null); // Return a neutral response or a specific value if needed
-    //       }
-    //       throw error;
-    //     })
-    //   );
   }
 }

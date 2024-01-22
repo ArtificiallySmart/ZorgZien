@@ -44,7 +44,7 @@ export class AuthService {
   });
 
   public user = computed(() => this.authState().user);
-
+  public isAuthenticated = computed(() => this.authState().isAuthenticated);
   // authenticate$ = new Subject<boolean>();
 
   login(loginForm: FormGroup) {

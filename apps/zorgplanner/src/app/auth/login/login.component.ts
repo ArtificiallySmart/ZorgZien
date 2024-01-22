@@ -9,7 +9,6 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { ToastService } from '../../shared/services/toast.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -28,8 +27,15 @@ import { AuthService } from '../services/auth.service';
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private toastService = inject(ToastService);
-  hasAccount = true;
+  loadPage = false;
+
+  constructor() {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/project']);
+      return;
+    }
+    this.loadPage = true;
+  }
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
