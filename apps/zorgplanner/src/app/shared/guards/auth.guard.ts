@@ -10,7 +10,6 @@ export const authGuard: CanActivateFn = () => {
       .refreshToken()
       .subscribe(() => ({
         next: () => {
-          inject(AuthService).authenticate$.next(true);
           return true;
         },
         error: () => {

@@ -84,10 +84,7 @@ export class UsersController {
 
     const user = decodedToken.user;
     const newAccessToken = this.authService.createAccessToken(user);
-    const newRefreshToken = this.authService.replaceRefreshToken(
-      user,
-      decodedToken.tokenId
-    );
+    const newRefreshToken = this.authService.replaceRefreshToken(user);
 
     return forkJoin([newAccessToken, newRefreshToken]).pipe(
       map((tokens: string[]) => {
