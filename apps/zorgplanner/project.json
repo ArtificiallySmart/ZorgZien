@@ -18,7 +18,8 @@
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/zorgplanner/src/favicon.ico",
-          "apps/zorgplanner/src/assets"
+          "apps/zorgplanner/src/assets",
+          "apps/zorgplanner/src/.htaccess"
         ],
         "styles": ["apps/zorgplanner/src/styles.scss"],
         "scripts": []
