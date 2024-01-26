@@ -17,6 +17,12 @@ async function bootstrap() {
   }
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({
+      origin: ['https://dev.kilobryte.nl/'],
+      credentials: true,
+    });
+  }
+  if (process.env.NODE_ENV === 'local') {
+    app.enableCors({
       origin: ['http://localhost:4200'],
       credentials: true,
     });

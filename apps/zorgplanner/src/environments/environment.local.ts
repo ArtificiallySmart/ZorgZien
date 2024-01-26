@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'backend-development-6748.up.railway.app',
+  apiBaseUrl: 'http://localhost:3000',
   hoursInFTE: 36,
 };
