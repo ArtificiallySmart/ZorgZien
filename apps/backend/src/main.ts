@@ -17,7 +17,7 @@ async function bootstrap() {
   }
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({
-      origin: ['https://dev.kilobryte.nl/'],
+      origin: ['https://dev.kilobryte.nl'],
       credentials: true,
     });
   }
