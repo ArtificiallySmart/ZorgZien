@@ -17,6 +17,7 @@ import { UserEntity } from './users/models/user.entity';
 import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 import { CareDemandEntry } from './care-demand/entities/care-demand-entry.entity';
 import { UserWhitelistEntity } from './users/models/user-whitelist.entity';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserWhitelistEntity } from './users/models/user-whitelist.entity';
     CareSupplyModule,
     AuthModule,
     UsersModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,7 +14,10 @@
         "outputPath": "dist/apps/backend",
         "main": "apps/backend/src/main.ts",
         "tsConfig": "apps/backend/tsconfig.app.json",
-        "assets": ["apps/backend/src/assets"],
+        "assets": [
+          "apps/backend/src/assets",
+          "apps/backend/src/app/email/templates"
+        ],
         "isolatedConfig": true,
         "webpackConfig": "apps/backend/webpack.config.js"
       },
