@@ -4,11 +4,23 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import cookieParser from 'cookie-parser';
 
+import rateLimit from 'express-rate-limit';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
   const globalPrefix = 'api';
+  const port = process.env.PORT || 3000;
+
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message:
+      'Too many login attempts from this IP, please try again after 15 minutes',
+  });
+
+  app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix(globalPrefix);
+
   if (process.env.NODE_ENV === 'production') {
     app.enableCors({
       origin: ['https://kilobryte.nl', 'https://www.kilobryte.nl'],
@@ -29,7 +41,8 @@ async function bootstrap() {
   }
 
   app.use(cookieParser());
-  const port = process.env.PORT || 3000;
+  app.use('/loginOtp', loginLimiter);
+  app.use('/loginOtpVerify', loginLimiter);
   await app.listen(port);
 }
 
