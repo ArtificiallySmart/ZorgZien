@@ -5,4 +5,5 @@ export interface User {
   password: string;
   otp?: string;
   otpExpires?: Date;
+  otpAttempts?: number;
 }

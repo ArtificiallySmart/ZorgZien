@@ -3,7 +3,15 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable, catchError, forkJoin, from, map, switchMap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  forkJoin,
+  from,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { DataSource } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -161,15 +169,16 @@ export class UsersService {
     return this.findOne(email).pipe(
       switchMap((user: User) => {
         if (!user) {
-          throw new UnauthorizedException('Invalid credentials');
+          throw new UnauthorizedException('Ongeldig emailadres');
         }
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date();
-        otpExpires.setMinutes(otpExpires.getMinutes() + 5);
+        otpExpires.setMinutes(otpExpires.getMinutes() + 15);
         return from(
           this.userRepository.update(user.id, {
             otp: otp,
             otpExpires: otpExpires,
+            otpAttempts: 0,
           })
         ).pipe(
           switchMap(() => {
@@ -189,15 +198,27 @@ export class UsersService {
     return this.findOne(email).pipe(
       switchMap((user: User) => {
         if (!user) {
-          throw new UnauthorizedException('Invalid credentials');
+          throw new UnauthorizedException('Ongeldig emailadres');
+        }
+        if (user.otpAttempts >= 5) {
+          this.clearOtp(user);
+          throw new UnauthorizedException(
+            'Te veel pogingen. Vraag een nieuwe inlogcode aan.'
+          );
         }
         if (user.otp !== otp) {
-          throw new UnauthorizedException('Invalid credentials');
+          this.trackOtpAttempts(user);
+          throw new UnauthorizedException('inlogcode onjuist');
         }
         if (user.otpExpires < new Date()) {
-          throw new UnauthorizedException('OTP expired');
+          throw new UnauthorizedException(
+            'Inlogcode verlopen, vraag een nieuwe aan.'
+          );
         }
         return this.authService.createAccessToken(user).pipe(
+          tap(() => {
+            this.clearOtp(user);
+          }),
           switchMap((jwt: string) => {
             return this.authService.createRefreshToken(user).pipe(
               map((refreshToken: string) => {
@@ -214,8 +235,27 @@ export class UsersService {
     );
   }
 
+  trackOtpAttempts(user: User) {
+    const otpAttempts = user.otpAttempts + 1;
+    return from(
+      this.userRepository.update(user.id, {
+        otpAttempts: otpAttempts,
+      })
+    );
+  }
+
   sendOtpEmail(email: string, otp: string) {
     return this.emailService.sendOtpEmail(email, otp);
+  }
+
+  clearOtp(user: User) {
+    return from(
+      this.userRepository.update(user.id, {
+        otp: null,
+        otpExpires: null,
+        otpAttempts: null,
+      })
+    );
   }
 
   validateUser(

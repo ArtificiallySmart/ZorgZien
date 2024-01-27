@@ -20,6 +20,9 @@ export class UserEntity {
   @Column({ nullable: true })
   otpExpires: Date;
 
+  @Column({ nullable: true })
+  otpAttempts: number;
+
   @BeforeInsert()
   emailToLowerCase() {
     this.email = this.email.toLowerCase();

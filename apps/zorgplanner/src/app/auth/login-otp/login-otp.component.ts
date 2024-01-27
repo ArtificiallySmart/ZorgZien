@@ -28,18 +28,9 @@ export class LoginOtpComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   loadPage = false;
-  otpSent = false;
-  email = '';
+  redirectToOtp = this.authService.redirectToOtp;
 
   constructor() {
-    const otpData = localStorage.getItem('otp_sent');
-    if (otpData) {
-      const { email, otpExpires } = JSON.parse(otpData);
-      if (Date.now() < otpExpires) {
-        this.email = email;
-        this.otpSent = true;
-      }
-    }
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/project']);
       return;
@@ -52,7 +43,6 @@ export class LoginOtpComponent {
   });
 
   otpForm = new FormGroup({
-    email: new FormControl(this.email, [Validators.required, Validators.email]),
     otp: new FormControl('', Validators.required),
   });
 
@@ -65,14 +55,12 @@ export class LoginOtpComponent {
         return this.loginForm.reset();
       },
       next: () => {
-        this.email = loginForm.value.email;
-        this.otpSent = true;
+        this.loginForm.reset();
       },
     });
   }
 
   onOtpSubmit(otpForm: FormGroup) {
-    otpForm.controls['email'].setValue(this.email);
     if (!otpForm.valid) {
       return;
     }
@@ -82,6 +70,7 @@ export class LoginOtpComponent {
         return this.otpForm.reset();
       },
       next: () => {
+        this.otpForm.reset();
         this.router.navigate(['/project']);
       },
     });

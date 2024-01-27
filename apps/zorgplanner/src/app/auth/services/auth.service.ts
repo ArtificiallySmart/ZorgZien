@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { HttpService } from '../../shared/services/http.service';
@@ -25,6 +25,12 @@ interface UnauthenticatedState {
 
 type AuthState = AuthenticatedState | UnauthenticatedState;
 
+interface OTPState {
+  email: string;
+  otpExpires: number;
+  attempts: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -33,48 +39,39 @@ export class AuthService {
   private router = inject(Router);
   private toastService = inject(ToastService);
 
-  constructor() {
-    this.checkForToken();
-  }
-
   public authState = signal<AuthState>({
     isAuthenticated: false,
     user: null,
     tokenExpiration: null,
   });
 
+  public otpState = signal<OTPState>({
+    email: '',
+    otpExpires: 0,
+    attempts: 0,
+  });
+
+  public redirectToOtp = computed(() => {
+    return (
+      this.otpState().email !== '' &&
+      this.otpState().otpExpires > Date.now() &&
+      this.otpState().attempts < 5
+    );
+  });
+
+  constructor() {
+    this.checkForToken();
+    this.getOtpStateFromLocalStorage();
+
+    effect(() => {
+      if (this.otpState()) {
+        localStorage.setItem('otp_sent', JSON.stringify(this.otpState()));
+      }
+    });
+  }
+
   public user = computed(() => this.authState().user);
   public isAuthenticated = computed(() => this.authState().isAuthenticated);
-  // authenticate$ = new Subject<boolean>();
-
-  login(loginForm: FormGroup) {
-    return this.httpService
-      .post<LoginResponse, object>('/api/users/login', loginForm.value)
-      .pipe(
-        map((res) => {
-          this.setAccessToken(res.access_token);
-          const { exp } = jwtDecode<{ exp: number }>(res.access_token);
-          this.authState.update(() => ({
-            isAuthenticated: true,
-            user: res.user,
-            tokenExpiration: exp * 1000,
-          }));
-          return res;
-        }),
-        catchError((err) => {
-          if (err.status === 401) {
-            this.authState.update(() => ({
-              isAuthenticated: false,
-              user: null,
-              tokenExpiration: null,
-            }));
-            this.toastService.error('onjuiste gegevens');
-            throw err;
-          }
-          return of(null);
-        })
-      );
-  }
 
   loginOtp(loginForm: FormGroup) {
     return this.httpService
@@ -84,7 +81,7 @@ export class AuthService {
       )
       .pipe(
         tap(() => {
-          this.setOtpSent(loginForm.value.email);
+          this.otpSent(loginForm.value.email);
           this.toastService.success(`Een email is verzonden met een OTP code`);
         }),
         catchError((err) => {
@@ -98,8 +95,13 @@ export class AuthService {
   }
 
   loginOtpVerify(otpForm: FormGroup) {
+    const { email } = this.otpState();
+    const { otp } = otpForm.value;
     return this.httpService
-      .post<LoginResponse, object>('/api/users/login-otp-verify', otpForm.value)
+      .post<LoginResponse, object>('/api/users/login-otp-verify', {
+        otp,
+        email,
+      })
       .pipe(
         map((res) => {
           this.setAccessToken(res.access_token);
@@ -109,16 +111,20 @@ export class AuthService {
             user: res.user,
             tokenExpiration: exp * 1000,
           }));
+          this.otpReset();
           return res;
         }),
         catchError((err) => {
           if (err.status === 401) {
-            this.authState.update(() => ({
-              isAuthenticated: false,
-              user: null,
-              tokenExpiration: null,
-            }));
-            this.toastService.error('onjuiste gegevens');
+            this.otpAddAttempt();
+            if (this.otpState().attempts >= 5) {
+              this.otpReset();
+              this.toastService.error(
+                'Te veel pogingen. \n Vraag een nieuwe inlogcode aan'
+              );
+              throw err;
+            }
+            this.toastService.error(err.error.message);
             throw err;
           }
           return of(null);
@@ -132,7 +138,7 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.toastService.success(
-            `Gebruiker aangemaakt \n U kunt nu inloggen`
+            `Gebruiker aangemaakt. \n U kunt nu inloggen`
           );
         }),
         catchError((err) => {
@@ -207,9 +213,43 @@ export class AuthService {
     localStorage.setItem('access_token', accessToken);
   }
 
-  setOtpSent(email: string) {
-    const otpExpires = Date.now() + 1000 * 60 * 5;
-    const otpSent = { email, otpExpires };
-    localStorage.setItem('otp_sent', JSON.stringify(otpSent));
+  getOtpStateFromLocalStorage() {
+    const otpData = localStorage.getItem('otp_sent');
+    if (otpData) {
+      const { email, otpExpires, attempts } = JSON.parse(otpData);
+      if (Date.now() > otpExpires) {
+        this.otpReset();
+        return;
+      }
+
+      this.otpState.update(() => ({
+        email,
+        otpExpires,
+        attempts,
+      }));
+    }
+  }
+
+  otpSent(email: string) {
+    this.otpState.update(() => ({
+      email,
+      otpExpires: Date.now() + 1000 * 60 * 15,
+      attempts: 0,
+    }));
+  }
+
+  otpReset() {
+    this.otpState.update(() => ({
+      email: '',
+      otpExpires: 0,
+      attempts: 0,
+    }));
+  }
+
+  otpAddAttempt() {
+    this.otpState.update((state) => ({
+      ...state,
+      attempts: state.attempts + 1,
+    }));
   }
 }

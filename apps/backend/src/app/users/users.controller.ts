@@ -78,11 +78,7 @@ export class UsersController {
   @Post('login-otp')
   loginOtp(@Body() dto: LoginOtpDto) {
     const { email } = dto;
-    return this.usersService.loginOtp(email).pipe(
-      catchError(() => {
-        throw new UnauthorizedException('Invalid credentials');
-      })
-    );
+    return this.usersService.loginOtp(email);
   }
 
   @Public()
@@ -102,10 +98,7 @@ export class UsersController {
             user: tokens.user,
           });
         }
-      ),
-      catchError(() => {
-        throw new UnauthorizedException('Invalid credentials');
-      })
+      )
     );
   }
 
