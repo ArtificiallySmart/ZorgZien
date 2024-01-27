@@ -14,10 +14,10 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   otp: string;
 
-  @Column()
+  @Column({ nullable: true })
   otpExpires: Date;
 
   @BeforeInsert()

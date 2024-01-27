@@ -76,6 +76,56 @@ export class AuthService {
       );
   }
 
+  loginOtp(loginForm: FormGroup) {
+    return this.httpService
+      .post<{ message: string }, object>(
+        '/api/users/login-otp',
+        loginForm.value
+      )
+      .pipe(
+        tap(() => {
+          this.setOtpSent(loginForm.value.email);
+          this.toastService.success(`Een email is verzonden met een OTP code`);
+        }),
+        catchError((err) => {
+          if (err.status === 401) {
+            this.toastService.error('onjuiste gegevens');
+            throw err;
+          }
+          return of(null);
+        })
+      );
+  }
+
+  loginOtpVerify(otpForm: FormGroup) {
+    return this.httpService
+      .post<LoginResponse, object>('/api/users/login-otp-verify', otpForm.value)
+      .pipe(
+        map((res) => {
+          this.setAccessToken(res.access_token);
+          const { exp } = jwtDecode<{ exp: number }>(res.access_token);
+          this.authState.update(() => ({
+            isAuthenticated: true,
+            user: res.user,
+            tokenExpiration: exp * 1000,
+          }));
+          return res;
+        }),
+        catchError((err) => {
+          if (err.status === 401) {
+            this.authState.update(() => ({
+              isAuthenticated: false,
+              user: null,
+              tokenExpiration: null,
+            }));
+            this.toastService.error('onjuiste gegevens');
+            throw err;
+          }
+          return of(null);
+        })
+      );
+  }
+
   register(registerForm: FormGroup) {
     return this.httpService
       .post<LoginResponse, object>('/api/users/register', registerForm.value)
@@ -155,5 +205,11 @@ export class AuthService {
 
   setAccessToken(accessToken: string) {
     localStorage.setItem('access_token', accessToken);
+  }
+
+  setOtpSent(email: string) {
+    const otpExpires = Date.now() + 1000 * 60 * 5;
+    const otpSent = { email, otpExpires };
+    localStorage.setItem('otp_sent', JSON.stringify(otpSent));
   }
 }
