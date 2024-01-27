@@ -16,6 +16,8 @@ import { UserEntity } from './models/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { CookieOptions } from 'express-serve-static-core';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginOtpDto } from './dto/login-otp.dto';
+import { LoginOtpDtoStep2 } from './dto/login-otp-step2.dto';
 
 @Controller('users')
 export class UsersController {
@@ -53,6 +55,41 @@ export class UsersController {
   @Post('login')
   login(@Body() user: LoginDto, @Res() res: Response) {
     return this.usersService.login(user).pipe(
+      map(
+        (tokens: {
+          access_token: string;
+          refresh_token: string;
+          user: UserEntity;
+        }) => {
+          res.cookie('refresh_token', tokens.refresh_token, this.cookieOptions);
+          return res.send({
+            access_token: tokens.access_token,
+            user: tokens.user,
+          });
+        }
+      ),
+      catchError(() => {
+        throw new UnauthorizedException('Invalid credentials');
+      })
+    );
+  }
+
+  @Public()
+  @Post('login-otp')
+  loginOtp(@Body() dto: LoginOtpDto) {
+    const { email } = dto;
+    return this.usersService.loginOtp(email).pipe(
+      catchError(() => {
+        throw new UnauthorizedException('Invalid credentials');
+      })
+    );
+  }
+
+  @Public()
+  @Post('login-otp-verify')
+  loginOtpVerify(@Body() dto: LoginOtpDtoStep2, @Res() res: Response) {
+    const { email, otp } = dto;
+    return this.usersService.loginOtpVerify(email, otp).pipe(
       map(
         (tokens: {
           access_token: string;

@@ -24,4 +24,17 @@ export class EmailService {
       },
     });
   }
+
+  sendOtpEmail(email: string, otp: string) {
+    const subject = `Inlogcode: ${otp}`;
+
+    return this.mailerService.sendMail({
+      to: email,
+      subject,
+      template: './otp',
+      context: {
+        otp,
+      },
+    });
+  }
 }

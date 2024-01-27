@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserWhitelistEntity } from './models/user-whitelist.entity';
 import { UserEntity } from './models/user.entity';
 import { User } from './models/user.interface';
+import { EmailService } from '../email/email.service';
 
 type FailedLoginResponse = {
   error: string;
@@ -26,7 +27,8 @@ type LoginResponse = FailedLoginResponse | SuccessfulLoginResponse;
 export class UsersService {
   constructor(
     private dataSource: DataSource,
-    private authService: AuthService
+    private authService: AuthService,
+    private emailService: EmailService
   ) {
     this.seedWhitelist();
   }
@@ -42,10 +44,6 @@ export class UsersService {
       this.userWhitelistRepository.save({ email: firstUser });
     }
   }
-
-  // async findOne(email: string): Promise<User | undefined> {
-  //   return this.users.find((user) => user.email === email);
-  // }
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
     return from(
@@ -157,6 +155,67 @@ export class UsersService {
         throw err;
       })
     );
+  }
+
+  loginOtp(email: string) {
+    return this.findOne(email).pipe(
+      switchMap((user: User) => {
+        if (!user) {
+          throw new UnauthorizedException('Invalid credentials');
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date();
+        otpExpires.setMinutes(otpExpires.getMinutes() + 5);
+        return from(
+          this.userRepository.update(user.id, {
+            otp: otp,
+            otpExpires: otpExpires,
+          })
+        ).pipe(
+          switchMap(() => {
+            return this.sendOtpEmail(email, otp);
+          }),
+          map(() => {
+            return {
+              message: 'OTP sent',
+            };
+          })
+        );
+      })
+    );
+  }
+
+  loginOtpVerify(email: string, otp: string): Observable<LoginResponse> {
+    return this.findOne(email).pipe(
+      switchMap((user: User) => {
+        if (!user) {
+          throw new UnauthorizedException('Invalid credentials');
+        }
+        if (user.otp !== otp) {
+          throw new UnauthorizedException('Invalid credentials');
+        }
+        if (user.otpExpires < new Date()) {
+          throw new UnauthorizedException('OTP expired');
+        }
+        return this.authService.createAccessToken(user).pipe(
+          switchMap((jwt: string) => {
+            return this.authService.createRefreshToken(user).pipe(
+              map((refreshToken: string) => {
+                return {
+                  access_token: jwt,
+                  refresh_token: refreshToken,
+                  user: user,
+                };
+              })
+            );
+          })
+        );
+      })
+    );
+  }
+
+  sendOtpEmail(email: string, otp: string) {
+    return this.emailService.sendOtpEmail(email, otp);
   }
 
   validateUser(
