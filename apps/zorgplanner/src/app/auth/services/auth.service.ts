@@ -82,11 +82,14 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.otpSent(loginForm.value.email);
-          this.toastService.success(`Een email is verzonden met een OTP code`);
+          this.toastService.show(
+            `Een email is verzonden met een OTP code`,
+            'success'
+          );
         }),
         catchError((err) => {
           if (err.status === 401) {
-            this.toastService.error('onjuiste gegevens');
+            this.toastService.show('onjuiste gegevens', 'danger');
             throw err;
           }
           return of(null);
@@ -119,12 +122,13 @@ export class AuthService {
             this.otpAddAttempt();
             if (this.otpState().attempts >= 5) {
               this.otpReset();
-              this.toastService.error(
-                'Te veel pogingen. \n Vraag een nieuwe inlogcode aan'
+              this.toastService.show(
+                'Te veel pogingen. \n Vraag een nieuwe inlogcode aan',
+                'danger'
               );
               throw err;
             }
-            this.toastService.error(err.error.message);
+            this.toastService.show(err.error.message, 'danger');
             throw err;
           }
           return of(null);
@@ -137,13 +141,14 @@ export class AuthService {
       .post<LoginResponse, object>('/api/users/register', registerForm.value)
       .pipe(
         tap(() => {
-          this.toastService.success(
-            `Gebruiker aangemaakt. \n U kunt nu inloggen`
+          this.toastService.show(
+            `Gebruiker aangemaakt. \n U kunt nu inloggen`,
+            'success'
           );
         }),
         catchError((err) => {
           if (err.status === 403) {
-            this.toastService.error('Gebruiker niet toegestaan');
+            this.toastService.show('Gebruiker niet toegestaan', 'danger');
             throw err;
           }
           return of(null);
