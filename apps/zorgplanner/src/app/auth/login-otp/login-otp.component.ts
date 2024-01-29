@@ -10,6 +10,7 @@ import {
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { OtpService } from '../services/otp.service';
 
 @Component({
   selector: 'zorgplanner-login-otp',
@@ -25,10 +26,11 @@ import { TablerIconsModule } from 'angular-tabler-icons';
   styleUrl: './login-otp.component.scss',
 })
 export class LoginOtpComponent {
+  private otpService = inject(OtpService);
   private authService = inject(AuthService);
   private router = inject(Router);
   loadPage = false;
-  redirectToOtp = this.authService.redirectToOtp;
+  redirectToOtp = this.otpService.redirectToOtp;
 
   constructor() {
     if (this.authService.isAuthenticated()) {
@@ -50,7 +52,7 @@ export class LoginOtpComponent {
     if (!loginForm.valid) {
       return;
     }
-    this.authService.loginOtp(loginForm).subscribe({
+    this.otpService.loginOtp(loginForm).subscribe({
       error: () => {
         return this.loginForm.reset();
       },
@@ -65,7 +67,7 @@ export class LoginOtpComponent {
       return;
     }
 
-    this.authService.loginOtpVerify(otpForm).subscribe({
+    this.otpService.loginOtpVerify(otpForm).subscribe({
       error: () => {
         return this.otpForm.reset();
       },
