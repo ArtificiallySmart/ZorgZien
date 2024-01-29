@@ -1,10 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface Toast {
+  id: string;
   header?: string;
   content: string;
-  type?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
+  type: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
   delay?: number;
 }
 
@@ -15,7 +17,7 @@ export class ToastService {
   toasts = signal<Toast[]>([]);
 
   show$ = new Subject<Toast>();
-  remove$ = new Subject<Toast>();
+  remove$ = new Subject<string>();
   clear$ = new Subject<void>();
 
   constructor() {
@@ -24,33 +26,12 @@ export class ToastService {
     });
 
     this.remove$.subscribe({
-      next: (toast) =>
-        this.toasts.update((toasts) => toasts.filter((t) => t !== toast)),
+      next: (id) =>
+        this.toasts.update((toasts) => toasts.filter((t) => t.id !== id)),
     });
 
     this.clear$.subscribe({
       next: () => this.toasts.update(() => []),
-    });
-  }
-
-  success(content: string) {
-    this.show$.next({
-      content,
-      type: 'success',
-    });
-  }
-
-  error(content: string) {
-    this.show$.next({
-      content,
-      type: 'danger',
-    });
-  }
-
-  warning(content: string) {
-    this.show$.next({
-      content,
-      type: 'warning',
     });
   }
 
@@ -61,6 +42,7 @@ export class ToastService {
     delay?: number
   ) {
     this.show$.next({
+      id: uuidv4(),
       content,
       type,
       header,

@@ -101,7 +101,7 @@ export class ProjectService {
       next: (project) => {
         this.load$.next(project);
         this.router.navigate(['project', project.id]);
-        this.toastService.success('Project aangemaakt');
+        this.toastService.show('Project aangemaakt', 'success');
       },
       error: (err) => this.load$.next(err),
     });

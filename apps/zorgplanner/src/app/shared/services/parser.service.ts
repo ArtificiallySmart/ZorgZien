@@ -26,7 +26,7 @@ export class ParserService {
   }
 
   parseZipcodes(data: string) {
-    const zipcodes = data.match(/(\d{4})/g);
+    const zipcodes = data.match(/\b(\d{4})\b/g);
     return zipcodes ?? [];
   }
 }
