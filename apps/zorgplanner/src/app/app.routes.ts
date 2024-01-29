@@ -15,13 +15,6 @@ export const appRoutes: Route[] = [
       ),
   },
   {
-    path: 'register',
-    loadComponent: () =>
-      import('./auth/register/register.component').then(
-        (m) => m.RegisterComponent
-      ),
-  },
-  {
     path: 'project',
     loadComponent: () =>
       import('./project/project.component').then((m) => m.ProjectComponent),

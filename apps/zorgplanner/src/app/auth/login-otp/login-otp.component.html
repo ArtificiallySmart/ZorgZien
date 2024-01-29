@@ -13,7 +13,7 @@
                         <p class="text-center">Placeholder tekst</p>
 
                         <form [formGroup]="loginForm" (ngSubmit)="onEmailSubmit(loginForm)"
-                            *ngIf="!redirectToOtp(); else otpPage">
+                            *ngIf="!redirectToOtp; else otpPage">
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="exampleInputEmail1"
@@ -27,13 +27,14 @@
                             <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit(otpForm)">
                                 <div class="mb-3">
                                     <label for="exampleInputEmail1" class="form-label">Otp</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1"
+                                    <input maxlength="6" type="text" class="form-control" id="exampleInputEmail1"
                                         aria-describedby="emailHelp" formControlName="otp">
                                 </div>
 
                                 <button type="submit"
                                     class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Inloggen</button>
                             </form>
+
                         </ng-template>
 
                     </div>
