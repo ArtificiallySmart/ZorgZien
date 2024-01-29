@@ -30,8 +30,7 @@ export class LoginOtpComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   loadPage = false;
-  // redirectToOtp = this.otpService.redirectToOtp;
-  redirectToOtp = true;
+  redirectToOtp = this.otpService.redirectToOtp;
   constructor() {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/project']);
