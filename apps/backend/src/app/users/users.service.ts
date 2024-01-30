@@ -9,15 +9,16 @@ import {
   forkJoin,
   from,
   map,
+  of,
   switchMap,
   tap,
 } from 'rxjs';
-import { DataSource } from 'typeorm';
+// import { DataSource } from 'typeorm';
+import { postgresDataSource } from '../../../db/data-source';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserWhitelistEntity } from './models/user-whitelist.entity';
-import { UserEntity } from './models/user.entity';
-import { User } from './models/user.interface';
+import { UserEntity } from './entities/user.entity';
+import { User } from './entities/user.interface';
 import { EmailService } from '../email/email.service';
 
 type FailedLoginResponse = {
@@ -34,33 +35,14 @@ type LoginResponse = FailedLoginResponse | SuccessfulLoginResponse;
 @Injectable()
 export class UsersService {
   constructor(
-    private dataSource: DataSource,
     private authService: AuthService,
     private emailService: EmailService
-  ) {
-    this.seedWhitelist();
-  }
+  ) {}
 
-  userRepository = this.dataSource.getRepository(UserEntity);
-  userWhitelistRepository = this.dataSource.getRepository(UserWhitelistEntity);
-
-  async seedWhitelist() {
-    const count = await this.userWhitelistRepository.count();
-    if (count === 0) {
-      const firstUser = process.env.ADMIN_EMAIL;
-      this.userWhitelistRepository.create({ email: firstUser });
-      this.userWhitelistRepository.save({ email: firstUser });
-    }
-  }
+  userRepository = postgresDataSource.getRepository(UserEntity);
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
-    return from(
-      this.userWhitelistRepository.exist({
-        where: {
-          email: createUserDto.email,
-        },
-      })
-    ).pipe(
+    return of(true).pipe(
       switchMap((exist: boolean) => {
         if (!exist) {
           throw new ForbiddenException('User not whitelisted');

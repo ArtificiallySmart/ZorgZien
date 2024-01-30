@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/deploy-dev.js"
+    "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/deploy-dev.js",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "private": true,
   "dependencies": {

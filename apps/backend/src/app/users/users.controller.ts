@@ -11,7 +11,7 @@ import { catchError, forkJoin, map } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
 import { UsersService } from './users.service';
-import { UserEntity } from './models/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { CookieOptions } from 'express-serve-static-core';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginOtpDto } from './dto/login-otp.dto';
