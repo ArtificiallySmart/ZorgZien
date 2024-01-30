@@ -12,31 +12,31 @@
                         </a>
                         <p class="text-center">Placeholder tekst</p>
 
-                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm)">
+                        <form [formGroup]="loginForm" (ngSubmit)="onEmailSubmit(loginForm)"
+                            *ngIf="!redirectToOtp(); else otpPage">
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="exampleInputEmail1"
                                     aria-describedby="emailHelp" formControlName="email">
                             </div>
-                            <div class="mb-4">
-                                <label for="exampleInputPassword1" class="form-label">Wachtwoord</label>
-                                <input type="password" class="form-control" id="exampleInputPassword1"
-                                    formControlName="password">
-                            </div>
 
-                            <button type="submit"
-                                class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Inloggen</button>
-                            <div class="d-flex align-items-center justify-content-center">
-                                <p class="fs-4 mb-0 fw-bold">Nog geen account?</p>
-                                <a class="btn text-primary fw-bold ms-2" [routerLink]="['/register']">Maak een
-                                    account aan</a>
-                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Inlogcode
+                                aanvragen</button>
                         </form>
+
+                        <ng-template #otpPage>
+                            <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit(otpForm)">
+                                <div class="mb-3">
+                                    <label for="exampleInputEmail1" class="form-label">Otp</label>
+                                    <input maxlength="6" type="text" class="form-control" id="exampleInputEmail1"
+                                        aria-describedby="emailHelp" formControlName="otp">
+                                </div>
+
+                                <button type="submit"
+                                    class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Inloggen</button>
+                            </form>
+
+                        </ng-template>
 
                     </div>
                 </div>
-
-            </div>
-        </div>
-    </div>
-</div>

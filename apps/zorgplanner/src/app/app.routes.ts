@@ -10,13 +10,8 @@ export const appRoutes: Route[] = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./auth/login/login.component').then((m) => m.LoginComponent),
-  },
-  {
-    path: 'register',
-    loadComponent: () =>
-      import('./auth/register/register.component').then(
-        (m) => m.RegisterComponent
+      import('./auth/login-otp/login-otp.component').then(
+        (m) => m.LoginOtpComponent
       ),
   },
   {

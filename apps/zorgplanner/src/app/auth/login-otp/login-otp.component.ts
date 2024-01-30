@@ -1,18 +1,19 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
-  FormControl,
   FormGroup,
+  FormControl,
+  Validators,
   FormsModule,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TablerIconsModule } from 'angular-tabler-icons';
 import { AuthService } from '../services/auth.service';
+import { TablerIconsModule } from 'angular-tabler-icons';
+import { OtpService } from '../services/otp.service';
 
 @Component({
-  selector: 'zorgplanner-login',
+  selector: 'zorgplanner-login-otp',
   standalone: true,
   imports: [
     CommonModule,
@@ -21,14 +22,15 @@ import { AuthService } from '../services/auth.service';
     TablerIconsModule,
     RouterModule,
   ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './login-otp.component.html',
+  styleUrl: './login-otp.component.scss',
 })
-export class LoginComponent {
+export class LoginOtpComponent {
+  private otpService = inject(OtpService);
   private authService = inject(AuthService);
   private router = inject(Router);
   loadPage = false;
-
+  redirectToOtp = this.otpService.redirectToOtp;
   constructor() {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/project']);
@@ -39,18 +41,37 @@ export class LoginComponent {
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', Validators.required),
   });
 
-  onSubmit(loginForm: FormGroup) {
+  otpForm = new FormGroup({
+    otp: new FormControl('', Validators.required),
+  });
+
+  onEmailSubmit(loginForm: FormGroup) {
     if (!loginForm.valid) {
       return;
     }
-    this.authService.login(loginForm).subscribe({
+    this.otpService.loginOtp(loginForm).subscribe({
       error: () => {
         return this.loginForm.reset();
       },
       next: () => {
+        this.loginForm.reset();
+      },
+    });
+  }
+
+  onOtpSubmit(otpForm: FormGroup) {
+    if (!otpForm.valid) {
+      return;
+    }
+
+    this.otpService.loginOtpVerify(otpForm).subscribe({
+      error: () => {
+        return this.otpForm.reset();
+      },
+      next: () => {
+        this.otpForm.reset();
         this.router.navigate(['/project']);
       },
     });

@@ -3,13 +3,22 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable, catchError, forkJoin, from, map, switchMap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  forkJoin,
+  from,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { DataSource } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserWhitelistEntity } from './models/user-whitelist.entity';
 import { UserEntity } from './models/user.entity';
 import { User } from './models/user.interface';
+import { EmailService } from '../email/email.service';
 
 type FailedLoginResponse = {
   error: string;
@@ -26,7 +35,8 @@ type LoginResponse = FailedLoginResponse | SuccessfulLoginResponse;
 export class UsersService {
   constructor(
     private dataSource: DataSource,
-    private authService: AuthService
+    private authService: AuthService,
+    private emailService: EmailService
   ) {
     this.seedWhitelist();
   }
@@ -42,10 +52,6 @@ export class UsersService {
       this.userWhitelistRepository.save({ email: firstUser });
     }
   }
-
-  // async findOne(email: string): Promise<User | undefined> {
-  //   return this.users.find((user) => user.email === email);
-  // }
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
     return from(
@@ -155,6 +161,99 @@ export class UsersService {
       }),
       catchError((err) => {
         throw err;
+      })
+    );
+  }
+
+  loginOtp(email: string) {
+    return this.findOne(email).pipe(
+      switchMap((user: User) => {
+        if (!user) {
+          throw new UnauthorizedException('Ongeldig emailadres');
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date();
+        otpExpires.setMinutes(otpExpires.getMinutes() + 15);
+        return from(
+          this.userRepository.update(user.id, {
+            otp: otp,
+            otpExpires: otpExpires,
+            otpAttempts: 0,
+          })
+        ).pipe(
+          switchMap(() => {
+            return this.sendOtpEmail(email, otp);
+          }),
+          map(() => {
+            return {
+              message: 'OTP sent',
+            };
+          })
+        );
+      })
+    );
+  }
+
+  loginOtpVerify(email: string, otp: string): Observable<LoginResponse> {
+    return this.findOne(email).pipe(
+      switchMap((user: User) => {
+        if (!user) {
+          throw new UnauthorizedException('Ongeldig emailadres');
+        }
+        if (user.otpAttempts >= 5) {
+          this.clearOtp(user);
+          throw new UnauthorizedException(
+            'Te veel pogingen. Vraag een nieuwe inlogcode aan.'
+          );
+        }
+        if (user.otp !== otp) {
+          this.trackOtpAttempts(user);
+          throw new UnauthorizedException('inlogcode onjuist');
+        }
+        if (user.otpExpires < new Date()) {
+          throw new UnauthorizedException(
+            'Inlogcode verlopen, vraag een nieuwe aan.'
+          );
+        }
+        return this.authService.createAccessToken(user).pipe(
+          tap(() => {
+            this.clearOtp(user);
+          }),
+          switchMap((jwt: string) => {
+            return this.authService.createRefreshToken(user).pipe(
+              map((refreshToken: string) => {
+                return {
+                  access_token: jwt,
+                  refresh_token: refreshToken,
+                  user: user,
+                };
+              })
+            );
+          })
+        );
+      })
+    );
+  }
+
+  trackOtpAttempts(user: User) {
+    const otpAttempts = user.otpAttempts + 1;
+    return from(
+      this.userRepository.update(user.id, {
+        otpAttempts: otpAttempts,
+      })
+    );
+  }
+
+  sendOtpEmail(email: string, otp: string) {
+    return this.emailService.sendOtpEmail(email, otp);
+  }
+
+  clearOtp(user: User) {
+    return from(
+      this.userRepository.update(user.id, {
+        otp: null,
+        otpExpires: null,
+        otpAttempts: null,
       })
     );
   }

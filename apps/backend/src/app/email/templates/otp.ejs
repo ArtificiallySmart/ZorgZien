@@ -1,0 +1,65 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<%- include("./shared/head.ejs") %>
+
+    <body>
+        <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+                <td align="center">
+                    <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                        <tr>
+                            <td class="email-masthead">
+                                <a href="https://example.com" class="f-fallback email-masthead_name">
+                                    Welcome to company
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Email Body -->
+                        <tr>
+                            <td class="email-body" width="570" cellpadding="0" cellspacing="0">
+                                <table class="email-body_inner" align="center" width="570" cellpadding="0"
+                                    cellspacing="0" role="presentation">
+                                    <!-- Body content -->
+                                    <tr>
+                                        <td class="content-cell">
+                                            <div class="f-fallback">
+                                                <h1>Welkom!</h1>
+                                                <p>
+                                                    Voer de volgende code in om in te loggen op Kilobryte.nl
+                                                </p>
+
+                                                <h2>
+                                                    <%= locals.otp %>
+                                                </h2>
+                                                <p>Deze code is 15 minuten geldig. </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <!-- Sub copy -->
+                                <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0"
+                                    role="presentation">
+                                    <tr>
+                                        <td class="content-cell" align="center">
+                                            <p class="f-fallback sub align-center">
+                                                kilobryte.nl<br />
+                                                Adres hier<br />
+                                                meer gegevens hier
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+
+</html>

@@ -14,6 +14,15 @@ export class UserEntity {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true })
+  otpExpires: Date;
+
+  @Column({ nullable: true })
+  otpAttempts: number;
+
   @BeforeInsert()
   emailToLowerCase() {
     this.email = this.email.toLowerCase();

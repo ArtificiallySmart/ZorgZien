@@ -1,16 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { Observable, catchError, map, of, tap } from 'rxjs';
-import { HttpService } from '../../shared/services/http.service';
 import { Router } from '@angular/router';
-import { User } from '../../shared/interfaces/user';
-import { ToastService } from '../../shared/services/toast.service';
 import { jwtDecode } from 'jwt-decode';
-
-interface LoginResponse {
-  access_token: string;
-  user: User;
-}
+import { Observable, catchError, map, tap } from 'rxjs';
+import { User } from '../../shared/interfaces/user';
+import { HttpService } from '../../shared/services/http.service';
 
 interface AuthenticatedState {
   isAuthenticated: true;
@@ -31,11 +24,6 @@ type AuthState = AuthenticatedState | UnauthenticatedState;
 export class AuthService {
   private httpService = inject(HttpService);
   private router = inject(Router);
-  private toastService = inject(ToastService);
-
-  constructor() {
-    this.checkForToken();
-  }
 
   public authState = signal<AuthState>({
     isAuthenticated: false,
@@ -43,59 +31,14 @@ export class AuthService {
     tokenExpiration: null,
   });
 
+  constructor() {
+    this.checkForAccessToken();
+  }
+
   public user = computed(() => this.authState().user);
   public isAuthenticated = computed(() => this.authState().isAuthenticated);
-  // authenticate$ = new Subject<boolean>();
 
-  login(loginForm: FormGroup) {
-    return this.httpService
-      .post<LoginResponse, object>('/api/users/login', loginForm.value)
-      .pipe(
-        map((res) => {
-          this.setAccessToken(res.access_token);
-          const { exp } = jwtDecode<{ exp: number }>(res.access_token);
-          this.authState.update(() => ({
-            isAuthenticated: true,
-            user: res.user,
-            tokenExpiration: exp * 1000,
-          }));
-          return res;
-        }),
-        catchError((err) => {
-          if (err.status === 401) {
-            this.authState.update(() => ({
-              isAuthenticated: false,
-              user: null,
-              tokenExpiration: null,
-            }));
-            this.toastService.error('onjuiste gegevens');
-            throw err;
-          }
-          return of(null);
-        })
-      );
-  }
-
-  register(registerForm: FormGroup) {
-    return this.httpService
-      .post<LoginResponse, object>('/api/users/register', registerForm.value)
-      .pipe(
-        tap(() => {
-          this.toastService.success(
-            `Gebruiker aangemaakt \n U kunt nu inloggen`
-          );
-        }),
-        catchError((err) => {
-          if (err.status === 403) {
-            this.toastService.error('Gebruiker niet toegestaan');
-            throw err;
-          }
-          return of(null);
-        })
-      );
-  }
-
-  checkForToken() {
+  checkForAccessToken() {
     const token = localStorage.getItem('access_token');
     if (!token) {
       this.refreshToken().subscribe();

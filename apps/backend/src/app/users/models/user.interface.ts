@@ -3,4 +3,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  otp?: string;
+  otpExpires?: Date;
+  otpAttempts?: number;
 }

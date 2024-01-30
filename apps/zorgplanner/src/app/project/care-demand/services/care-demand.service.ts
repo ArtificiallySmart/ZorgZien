@@ -160,7 +160,7 @@ export class CareDemandService {
     this.dataService.addCareDemandList(addCareDemandList).subscribe({
       next: (careDemandList) => {
         this.add$.next(careDemandList);
-        this.toastService.success('Zorgbehoefte lijst opgeslagen');
+        this.toastService.show('Zorgbehoefte lijst opgeslagen', 'success');
       },
       error: (err) => this.add$.next(err),
     });

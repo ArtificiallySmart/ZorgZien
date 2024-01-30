@@ -11,12 +11,10 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
     @for (toast of toastService.toasts(); track toast) {
     <ngb-toast
       [header]="toast.header || ''"
-      [class]="
-        'toast align-items-center border-0 text-bg-' + (toast.type ?? 'primary')
-      "
+      [class]="'toast align-items-center border-0 text-bg-' + toast.type"
       [autohide]="true"
       [delay]="toast.delay || 5000"
-      (hidden)="toastService.remove$.next(toast)"
+      (hidden)="toastService.remove$.next(toast.id)"
     >
       <div class="d-flex">
         <div class="toast-body" style="white-space: pre;">
@@ -27,7 +25,7 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
           class="btn-close btn-close-white me-2 m-auto"
           data-bs-dismiss="toast"
           aria-label="Close"
-          (click)="toastService.remove$.next(toast)"
+          (click)="toastService.remove$.next(toast.id)"
         ></button>
       </div>
     </ngb-toast>
