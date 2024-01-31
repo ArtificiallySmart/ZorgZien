@@ -23,6 +23,9 @@ export class UserEntity {
   @Column({ nullable: true })
   otpAttempts: number;
 
+  @Column({ nullable: true })
+  test: string;
+
   @BeforeInsert()
   emailToLowerCase() {
     this.email = this.email.toLowerCase();

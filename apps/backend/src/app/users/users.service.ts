@@ -13,7 +13,6 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-// import { DataSource } from 'typeorm';
 import { postgresDataSource } from '../../../db/data-source';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';

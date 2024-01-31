@@ -8,9 +8,7 @@ import {
 import { CareDemandList } from './care-demand-list.entity';
 import { ColumnNumericTransformer } from '../../shared/transformers/decimal-column.transformer';
 
-/// ColumnNumericTransformer
-
-@Entity()
+@Entity('care_demand_entry')
 export class CareDemandEntry {
   @PrimaryGeneratedColumn('uuid')
   id: string;
