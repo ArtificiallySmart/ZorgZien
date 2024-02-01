@@ -5,8 +5,9 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response, Request } from 'express';
 import { catchError, forkJoin, map } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public';
@@ -15,7 +16,9 @@ import { UserEntity } from './models/user.entity';
 import { CookieOptions } from 'express-serve-static-core';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginOtpDto } from './dto/login-otp.dto';
-import { LoginOtpDtoStep2 } from './dto/login-otp-step2.dto';
+
+import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
+import { User } from './models/user.interface';
 
 @Controller('users')
 export class UsersController {
@@ -56,11 +59,12 @@ export class UsersController {
     return this.usersService.loginOtp(email);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Public()
   @Post('login-otp-verify')
-  loginOtpVerify(@Body() dto: LoginOtpDtoStep2, @Res() res: Response) {
-    const { email, otp } = dto;
-    return this.usersService.loginOtpVerify(email, otp).pipe(
+  loginOtpVerify(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as Omit<User, 'password'>;
+    return this.usersService.login(user).pipe(
       map(
         (tokens: {
           access_token: string;

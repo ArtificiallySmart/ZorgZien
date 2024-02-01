@@ -14,11 +14,10 @@ import { CareSupplyList } from './care-supply/entities/care-supply-list.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { UserEntity } from './users/models/user.entity';
-import { TokenBlacklistEntity } from './auth/models/token-blacklist.entity';
 import { CareDemandEntry } from './care-demand/entities/care-demand-entry.entity';
-import { UserWhitelistEntity } from './users/models/user-whitelist.entity';
 import { EmailModule } from './email/email.module';
 import { OrganisationModule } from './organisation/organisation.module';
+import { Organisation } from './organisation/entities/organisation.entity';
 
 @Module({
   imports: [
@@ -33,11 +32,10 @@ import { OrganisationModule } from './organisation/organisation.module';
         CareSupplyEntry,
         CareSupplyList,
         UserEntity,
-        TokenBlacklistEntity,
-        UserWhitelistEntity,
+        Organisation,
       ],
-      synchronize: process.env.NODE_ENV !== 'production',
-      //synchronize: true,
+      //synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true,
     }),
     CareDemandModule,
     CareSupplyModule,

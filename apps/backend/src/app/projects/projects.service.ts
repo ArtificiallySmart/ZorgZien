@@ -13,8 +13,17 @@ export class ProjectsService {
     return this.projectRepository.save(createProjectDto);
   }
 
-  findAll() {
-    return this.projectRepository.find();
+  findAll(organisationId: string) {
+    return this.projectRepository.find({
+      relations: {
+        organisations: true,
+      },
+      where: {
+        organisations: {
+          id: organisationId,
+        },
+      },
+    });
   }
 
   findOne(id: number) {

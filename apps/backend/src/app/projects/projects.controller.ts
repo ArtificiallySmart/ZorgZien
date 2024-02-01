@@ -1,15 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  // Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-// import { UpdateProjectDto } from './dto/update-project.dto';
+import { User } from '../users/models/user.interface';
 
 @Controller('projects')
 export class ProjectsController {
@@ -21,8 +22,11 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  findAll(@Req() req: Request) {
+    const { user } = req.user as { user: User };
+    console.log(user);
+    const organisation = user.organisation;
+    return this.projectsService.findAll(organisation.id);
   }
 
   @Get(':id')
