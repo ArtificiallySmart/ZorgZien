@@ -4,6 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/deploy-dev.js",
+    "build-datasource": "ts-node ./scripts/data-source-generator.ts && npx tsc ./apps/backend/db/data-source.ts --outDir ./dist/apps/backend",
+    "generate-migrations": "typeorm -d ./dist/apps/backend/db/data-source.js migration:generate",
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "private": true,
@@ -86,7 +88,7 @@
     "@types/d3": "^7.4.3",
     "@types/geojson": "^7946.0.13",
     "@types/jest": "^29.4.0",
-    "@types/node": "~18.7.1",
+    "@types/node": "^20.11.15",
     "@types/passport-jwt": "^3.0.13",
     "@types/passport-local": "^1.0.38",
     "@types/topojson": "^3.2.6",
