@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 // import { UpdateProjectDto } from './dto/update-project.dto';
-import { DataSource } from 'typeorm';
+import { postgresDataSource } from '../../../db/data-source';
 import { Project } from './entities/project.entity';
 
 @Injectable()
 export class ProjectsService {
-  projectRepository = this.dataSource.getRepository(Project);
-  constructor(private dataSource: DataSource) {}
+  projectRepository = postgresDataSource.getRepository(Project);
+  constructor() {}
 
   create(createProjectDto: CreateProjectDto) {
     return this.projectRepository.save(createProjectDto);
@@ -33,10 +33,6 @@ export class ProjectsService {
       },
     });
   }
-
-  // update(id: number, updateProjectDto: UpdateProjectDto) {
-  //   return `This action updates a #${id} project`;
-  // }
 
   remove(id: number) {
     return `This action removes a #${id} project`;

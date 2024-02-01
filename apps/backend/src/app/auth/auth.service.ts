@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { from } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../users/models/user.interface';
+import { User } from '../users/entities/user.interface';
 
 export type DecodedToken = {
   user: Omit<User, 'password'>;

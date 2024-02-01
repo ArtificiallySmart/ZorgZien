@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCareSupplyListDto } from './dto/create-care-supply.dto';
 import { UpdateCareSupplyListDto } from './dto/update-care-supply.dto';
-import { DataSource } from 'typeorm';
 import { CareSupplyList } from './entities/care-supply-list.entity';
 import { Project } from '../projects/entities/project.entity';
 import { CareSupplyEntry } from './entities/care-supply-entry.entity';
+import { postgresDataSource } from '../../../db/data-source';
 
 @Injectable()
 export class CareSupplyService {
-  constructor(private dataSource: DataSource) {}
-  careSupplyRepository = this.dataSource.getRepository(CareSupplyList);
-  careSupplyEntryRepository = this.dataSource.getRepository(CareSupplyEntry);
-  projectRepository = this.dataSource.getRepository(Project);
+  constructor() {}
+  careSupplyRepository = postgresDataSource.getRepository(CareSupplyList);
+  careSupplyEntryRepository = postgresDataSource.getRepository(CareSupplyEntry);
+  projectRepository = postgresDataSource.getRepository(Project);
 
   async create(createCareSupplyListDto: CreateCareSupplyListDto) {
     const careSupply = new CareSupplyList();
