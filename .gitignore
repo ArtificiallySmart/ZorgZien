@@ -1,7 +1,11 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+
+#dataSource file with credentials
 apps/backend/db/data-source.ts
+
 #scripts
-/scripts
+/scripts/private/*.js
+/scripts/private/*.ts
 
 # secrets
 .env
