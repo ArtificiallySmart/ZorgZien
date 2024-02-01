@@ -50,5 +50,9 @@ export const postgresDataSource = new DataSource(dataSourceOptions);
 `;
 
 console.log('Generating data source file...');
-fs.writeFileSync('apps/backend/db/data-source.ts', typeOrmConfig);
-//console.log(typeOrmConfig);
+fs.writeFile('apps/backend/db/data-source.ts', typeOrmConfig, (err) => {
+  if (err) console.log(err);
+  else {
+    console.log('File written successfully\n');
+  }
+});
