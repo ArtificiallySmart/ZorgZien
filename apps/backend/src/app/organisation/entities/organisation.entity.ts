@@ -17,7 +17,7 @@ export class Organisation {
   @Column()
   name: string;
 
-  @ManyToMany(() => Project)
+  @ManyToMany(() => Project, (project) => project.organisations)
   @JoinTable()
   projects: Project[];
 

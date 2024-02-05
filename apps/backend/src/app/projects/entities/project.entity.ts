@@ -37,6 +37,8 @@ export class Project {
   @OneToMany(() => CareSupplyList, (careSupplyList) => careSupplyList.project)
   careSupplyLists: CareSupplyList[];
 
-  @ManyToMany(() => Organisation, (organisation) => organisation.projects)
+  @ManyToMany(() => Organisation, (organisation) => organisation.projects, {
+    cascade: true,
+  })
   organisations: Organisation[];
 }

@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
-// import { UpdateProjectDto } from './dto/update-project.dto';
-import { postgresDataSource } from '../../../db/data-source';
+import { DataSource } from 'typeorm';
 import { Project } from './entities/project.entity';
+import { Organisation } from '../organisation/entities/organisation.entity';
+import { from, map } from 'rxjs';
 
 @Injectable()
 export class ProjectsService {
-  projectRepository = postgresDataSource.getRepository(Project);
-  constructor() {}
-
-  create(createProjectDto: CreateProjectDto) {
-    return this.projectRepository.save(createProjectDto);
+  constructor(private dataSource: DataSource) {}
+  projectRepository = this.dataSource.getRepository(Project);
+  create(createProjectDto: CreateProjectDto, organisation: Organisation) {
+    const project = this.projectRepository.create(createProjectDto);
+    project.organisations = [organisation];
+    console.log('project', project);
+    return this.projectRepository.save(project);
   }
 
   findAll(organisationId: string) {
@@ -26,12 +29,29 @@ export class ProjectsService {
     });
   }
 
-  findOne(id: number) {
-    return this.projectRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
+  findOne(id: number, organisationId: string) {
+    return from(
+      this.projectRepository.findOne({
+        relations: {
+          organisations: true,
+        },
+        where: {
+          id: id,
+        },
+      })
+    ).pipe(
+      map((project) => {
+        if (
+          project.organisations.find((o) => o.id === organisationId) ===
+          undefined
+        ) {
+          throw new UnauthorizedException(
+            'You are not authorized to access this project.'
+          );
+        }
+        return project;
+      })
+    );
   }
 
   remove(id: number) {

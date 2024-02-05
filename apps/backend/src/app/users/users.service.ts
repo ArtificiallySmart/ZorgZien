@@ -11,15 +11,13 @@ import {
   map,
   of,
   switchMap,
-  tap,
 } from 'rxjs';
-import { postgresDataSource } from '../../../db/data-source';
+import { DataSource } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { EmailService } from '../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { User } from './entities/user.interface';
-import { EmailService } from '../email/email.service';
 
 type FailedLoginResponse = {
   error: string;
@@ -36,10 +34,11 @@ type LoginResponse = FailedLoginResponse | SuccessfulLoginResponse;
 export class UsersService {
   constructor(
     private authService: AuthService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private dataSource: DataSource
   ) {}
 
-  userRepository = postgresDataSource.getRepository(UserEntity);
+  userRepository = this.dataSource.getRepository(UserEntity);
 
   create(createUserDto: CreateUserDto): Observable<Omit<User, 'password'>> {
     return of(true).pipe(

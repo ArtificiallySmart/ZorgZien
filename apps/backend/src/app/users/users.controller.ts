@@ -18,7 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginOtpDto } from './dto/login-otp.dto';
 
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { User } from './models/user.interface';
+import { User } from './entities/user.interface';
 
 @Controller('users')
 export class UsersController {

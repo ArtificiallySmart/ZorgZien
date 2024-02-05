@@ -4,14 +4,14 @@ import { UpdateCareSupplyListDto } from './dto/update-care-supply.dto';
 import { CareSupplyList } from './entities/care-supply-list.entity';
 import { Project } from '../projects/entities/project.entity';
 import { CareSupplyEntry } from './entities/care-supply-entry.entity';
-import { postgresDataSource } from '../../../db/data-source';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class CareSupplyService {
-  constructor() {}
-  careSupplyRepository = postgresDataSource.getRepository(CareSupplyList);
-  careSupplyEntryRepository = postgresDataSource.getRepository(CareSupplyEntry);
-  projectRepository = postgresDataSource.getRepository(Project);
+  constructor(private dataSource: DataSource) {}
+  careSupplyRepository = this.dataSource.getRepository(CareSupplyList);
+  careSupplyEntryRepository = this.dataSource.getRepository(CareSupplyEntry);
+  projectRepository = this.dataSource.getRepository(Project);
 
   async create(createCareSupplyListDto: CreateCareSupplyListDto) {
     const careSupply = new CareSupplyList();
