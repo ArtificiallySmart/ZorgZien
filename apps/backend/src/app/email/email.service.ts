@@ -23,6 +23,11 @@ export class EmailService {
   sendOtpEmail(email: string, otp: string) {
     const subject = `Inlogcode: ${otp}`;
 
+    if (process.env.NODE_ENV === 'local') {
+      console.log('Otp:', otp);
+      return Promise.resolve();
+    }
+
     return this.mailerService.sendMail({
       to: email,
       subject,
