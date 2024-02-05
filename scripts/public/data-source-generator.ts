@@ -42,7 +42,7 @@ export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   url: '${process.env.DATABASE_URL}',
   entities: [${entitiesList}],
-  synchronize: process.env.NODE_ENV !== 'production',
+  synchronize: false,
 };
 
 export const postgresDataSource = new DataSource(dataSourceOptions);

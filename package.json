@@ -4,9 +4,9 @@
   "license": "MIT",
   "scripts": {
     "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/private/deploy-dev.js",
-    "build-datasource": "ts-node ./scripts/public/data-source-generator.ts",
+    "build-datasource": "npx ts-node ./scripts/public/data-source-generator.ts",
     "compile-datasource": "npx tsc ./apps/backend/db/data-source.ts --outDir ./dist/apps/backend --target ES5 --emitDecoratorMetadata --experimentalDecorators",
-    "generate-migrations": "typeorm -d ./dist/apps/backend/db/data-source.js migration:generate"
+    "generate-migrations": "npx typeorm -d ./dist/apps/backend/db/data-source.js migration:generate"
   },
   "private": true,
   "dependencies": {

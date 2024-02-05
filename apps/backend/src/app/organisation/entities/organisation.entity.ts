@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from '../../projects/entities/project.entity';
-import { UserEntity } from '../../users/models/user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity()
 export class Organisation {
