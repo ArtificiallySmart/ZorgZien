@@ -1,64 +1,53 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<%- include("./shared/head.ejs") %>
+<!DOCTYPE html>
+<html lang="en">
 
-    <body>
-        <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-            <tr>
-                <td align="center">
-                    <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                        <tr>
-                            <td class="email-masthead">
-                                <a href="https://example.com" class="f-fallback email-masthead_name">
-                                    Welcome to company
-                                </a>
-                            </td>
-                        </tr>
-                        <!-- Email Body -->
-                        <tr>
-                            <td class="email-body" width="570" cellpadding="0" cellspacing="0">
-                                <table class="email-body_inner" align="center" width="570" cellpadding="0"
-                                    cellspacing="0" role="presentation">
-                                    <!-- Body content -->
-                                    <tr>
-                                        <td class="content-cell">
-                                            <div class="f-fallback">
-                                                <h1>Welkom, <%= locals.name %>!</h1>
-                                                <p>
-                                                    Thanks for trying company. We’re thrilled to have you
-                                                    on board.
-                                                </p>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+        <%= title %>
+    </title>
 
-                                                <p>
-                                                    If you have any questions, feel free to
-                                                    <a href="mailto:support@@company.com">email our customer success
-                                                        team</a>. (We're lightning quick at replying.) We also offer
-                                                    <a href="https://www.company.com/live-chat">live chat</a>
-                                                    during business hours.
-                                                </p>
-                                                <p>Thanks, <br />company team</p>
-                                                <p>
-                                                    <strong>P.S.</strong> Need immediate help getting
-                                                    started? Check out our
-                                                    <a href="https://www.company.com/help">help documentation</a>. Or,
-                                                    just reply to this
-                                                    <a href="mailto:support@company.com">email</a>, the
-                                                    company support team is always ready to help!
-                                                </p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <%- include("./shared/footer.ejs") %>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
+</head>
+
+<body>
+    <%- include("./styles/style.ejs") %>
+        <div class="mail-container">
+            <%- include("./partials/header.ejs") %>
+
+                <main>
+                    <div class="mail-content">
+                        <div class="container">
+
+                            <h1>
+                                Welkom!
+                            </h1>
+
+                            <p class="greeting">
+                                Hoi <%= firstName %>,
+                            </p>
+                            <p class="content">
+                                Er is een account voor je aangemaakt op <%= domainName %>.
+                                    Je kunt nu inloggen met het email adres <%= email %>
+                            </p>
+
+                        </div>
+                    </div>
+
+                    <div class="help-text">
+                        <p>
+                            Heb je hulp nodig of vragen? Stuur dan een bericht naar
+                            <a href="mailto:Bryan@MegaBryte.nl" class="email">Bryan@MegaBryte.nl</a>
+
+                        </p>
+                    </div>
+
+                </main>
+
+                <%- include("./partials/footer.ejs") %>
+
+        </div>
+</body>
 
 </html>

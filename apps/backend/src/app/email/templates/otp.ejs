@@ -1,65 +1,58 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<%- include("./shared/head.ejs") %>
+<!DOCTYPE html>
+<html lang="en">
 
-    <body>
-        <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-            <tr>
-                <td align="center">
-                    <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                        <tr>
-                            <td class="email-masthead">
-                                <a href="https://example.com" class="f-fallback email-masthead_name">
-                                    Welcome to company
-                                </a>
-                            </td>
-                        </tr>
-                        <!-- Email Body -->
-                        <tr>
-                            <td class="email-body" width="570" cellpadding="0" cellspacing="0">
-                                <table class="email-body_inner" align="center" width="570" cellpadding="0"
-                                    cellspacing="0" role="presentation">
-                                    <!-- Body content -->
-                                    <tr>
-                                        <td class="content-cell">
-                                            <div class="f-fallback">
-                                                <h1>Welkom!</h1>
-                                                <p>
-                                                    Voer de volgende code in om in te loggen op Kilobryte.nl
-                                                </p>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+        <%= title %>
+    </title>
 
-                                                <h2>
-                                                    <%= locals.otp %>
-                                                </h2>
-                                                <p>Deze code is 15 minuten geldig. </p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <!-- Sub copy -->
-                                <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0"
-                                    role="presentation">
-                                    <tr>
-                                        <td class="content-cell" align="center">
-                                            <p class="f-fallback sub align-center">
-                                                kilobryte.nl<br />
-                                                Adres hier<br />
-                                                meer gegevens hier
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
+</head>
+
+<body>
+    <%- include("./styles/style.ejs") %>
+        <div class="mail-container">
+            <%- include("./partials/header.ejs") %>
+
+                <main>
+                    <div class="mail-content">
+                        <div class="container">
+
+                            <h1>
+                                Je Toegangscode
+                            </h1>
+
+                            <p class="greeting">
+                                Hoi <%= firstName %>,
+                            </p>
+                            <p class="content">
+                                Je hebt zojuist een toegangscode aangevraagd om in te loggen op <%= domainName %>.
+                                    Gebruik onderstaande code om verder te gaan.
+                                    Deze code is <span class="otp-duration">5 minuten</span> geldig, en kan maar
+                                    &#233;&#233;n keer gebruikt worden.
+                                    Deel deze code nooit met anderen.
+                            </p>
+                            <p class="otp">
+                                <%= otp %>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="help-text">
+                        <p>
+                            Heb je hulp nodig of vragen? Stuur dan een bericht naar
+                            <a href="mailto:archisketch@gmail.com" class="email">Bryan@MegaBryte.nl</a>
+
+                        </p>
+                    </div>
+
+                </main>
+
+                <%- include("./partials/footer.ejs") %>
+
+        </div>
+</body>
 
 </html>
