@@ -182,7 +182,7 @@ export class UsersService {
           })
         ).pipe(
           switchMap(() => {
-            return this.sendOtpEmail(email, otp);
+            return this.emailService.sendOtpEmail(email, user, otp);
           }),
           map(() => {
             return {
@@ -242,10 +242,6 @@ export class UsersService {
         otpAttempts: otpAttempts,
       })
     );
-  }
-
-  sendOtpEmail(email: string, otp: string) {
-    return this.emailService.sendOtpEmail(email, otp);
   }
 
   clearOtp(user: User) {
