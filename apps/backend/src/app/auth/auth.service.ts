@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt';
 import { from } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/entities/user.interface';
@@ -18,14 +18,6 @@ export class AuthService {
 
   createAccessToken(user: Omit<User, 'password'>) {
     return from(this.jwtService.signAsync({ user }));
-  }
-
-  hashPassword(password: string) {
-    return from(bcrypt.hash(password, 12));
-  }
-
-  comparePasswords(newPassword: string, passwordHash: string) {
-    return from(bcrypt.compare(newPassword, passwordHash));
   }
 
   createRefreshToken(user: Omit<User, 'password'>) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from '../users/models/user.interface';
+import { User } from '../users/entities/user.interface';
 
 @Injectable()
 export class EmailService {
@@ -41,7 +41,6 @@ export class EmailService {
    */
   sendOtpEmail(email: string, user: User, otp: string) {
     const subject = `Inlogcode: ${otp}`;
-
 
     if (process.env.NODE_ENV === 'local') {
       console.log('Otp:', otp);
