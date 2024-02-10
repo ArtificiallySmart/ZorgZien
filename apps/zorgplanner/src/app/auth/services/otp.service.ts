@@ -52,10 +52,7 @@ export class OtpService {
 
   loginOtp(loginForm: FormGroup) {
     return this.httpService
-      .post<{ message: string }, object>(
-        '/api/users/login-otp',
-        loginForm.value
-      )
+      .post<{ message: string }, object>('/api/auth/login-otp', loginForm.value)
       .pipe(
         tap(() => {
           this.otpSent(loginForm.value.email);
@@ -78,7 +75,7 @@ export class OtpService {
     const { email } = this.otpState();
     const { otp } = otpForm.value;
     return this.httpService
-      .post<LoginResponse, object>('/api/users/login-otp-verify', {
+      .post<LoginResponse, object>('/api/auth/login-otp-verify', {
         otp,
         email,
       })
