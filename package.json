@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/deploy-dev.js"
+    "build-and-deploy-dev": "npx nx run zorgplanner:build:development && node ./scripts/private/deploy-dev.js",
+    "build-datasource": "npx ts-node ./scripts/public/data-source-generator.ts",
+    "compile-datasource": "npx tsc ./apps/backend/db/data-source.ts --outDir ./dist/apps/backend --target ES5 --emitDecoratorMetadata --experimentalDecorators",
+    "generate-migrations": "npx typeorm -d ./dist/apps/backend/db/data-source.js migration:generate"
   },
   "private": true,
   "dependencies": {
@@ -84,8 +87,9 @@
     "@types/cookie-parser": "^1.4.6",
     "@types/d3": "^7.4.3",
     "@types/geojson": "^7946.0.13",
+    "@types/glob": "^8.1.0",
     "@types/jest": "^29.4.0",
-    "@types/node": "~18.7.1",
+    "@types/node": "^20.11.15",
     "@types/passport-jwt": "^3.0.13",
     "@types/passport-local": "^1.0.38",
     "@types/topojson": "^3.2.6",
@@ -96,6 +100,7 @@
     "eslint": "~8.46.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-cypress": "^2.13.4",
+    "glob": "^10.3.10",
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
     "jest-environment-node": "^29.4.1",

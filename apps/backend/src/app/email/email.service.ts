@@ -41,6 +41,13 @@ export class EmailService {
    */
   sendOtpEmail(email: string, user: User, otp: string) {
     const subject = `Inlogcode: ${otp}`;
+
+
+    if (process.env.NODE_ENV === 'local') {
+      console.log('Otp:', otp);
+      return Promise.resolve();
+    }
+
     const title = 'Inlogcode';
     const date = new Date().toLocaleDateString('nl-NL', {
       year: 'numeric',
@@ -49,6 +56,7 @@ export class EmailService {
     });
     const firstName = user.name;
     const domainName = 'change me';
+
     return this.mailerService.sendMail({
       to: email,
       subject,
