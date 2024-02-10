@@ -59,7 +59,7 @@ export class AuthService {
   refreshToken(): Observable<string> {
     return this.httpService
       .post<{ access_token: string; user: User }, object>(
-        '/api/users/refresh',
+        '/api/auth/refresh',
         {}
       )
       .pipe(
@@ -93,7 +93,7 @@ export class AuthService {
       tokenExpiration: null,
     }));
     this.router.navigate(['/login']);
-    this.httpService.post('/api/users/logout', {}).subscribe();
+    this.httpService.post('/api/auth/logout', {}).subscribe();
   }
 
   setAccessToken(accessToken: string) {
