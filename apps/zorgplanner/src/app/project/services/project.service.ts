@@ -33,6 +33,7 @@ export class ProjectService {
 
   //selectors
   project = computed(() => this.state().project);
+  projectId = computed(() => this.state().project.id);
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 

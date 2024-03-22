@@ -45,6 +45,7 @@
     "express-rate-limit": "^7.1.5",
     "jwt-decode": "^4.0.0",
     "ngx-color-picker": "^16.0.0",
+    "ngxtension": "^2.1.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

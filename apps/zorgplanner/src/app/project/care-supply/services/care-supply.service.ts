@@ -1,21 +1,27 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { Subject, switchMap } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
   EditCareSupplyList,
   RemoveCareSupplyList,
 } from '../../../shared/interfaces/care-supply';
+import { ToastService } from '../../../shared/services/toast.service';
 import { DataService } from '../../services/data.service';
 import { ProjectService } from '../../services/project.service';
-import { Subject } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ToastService } from '../../../shared/services/toast.service';
 
 export interface CareSupplyState {
   careSupplyLists: CareSupplyList[];
   selectedCareSupplyList: CareSupplyList | null;
   loaded: boolean;
   error: string | null;
+}
+
+export interface ChangeZipcodeForOrganisation {
+  zipcode: string;
+  oldOrganisationName: string | null;
+  newOrganisationName: string | null;
 }
 
 @Injectable({
@@ -27,6 +33,7 @@ export class CareSupplyService {
   private toastService = inject(ToastService);
 
   project = this.projectService.project;
+  projectId$ = toObservable(this.projectService.projectId);
 
   //state
   public state = signal<CareSupplyState>({
@@ -43,14 +50,10 @@ export class CareSupplyService {
   error = computed(() => this.state().error);
 
   //sources
+
   careSupplyListsLoaded$ = new Subject<CareSupplyList[]>();
   selectCareSupplyListId$ = new Subject<string>();
-
-  changeZipcodeForOrganisation$ = new Subject<{
-    zipcode: string;
-    oldOrganisationName: string | null;
-    newOrganisationName: string | null;
-  }>();
+  changeZipcodeForOrganisation$ = new Subject<ChangeZipcodeForOrganisation>();
 
   add$ = new Subject<CareSupplyList>();
   edit$ = new Subject<EditCareSupplyList>();
@@ -119,6 +122,12 @@ export class CareSupplyService {
         })),
     });
 
+    // this.add$.pipe(
+    //   map((careSupplyList) => ({
+    //     careSupplyLists: [...this.careSupplyLists(), careSupplyList],
+    //   }))
+    // );
+
     this.edit$.pipe(takeUntilDestroyed()).subscribe({
       next: ({ id, data }) =>
         this.state.update((state) => ({
@@ -182,6 +191,15 @@ export class CareSupplyService {
         this.loadCareSupplyLists(this.project().id);
       }
     });
+  }
+
+  getCareSupplyLists() {
+    return this.projectId$.pipe(
+      switchMap((projectId) => {
+        console.log(projectId);
+        return this.dataService.loadCareSupplyLists(projectId);
+      })
+    );
   }
 
   loadCareSupplyLists(projectId: number) {
