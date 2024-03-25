@@ -1,7 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-import { Subject } from 'rxjs';
+import { Subject, catchError, map, merge, of } from 'rxjs';
 import {
   AddCareDemandList,
   CareDemandList,
@@ -11,6 +9,7 @@ import {
 import { ProjectService } from '../../services/project.service';
 import { DataService } from '../../services/data.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { connect } from 'ngxtension/connect';
 
 export interface CareDemandState {
   careDemandLists: CareDemandList[];
@@ -29,13 +28,15 @@ export class CareDemandService {
 
   project = this.projectService.project;
 
-  //state
-  public state = signal<CareDemandState>({
+  initialState: CareDemandState = {
     careDemandLists: [],
     selectedCareDemandList: null,
     loaded: false,
     error: null,
-  });
+  };
+
+  //state
+  public state = signal<CareDemandState>(this.initialState);
 
   //selectors
   careDemandLists = computed(() => this.state().careDemandLists);
@@ -44,84 +45,69 @@ export class CareDemandService {
   error = computed(() => this.state().error);
 
   //sources
-  careDemandListsLoaded$ = new Subject<CareDemandList[]>();
-  selectCareDemandListId$ = new Subject<string>();
   add$ = new Subject<CareDemandList>();
   edit$ = new Subject<EditCareDemandList>();
   remove$ = new Subject<RemoveCareDemandList>();
   clear$ = new Subject<void>();
 
+  careDemandListsLoaded$ = new Subject<CareDemandList[]>();
+  selectCareDemandListId$ = new Subject<string>();
+
   constructor() {
-    this.careDemandListsLoaded$.pipe(takeUntilDestroyed()).subscribe({
-      next: (careDemandLists) =>
-        this.state.update((state) => ({
-          ...state,
-          careDemandLists: careDemandLists,
-          loaded: true,
+    //reducers
+    const nextStateCommonReducers$ = merge(
+      this.add$.pipe(
+        map((careDemandList) => ({
+          careDemandLists: [...this.careDemandLists(), careDemandList],
         })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
-        })),
-    });
-
-    this.add$.pipe(takeUntilDestroyed()).subscribe((careDemandList) => {
-      this.state.update((state) => ({
-        ...state,
-        careDemandLists: [...state.careDemandLists, careDemandList],
-      }));
-    });
-
-    this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
-      this.state.update((state) => ({
-        ...state,
-        careDemandLists: state.careDemandLists.filter(
-          (careDemandList) => careDemandList.id !== id
-        ),
-      }))
-    );
-
-    this.edit$.pipe(takeUntilDestroyed()).subscribe({
-      next: (update) =>
-        this.state.update((state) => ({
-          ...state,
-          careDemandLists: state.careDemandLists.map((careDemandList) =>
-            careDemandList.id === update.id
-              ? { ...careDemandList, ...update.data }
+        catchError((error) => of({ error }))
+      ),
+      this.edit$.pipe(
+        map(({ id, data }) => ({
+          careDemandLists: this.careDemandLists().map((careDemandList) =>
+            careDemandList.id === id
+              ? { ...careDemandList, ...data }
               : careDemandList
           ),
           selectedCareDemandList:
-            state.selectedCareDemandList?.id === update.id
-              ? { ...state.selectedCareDemandList, ...update.data }
-              : state.selectedCareDemandList,
+            this.selectedCareDemandList()?.id === id
+              ? { ...this.selectedCareDemandList(), ...data }
+              : this.selectedCareDemandList(),
         })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
+        catchError((error) => of({ error }))
+      ),
+      this.remove$.pipe(
+        map((id) => ({
+          selectedCareDemandList: null,
+          careDemandLists: this.careDemandLists().filter(
+            (careDemandList) => careDemandList.id !== id
+          ),
         })),
-    });
+        catchError((error) => of({ error }))
+      ),
+      this.clear$.pipe(map(() => this.initialState))
+    );
+    const nextStateSpecialReducers$ = merge(
+      this.careDemandListsLoaded$.pipe(
+        map((careDemandLists) => ({
+          ...this.initialState,
+          careDemandLists: careDemandLists,
+          loaded: true,
+        })),
+        catchError((error) => of({ error }))
+      ),
+      this.selectCareDemandListId$.pipe(
+        map((id) => ({
+          selectedCareDemandList: this.careDemandLists().find(
+            (list) => list.id == id || null
+          ),
+        }))
+      )
+    );
 
-    this.selectCareDemandListId$
-      .pipe(takeUntilDestroyed())
-      .subscribe((careDemandList) => {
-        const selectedCareDemandList = this.careDemandLists().find(
-          (list) => list.id == careDemandList
-        );
-        this.state.update((state) => ({
-          ...state,
-          selectedCareDemandList: selectedCareDemandList || null,
-        }));
-      });
-
-    this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
-      this.state.update(() => ({
-        careDemandLists: [],
-        selectedCareDemandList: null,
-        loaded: false,
-        error: null,
-      }))
+    connect(
+      this.state,
+      merge(nextStateCommonReducers$, nextStateSpecialReducers$)
     );
 
     effect(() => {

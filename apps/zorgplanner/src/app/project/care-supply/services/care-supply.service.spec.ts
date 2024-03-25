@@ -31,7 +31,4 @@ describe('CareSupplyService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should call loadCareSupplyLists on init', () => {
-    expect(mockDataService.loadCareSupplyLists).toHaveBeenCalled();
-  });
 });

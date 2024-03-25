@@ -5,11 +5,11 @@ import {
   Project,
   RemoveProject,
 } from '../../shared/interfaces/project';
-import { Subject } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Subject, catchError, map, merge, of } from 'rxjs';
 import { DataService } from './data.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { Router } from '@angular/router';
+import { connect } from 'ngxtension/connect';
 
 export interface ProjectState {
   project: Project;
@@ -25,11 +25,13 @@ export class ProjectService {
   toastService = inject(ToastService);
   private router = inject(Router);
   //state
-  public state = signal<ProjectState>({
+  initialState: ProjectState = {
     project: {} as Project,
     loaded: false,
     error: null,
-  });
+  };
+
+  public state = signal<ProjectState>(this.initialState);
 
   //selectors
   project = computed(() => this.state().project);
@@ -38,7 +40,7 @@ export class ProjectService {
   error = computed(() => this.state().error);
 
   //sources
-  load$ = new Subject<Project | HttpErrorResponse>();
+  load$ = new Subject<Project>();
   edit$ = new Subject<EditProject>();
   remove$ = new Subject<RemoveProject>();
   clear$ = new Subject<void>();
@@ -46,46 +48,29 @@ export class ProjectService {
   projectList$ = this.dataService.loadProjects();
 
   constructor() {
-    this.load$.subscribe((result) => {
-      if (result instanceof HttpErrorResponse) {
-        return this.state.update((state) => ({
-          ...state,
-          loaded: false,
-          error: result.message,
-        }));
-      }
-      this.state.update(() => ({
-        project: result,
-        loaded: true,
-        error: null,
-      }));
-    });
+    //reducers
 
-    this.edit$.subscribe((project) => {
-      this.state.update((state) => ({
-        ...state,
-        project: {
-          ...state.project,
-          ...project.data,
-        },
-      }));
-    });
+    const nextState$ = merge(
+      this.load$.pipe(
+        map((project) => ({
+          loaded: true,
+          project: project,
+        })),
+        catchError((err) => of(err))
+      ),
+      this.edit$.pipe(
+        map(({ data }) => ({
+          project: {
+            ...this.project(),
+            ...data,
+          },
+        }))
+      ),
+      this.remove$.pipe(map(() => this.initialState)),
+      this.clear$.pipe(map(() => this.initialState))
+    );
 
-    this.remove$.subscribe(() => {
-      this.state.update((state) => ({
-        ...state,
-        project: {} as Project,
-        loaded: false,
-      }));
-    });
-
-    this.clear$.subscribe(() => {
-      this.state.update((state) => ({
-        ...state,
-        project: {} as Project,
-        loaded: false,
-      }));
-    });
+    connect(this.state, nextState$);
   }
 
   loadProject(id: string) {

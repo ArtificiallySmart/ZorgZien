@@ -1,6 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Subject, switchMap } from 'rxjs';
+import { Subject, catchError, map, of } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -10,6 +9,8 @@ import {
 import { ToastService } from '../../../shared/services/toast.service';
 import { DataService } from '../../services/data.service';
 import { ProjectService } from '../../services/project.service';
+import { connect } from 'ngxtension/connect';
+import { merge } from 'rxjs';
 
 export interface CareSupplyState {
   careSupplyLists: CareSupplyList[];
@@ -33,15 +34,16 @@ export class CareSupplyService {
   private toastService = inject(ToastService);
 
   project = this.projectService.project;
-  projectId$ = toObservable(this.projectService.projectId);
 
-  //state
-  public state = signal<CareSupplyState>({
+  initialState: CareSupplyState = {
     careSupplyLists: [],
     selectedCareSupplyList: null,
     loaded: false,
     error: null,
-  });
+  };
+
+  //state
+  public state = signal<CareSupplyState>(this.initialState);
 
   //selectors
   careSupplyLists = computed(() => this.state().careSupplyLists);
@@ -50,156 +52,87 @@ export class CareSupplyService {
   error = computed(() => this.state().error);
 
   //sources
-
-  careSupplyListsLoaded$ = new Subject<CareSupplyList[]>();
-  selectCareSupplyListId$ = new Subject<string>();
-  changeZipcodeForOrganisation$ = new Subject<ChangeZipcodeForOrganisation>();
-
   add$ = new Subject<CareSupplyList>();
   edit$ = new Subject<EditCareSupplyList>();
   remove$ = new Subject<RemoveCareSupplyList>();
   clear$ = new Subject<void>();
 
+  careSupplyListsLoaded$ = new Subject<CareSupplyList[]>();
+  selectCareSupplyListId$ = new Subject<string>();
+  changeZipcodeForOrganisation$ = new Subject<ChangeZipcodeForOrganisation>();
+
   constructor() {
-    this.changeZipcodeForOrganisation$.pipe(takeUntilDestroyed()).subscribe({
-      next: ({ zipcode, oldOrganisationName, newOrganisationName }) => {
-        //update the selectedCareSupplyList in the state
-        this.state.update((state) => ({
-          ...state,
-          selectedCareSupplyList: {
-            ...state.selectedCareSupplyList,
-            id: state.selectedCareSupplyList?.id || '',
-            title: state.selectedCareSupplyList?.title || '',
-            projectId: state.selectedCareSupplyList?.projectId || 0,
-            careSupply:
-              state.selectedCareSupplyList?.careSupply.map((careSupply) =>
-                careSupply.name === oldOrganisationName
-                  ? {
-                      ...careSupply,
-                      areaZipcodes: careSupply.areaZipcodes?.filter(
-                        (areaZipcode) => areaZipcode !== zipcode
-                      ),
-                    }
-                  : careSupply.name === newOrganisationName
-                  ? {
-                      ...careSupply,
-                      areaZipcodes: [
-                        ...(careSupply.areaZipcodes || []),
-                        zipcode,
-                      ],
-                    }
-                  : careSupply
-              ) || [],
-          },
-        }));
-      },
-    });
-
-    this.careSupplyListsLoaded$.pipe(takeUntilDestroyed()).subscribe({
-      next: (careSupplyLists) =>
-        this.state.update((state) => ({
-          ...state,
-          careSupplyLists: careSupplyLists,
-          loaded: true,
+    //reducers
+    const nextStateCommonReducers$ = merge(
+      this.add$.pipe(
+        map((careSupplyList) => ({
+          careSupplyLists: [...this.careSupplyLists(), careSupplyList],
         })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
-        })),
-    });
-
-    this.add$.pipe(takeUntilDestroyed()).subscribe({
-      next: (careSupplyList) =>
-        this.state.update((state) => ({
-          ...state,
-          careSupplyLists: [...state.careSupplyLists, careSupplyList],
-        })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
-        })),
-    });
-
-    // this.add$.pipe(
-    //   map((careSupplyList) => ({
-    //     careSupplyLists: [...this.careSupplyLists(), careSupplyList],
-    //   }))
-    // );
-
-    this.edit$.pipe(takeUntilDestroyed()).subscribe({
-      next: ({ id, data }) =>
-        this.state.update((state) => ({
-          ...state,
-          careSupplyLists: state.careSupplyLists.map((careSupplyList) =>
+        catchError((error) => of({ error }))
+      ),
+      this.edit$.pipe(
+        map(({ id, data }) => ({
+          careSupplyLists: this.careSupplyLists().map((careSupplyList) =>
             careSupplyList.id === id
               ? { ...careSupplyList, ...data }
               : careSupplyList
           ),
           selectedCareSupplyList:
-            state.selectedCareSupplyList?.id === id
-              ? { ...state.selectedCareSupplyList, ...data }
-              : state.selectedCareSupplyList,
+            this.selectedCareSupplyList()?.id === id
+              ? { ...this.selectedCareSupplyList(), ...data }
+              : this.selectedCareSupplyList(),
         })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
-        })),
-    });
-
-    this.remove$.pipe(takeUntilDestroyed()).subscribe({
-      next: (id) =>
-        this.state.update((state) => ({
-          ...state,
+        catchError((error) => of({ error }))
+      ),
+      this.remove$.pipe(
+        map((id) => ({
           selectedCareSupplyList: null,
-          careSupplyLists: state.careSupplyLists.filter(
+          careSupplyLists: this.careSupplyLists().filter(
             (careSupplyList) => careSupplyList.id !== id
           ),
         })),
-      error: (err) =>
-        this.state.update((state) => ({
-          ...state,
-          error: err,
+        catchError((error) => of({ error }))
+      ),
+      this.clear$.pipe(map(() => this.initialState))
+    );
+
+    const nextStateSpecialReducers$ = merge(
+      this.careSupplyListsLoaded$.pipe(
+        map((careSupplyLists) => ({
+          ...this.initialState,
+          loaded: true,
+          careSupplyLists: careSupplyLists,
         })),
-    });
+        catchError((error) => of({ error }))
+      ),
+      this.selectCareSupplyListId$.pipe(
+        map((id) => ({
+          selectedCareSupplyList:
+            this.careSupplyLists().find((list) => list.id == id) || null,
+        }))
+      ),
+      this.changeZipcodeForOrganisation$.pipe(
+        map(({ zipcode, oldOrganisationName, newOrganisationName }) => ({
+          selectedCareSupplyList: this.moveZipcode(
+            zipcode,
+            oldOrganisationName,
+            newOrganisationName
+          ),
+        }))
+      )
+    );
 
-    this.selectCareSupplyListId$
-      .pipe(takeUntilDestroyed())
-      .subscribe((careSupplyList) => {
-        const selectedCareSupplyList = this.careSupplyLists().find(
-          (list) => list.id == careSupplyList
-        );
-        this.state.update((state) => ({
-          ...state,
-          selectedCareSupplyList: selectedCareSupplyList || null,
-        }));
-      });
-
-    this.clear$.pipe(takeUntilDestroyed()).subscribe(() =>
-      this.state.update(() => ({
-        careSupplyLists: [],
-        selectedCareSupplyList: null,
-        loaded: false,
-        error: null,
-      }))
+    connect(
+      this.state,
+      merge(nextStateCommonReducers$, nextStateSpecialReducers$)
     );
 
     effect(() => {
       if (this.project().id) {
+        this.clear$.next();
         this.loadCareSupplyLists(this.project().id);
       }
     });
-  }
-
-  getCareSupplyLists() {
-    return this.projectId$.pipe(
-      switchMap((projectId) => {
-        console.log(projectId);
-        return this.dataService.loadCareSupplyLists(projectId);
-      })
-    );
   }
 
   loadCareSupplyLists(projectId: number) {
@@ -244,5 +177,42 @@ export class CareSupplyService {
       },
       error: (err) => this.remove$.error(err),
     });
+  }
+
+  moveZipcode(zipcode: string, oldName: string, newName: string) {
+    // Clone the CareSupplyList to avoid mutating the original object directly
+    const updatedList = this.selectedCareSupplyList();
+
+    // Find the old CareSupplyEntry and remove the zipcode
+    const oldEntryIndex = updatedList.careSupply.findIndex(
+      (entry) => entry.name === oldName
+    );
+    if (
+      oldEntryIndex !== -1 &&
+      updatedList.careSupply[oldEntryIndex].areaZipcodes
+    ) {
+      const oldEntry = { ...updatedList.careSupply[oldEntryIndex] };
+      oldEntry.areaZipcodes = oldEntry.areaZipcodes.filter(
+        (z) => z !== zipcode
+      );
+      updatedList.careSupply[oldEntryIndex] = oldEntry;
+    }
+
+    // Find the new CareSupplyEntry and add the zipcode if not already present
+    const newEntryIndex = updatedList.careSupply.findIndex(
+      (entry) => entry.name === newName
+    );
+    if (newEntryIndex !== -1) {
+      const newEntry = { ...updatedList.careSupply[newEntryIndex] };
+      if (!newEntry.areaZipcodes) {
+        newEntry.areaZipcodes = [];
+      }
+      if (!newEntry.areaZipcodes.includes(zipcode)) {
+        newEntry.areaZipcodes.push(zipcode);
+      }
+      updatedList.careSupply[newEntryIndex] = newEntry;
+    }
+
+    return updatedList;
   }
 }
