@@ -70,7 +70,7 @@ export class ProjectService {
       this.clear$.pipe(map(() => this.initialState))
     );
 
-    connect(this.state, nextState$);
+    connect(this.state).with(nextState$);
   }
 
   loadProject(id: string) {

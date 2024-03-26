@@ -122,10 +122,9 @@ export class CareSupplyService {
       )
     );
 
-    connect(
-      this.state,
-      merge(nextStateCommonReducers$, nextStateSpecialReducers$)
-    );
+    connect(this.state)
+      .with(nextStateCommonReducers$)
+      .with(nextStateSpecialReducers$);
 
     effect(() => {
       if (this.project().id) {
