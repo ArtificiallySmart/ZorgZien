@@ -128,8 +128,8 @@ export class CareSupplyService {
 
     effect(() => {
       if (this.project().id) {
-        this.clear$.next();
         this.loadCareSupplyLists(this.project().id);
+        return;
       }
     });
   }
