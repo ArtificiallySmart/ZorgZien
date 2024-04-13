@@ -144,7 +144,6 @@ export class AuthService {
               id: user.id,
               name: user.name,
               email: user.email,
-              organisation: user.organisation,
             };
             return result;
           })

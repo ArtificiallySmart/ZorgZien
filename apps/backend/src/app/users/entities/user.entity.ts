@@ -1,11 +1,4 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Organisation } from '../../organisation/entities/organisation.entity';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class UserEntity {
@@ -29,9 +22,6 @@ export class UserEntity {
 
   @Column({ nullable: true })
   otpAttempts: number;
-
-  @ManyToOne(() => Organisation, (organisation) => organisation.users)
-  organisation: Organisation;
 
   @BeforeInsert()
   emailToLowerCase() {

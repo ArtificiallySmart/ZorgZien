@@ -1,5 +1,3 @@
-import { Organisation } from '../../organisation/entities/organisation.entity';
-
 export interface User {
   id: number;
   name: string;
@@ -8,5 +6,4 @@ export interface User {
   otp?: string;
   otpExpires?: Date;
   otpAttempts?: number;
-  organisation?: Organisation;
 }

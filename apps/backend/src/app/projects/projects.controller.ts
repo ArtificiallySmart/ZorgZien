@@ -1,41 +1,24 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Req,
-} from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { User } from '../users/entities/user.interface';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  create(@Req() req: Request, @Body() createProjectDto: CreateProjectDto) {
-    const { user } = req.user as { user: User };
-    const organisation = user.organisation;
-    console.log('organisation', organisation);
-    return this.projectsService.create(createProjectDto, organisation);
+  create(@Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.create(createProjectDto);
   }
 
   @Get()
-  findAll(@Req() req: Request) {
-    const { user } = req.user as { user: User };
-    const organisation = user.organisation;
-    return this.projectsService.findAll(organisation.id);
+  findAll() {
+    return this.projectsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Req() req: Request, @Param('id') id: string) {
-    const { user } = req.user as { user: User };
-    const organisation = user.organisation;
-    return this.projectsService.findOne(+id, organisation.id);
+  findOne(@Param('id') id: string) {
+    return this.projectsService.findOne(+id);
   }
 
   // @Patch(':id')

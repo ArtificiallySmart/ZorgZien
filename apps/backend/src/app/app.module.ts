@@ -9,7 +9,6 @@ import { AuthModule } from './auth/auth.module';
 import { CareDemandModule } from './care-demand/care-demand.module';
 import { CareSupplyModule } from './care-supply/care-supply.module';
 import { EmailModule } from './email/email.module';
-import { OrganisationModule } from './organisation/organisation.module';
 import { ProjectsModule } from './projects/projects.module';
 import { UsersModule } from './users/users.module';
 
@@ -22,7 +21,6 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     EmailModule,
-    OrganisationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

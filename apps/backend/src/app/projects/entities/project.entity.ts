@@ -2,14 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CareDemandList } from '../../care-demand/entities/care-demand-list.entity';
 import { CareSupplyList } from '../../care-supply/entities/care-supply-list.entity';
-import { Organisation } from '../../organisation/entities/organisation.entity';
 
 @Entity()
 export class Project {
@@ -36,9 +34,4 @@ export class Project {
 
   @OneToMany(() => CareSupplyList, (careSupplyList) => careSupplyList.project)
   careSupplyLists: CareSupplyList[];
-
-  @ManyToMany(() => Organisation, (organisation) => organisation.projects, {
-    cascade: true,
-  })
-  organisations: Organisation[];
 }
