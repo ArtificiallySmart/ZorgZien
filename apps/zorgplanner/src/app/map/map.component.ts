@@ -136,7 +136,7 @@ export class MapComponent {
     this.choroplethService.demandType.update(() => type);
   }
 
-  selectList(event: Event) {
+  selectDemandList(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.careDemandService.selectCareDemandListId$.next(target.value);
   }

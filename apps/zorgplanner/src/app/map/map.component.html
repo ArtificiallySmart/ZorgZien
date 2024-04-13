@@ -47,7 +47,7 @@
                                     lijst:</label>
                                 <select class="form-select" id="exampleFormControlSelect1"
                                     [disabled]="(careDemand().length === 0) ? true : false"
-                                    (change)="selectList($event)">
+                                    (change)="selectDemandList($event)">
 
                                     <option value="test" *ngIf="careDemand().length === 0; else lists">U
                                         heeft
@@ -84,7 +84,7 @@
                                         opgeslagen
                                     </option>
                                     <ng-template #lists2>
-                                        <option>Selecteer een lijst</option>
+                                        <option [value]="0">Selecteer een lijst</option>
                                         <option [value]="list.id" *ngFor="let list of careSupply()"
                                             [attr.selected]="careSupplyService.selectedCareSupplyList() && careSupplyService.selectedCareSupplyList()!.id === list.id">
                                             {{list.title}}</option>

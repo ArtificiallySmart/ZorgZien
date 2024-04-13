@@ -1,5 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { Subject, catchError, map, of } from 'rxjs';
+import { Subject, catchError, map, of, tap } from 'rxjs';
 import {
   AddCareSupplyList,
   CareSupplyList,
@@ -106,6 +106,7 @@ export class CareSupplyService {
         catchError((error) => of({ error }))
       ),
       this.selectCareSupplyListId$.pipe(
+        tap((id) => console.log('selectCareSupplyListId$', id)),
         map((id) => ({
           selectedCareSupplyList:
             this.careSupplyLists().find((list) => list.id == id) || null,

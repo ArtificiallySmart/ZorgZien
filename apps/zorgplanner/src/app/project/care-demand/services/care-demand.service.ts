@@ -98,9 +98,8 @@ export class CareDemandService {
       ),
       this.selectCareDemandListId$.pipe(
         map((id) => ({
-          selectedCareDemandList: this.careDemandLists().find(
-            (list) => list.id == id || null
-          ),
+          selectedCareDemandList:
+            this.careDemandLists().find((list) => list.id == id) || null,
         }))
       )
     );
