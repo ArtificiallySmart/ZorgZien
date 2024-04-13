@@ -9,8 +9,9 @@ import { DataService } from '../../project/services/data.service';
 import { ZipcodeData, ZipcodeDataService } from './zipcode-data.service';
 
 import * as utils from '../../shared/utils/hsl-hsla.util';
+import { Subject } from 'rxjs';
 
-export interface PopoverLocationState {
+export interface ClickLocationData {
   x: number;
   y: number;
   zipcodeData: ZipcodeData;
@@ -31,11 +32,7 @@ export class ChoroplethService {
   path = d3.geoPath(this.projection);
   transform: d3.ZoomTransform | null = null;
 
-  clickLocation = signal<PopoverLocationState>({
-    x: 0,
-    y: 0,
-    zipcodeData: {} as ZipcodeData,
-  });
+  clickLocation$ = new Subject<ClickLocationData>();
 
   demandType = signal<'hours' | 'clients'>('hours');
 
@@ -197,12 +194,17 @@ export class ChoroplethService {
       // .selectAll('path')
       .on('click', (event) => {
         if (event.target.nodeName !== 'path') {
-          this.clickLocation.update(() => {
-            return {
-              x: event.offsetX,
-              y: event.offsetY,
-              zipcodeData: {} as ZipcodeData,
-            };
+          // this.clickLocation.update(() => {
+          //   return {
+          //     x: event.offsetX,
+          //     y: event.offsetY,
+          //     zipcodeData: {} as ZipcodeData,
+          //   };
+          // });
+          this.clickLocation$.next({
+            x: event.offsetX,
+            y: event.offsetY,
+            zipcodeData: {} as ZipcodeData,
           });
           return;
         }
@@ -215,13 +217,18 @@ export class ChoroplethService {
           ...data[index],
           zipcode: event.target.__data__.properties!['postcode4'],
         };
-        this.clickLocation.update(() => {
-          return {
-            x: event.offsetX,
-            y: event.offsetY,
-            zipcodeData: zipcodeData,
-          };
+        this.clickLocation$.next({
+          x: event.offsetX,
+          y: event.offsetY,
+          zipcodeData: zipcodeData,
         });
+        // this.clickLocation.update(() => {
+        //   return {
+        //     x: event.offsetX,
+        //     y: event.offsetY,
+        //     zipcodeData: zipcodeData,
+        //   };
+        // });
       });
   }
 
