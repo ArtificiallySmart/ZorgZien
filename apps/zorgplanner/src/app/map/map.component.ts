@@ -1,4 +1,4 @@
-import { Component, ViewChild, computed, effect, inject } from '@angular/core';
+import { Component, ViewChild, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NgbCollapseModule,
@@ -6,7 +6,10 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
-import { ChoroplethService } from './services/choropleth.service';
+import {
+  ChoroplethService,
+  ClickLocationData,
+} from './services/choropleth.service';
 import { CareDemandService } from '../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../project/care-supply/services/care-supply.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -15,6 +18,7 @@ import {
   ZipcodeData,
   ZipcodeDataService,
 } from './services/zipcode-data.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'zorgplanner-map',
@@ -53,15 +57,13 @@ export class MapComponent {
   constructor() {
     this.choroplethService.init();
 
-    effect(
-      () => {
-        const zipcodeData = this.choroplethService.clickLocation().zipcodeData;
+    this.choroplethService.clickLocation$
+      .pipe(takeUntilDestroyed())
+      .subscribe((clickLocation) => {
         this.assignZipcodes
-          ? this.reassignZipcode(zipcodeData)
-          : this.togglePopover(zipcodeData);
-      },
-      { allowSignalWrites: true }
-    );
+          ? this.reassignZipcode(clickLocation.zipcodeData)
+          : this.togglePopover(clickLocation);
+      });
   }
 
   reassignZipcode(zipcodeData: ZipcodeData) {
@@ -77,19 +79,21 @@ export class MapComponent {
     });
   }
 
-  togglePopover(zipcodeData: ZipcodeData) {
+  togglePopover(clickLocation: ClickLocationData) {
     this.myPopover.close(false);
 
-    if (!zipcodeData.zipcode) {
+    if (!clickLocation.zipcodeData.zipcode) {
       return;
     }
-    if (this.choroplethService.clickLocation().x !== 0) {
-      this.setPopperOptions([
-        this.choroplethService.clickLocation().x,
-        this.choroplethService.clickLocation().y,
-      ]);
 
-      setTimeout(() => this.myPopover.open({ zipcodeData }), 100);
+    if (clickLocation.x !== 0) {
+      // Set the popper options to the click location
+      this.setPopperOptions([clickLocation.x, clickLocation.y]);
+
+      // Use requestAnimationFrame to delay execution until the next frame to ensure the popper options are set
+      requestAnimationFrame(() => {
+        this.myPopover.open({ zipcodeData: clickLocation.zipcodeData });
+      });
     }
   }
 
@@ -136,7 +140,7 @@ export class MapComponent {
     this.choroplethService.demandType.update(() => type);
   }
 
-  selectList(event: Event) {
+  selectDemandList(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.careDemandService.selectCareDemandListId$.next(target.value);
   }

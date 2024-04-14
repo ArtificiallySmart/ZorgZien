@@ -44,7 +44,6 @@ export class UsersService {
         where: {
           email: email,
         },
-        relations: ['organisation'],
       })
     );
   }

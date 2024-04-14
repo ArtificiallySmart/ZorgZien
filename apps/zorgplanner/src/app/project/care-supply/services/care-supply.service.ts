@@ -179,8 +179,12 @@ export class CareSupplyService {
   }
 
   moveZipcode(zipcode: string, oldName: string, newName: string) {
+    console.log('moveZipcode');
     // Clone the CareSupplyList to avoid mutating the original object directly
-    const updatedList = this.selectedCareSupplyList();
+    const updatedList = JSON.parse(
+      JSON.stringify(this.selectedCareSupplyList())
+    );
+    //const updatedList = this.selectedCareSupplyList();
 
     // Find the old CareSupplyEntry and remove the zipcode
     const oldEntryIndex = updatedList.careSupply.findIndex(
@@ -211,7 +215,8 @@ export class CareSupplyService {
       }
       updatedList.careSupply[newEntryIndex] = newEntry;
     }
-
+    console.log(this.selectedCareSupplyList());
+    console.log(updatedList);
     return updatedList;
   }
 }
