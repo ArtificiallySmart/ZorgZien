@@ -119,6 +119,24 @@ export class EditCareSupplyComponent implements OnInit {
     ).at(innerIndex) as FormControl;
   }
 
+  getOuterFormControl(outerIndex: number): FormControl {
+    return (this.careSupplyListForm.get('careSupply') as FormArray)
+      .at(outerIndex)
+      .get('areaZipcodes') as FormControl;
+  }
+
+  isZipcodeDuplicate(outerIndex: number, innerIndex: number) {
+    const containsDupes =
+      this.getOuterFormControl(outerIndex).hasError('duplicateZipcode');
+    if (!containsDupes) return false;
+
+    const dupeList = this.getOuterFormControl(outerIndex).getError(
+      'duplicateZipcode'
+    )?.duplicates as number[][];
+
+    return dupeList.some((indices) => indices.includes(innerIndex));
+  }
+
   createCareSupplyEntryForm(supplyEntry: CareSupplyEntry) {
     const entry = this.fb.group({
       name: [supplyEntry.name, Validators.required],
@@ -150,7 +168,7 @@ export class EditCareSupplyComponent implements OnInit {
 
   onSubmit() {
     if (this.careSupplyListForm.invalid) {
-      //console.log(this.careSupplyListForm);
+      console.log(this.careSupplyListForm);
       return;
     }
     const projectId = this.careSupplyList.projectId;

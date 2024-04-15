@@ -50,7 +50,8 @@
                                 <div formArrayName="areaZipcodes" class="form-group row mb-3">
                                     <div class="col-4"
                                         *ngFor="let zipcode of supply.areaZipcodes; let j = index; trackBy zipCodeById">
-                                        <div class="input-group mb-3"
+
+                                        <div class="input-group mt-3"
                                             [ngClass]="getInnerFormControl(i,j).errors ? 'is-invalid' : ''">
                                             <input type="text" class="form-control" id="autoSizingInputGroup"
                                                 placeholder="Postcode" [formControlName]="j">
@@ -59,12 +60,15 @@
                                             </div>
 
                                         </div>
-                                        <div class="invalid-feedback">
+                                        <div class="invalid-feedback mt-0">
                                             Ongeldige postcode.
+                                        </div>
+                                        <div class="duplicate-feedback mt-0" *ngIf="isZipcodeDuplicate(i,j)">
+                                            Dubbele postcode.
                                         </div>
 
                                     </div>
-                                    <div class="input-group">
+                                    <div class="input-group mt-3">
 
                                         <input type="text" class="form-control" id="autoSizingInputGroup"
                                             placeholder="Nieuwe postcode" #postcodeInput>
