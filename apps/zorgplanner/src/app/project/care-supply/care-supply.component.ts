@@ -9,6 +9,7 @@ import {
 } from '../../shared/interfaces/care-supply';
 import { EditCareSupplyComponent } from './edit-care-supply/edit-care-supply.component';
 import { CareSupplyService } from './services/care-supply.service';
+import { ParserService } from '../../shared/services/parser.service';
 
 @Component({
   selector: 'zorgplanner-care-supply',
@@ -27,6 +28,7 @@ export class CareSupplyComponent {
   @Input() editMode = false;
 
   private careSupplyService = inject(CareSupplyService);
+  private parserService = inject(ParserService);
 
   selectedList: CareSupplyList | undefined;
 
@@ -71,9 +73,13 @@ export class CareSupplyComponent {
 
   submitEntry() {
     const color = this.color || this.colorList[this.careSupplyEntries.length];
+    const separatedZipcodes = this.parserService.parseZipcodes(
+      this.areaZipcodes
+    );
+
     this.careSupplyEntries.push({
       name: this.newTeamName,
-      areaZipcodes: this.areaZipcodes.split(','),
+      areaZipcodes: separatedZipcodes,
       color: color,
       amount: this.availableFTES,
     });

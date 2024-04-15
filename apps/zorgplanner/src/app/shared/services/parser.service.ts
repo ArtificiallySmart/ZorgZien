@@ -1,10 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CareDemandEntry } from '../interfaces/care-demand';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ParserService {
+  toastService = inject(ToastService);
   constructor() {}
 
   parse(data: string): Omit<CareDemandEntry, 'id' | 'careDemandListId'>[] {
@@ -27,6 +29,12 @@ export class ParserService {
 
   parseZipcodes(data: string) {
     const zipcodes = data.match(/\b(\d{4})\b/g);
-    return zipcodes ?? [];
+    const uniqueZipcodes = zipcodes ? [...new Set(zipcodes)] : [];
+
+    if (zipcodes && zipcodes.length !== uniqueZipcodes.length) {
+      this.toastService.show('Dubbele postcodes verwijderd', 'warning');
+    }
+
+    return uniqueZipcodes ?? [];
   }
 }
