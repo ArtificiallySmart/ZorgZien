@@ -172,6 +172,7 @@ export class ChoroplethService {
 
       if (!color) return;
       element.attr('fill', color);
+      element.attr('stroke', 'grey');
     });
   }
 

@@ -29,7 +29,7 @@
 
                                     <tr (click)="item.isCollapsed = !item.isCollapsed" [class.add-bg]="even">
                                         <td>{{ item.organisationName }}</td>
-                                        <td>{{ item.totalSupplyHours | fteToHours}}</td>
+                                        <td>{{ item.totalSupplyHours | number:'1.1-2'}}</td>
                                         <td>{{ item.totalDemandHours | number:'1.1-2'}}</td>
                                         <td>{{ item.totalDemandClients }}</td>
                                         <td><i-tabler name="chevron-down" class="chevron-icon"
