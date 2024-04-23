@@ -14,6 +14,7 @@ export interface CareSupplyEntry {
 
 export interface CombinedDemandSupply {
   organisationName: string;
+  organisationColor?: string;
   totalDemandClients: number;
   totalDemandHours: number;
   totalSupplyHours: number;

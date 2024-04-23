@@ -68,8 +68,10 @@ export class ZipcodeDataService {
 
     const combined: CombinedDemandSupply[] = [];
     supplyListEntries.forEach((entry) => {
+      console.log(entry);
       const org: CombinedDemandSupply = {
         organisationName: entry.name,
+        organisationColor: entry.color,
         totalDemandClients: 0,
         totalDemandHours: 0,
         totalSupplyHours: entry.amount ?? 0,
@@ -92,6 +94,7 @@ export class ZipcodeDataService {
 
     const unassigned: CombinedDemandSupply = {
       organisationName: 'Niet toegewezen',
+      organisationColor: 'hsl(0, 100%, 0%)',
       totalDemandClients: 0,
       totalDemandHours: 0,
       totalSupplyHours: 0,

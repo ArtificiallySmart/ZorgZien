@@ -68,9 +68,12 @@ export class MapComponent {
 
   reassignZipcode(zipcodeData: ZipcodeData) {
     const oldOrganisationName = zipcodeData.assignedTeamName;
-    const newOrganisationName = this.selectedOrganisationName;
-    if (oldOrganisationName === newOrganisationName || !zipcodeData.zipcode) {
+    let newOrganisationName = this.selectedOrganisationName;
+    if (!zipcodeData.zipcode) {
       return;
+    }
+    if (oldOrganisationName === newOrganisationName) {
+      newOrganisationName = null;
     }
     this.careSupplyService.changeZipcodeForOrganisation$.next({
       zipcode: zipcodeData.zipcode,

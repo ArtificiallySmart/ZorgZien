@@ -294,23 +294,15 @@ export class ChoroplethService {
     }
 
     if (!zipcodeData.length) return;
-    const keyvalue: { [key: string]: string } = {};
-    const combinedDemandSupply = this.zipcodeDataService.combinedDemandSupply();
 
-    zipcodeData.forEach((entry) => {
-      if (entry.color === null) {
-        keyvalue[entry.assignedTeamName!] = this.getUnassignedColor(1, true);
-        return;
-      }
-      keyvalue[entry.assignedTeamName!] = utils.hslaToHsl(entry.color!);
-    });
+    const combinedDemandSupply = this.zipcodeDataService.combinedDemandSupply();
 
     const legend = {
       dots: {
         centerX: 25,
         firstCenterY: 100,
         radius: 7,
-        spaceBetween: 25,
+        spaceBetween: 50,
         centerY: (i: number) => {
           return legend.dots.firstCenterY + i * legend.dots.spaceBetween;
         },
@@ -328,13 +320,23 @@ export class ChoroplethService {
           return legend.dots.centerY(i);
         },
       },
+      progressBars: {
+        height: 20,
+        get startX() {
+          return legend.dots.centerX - legend.dots.radius;
+        },
+        centerY: (i: number) => {
+          return legend.dots.centerY(i) + legend.progressBars.height / 2;
+        },
+      },
     };
 
     this.svg
       .append('g')
       .attr('class', 'legend-group')
       .selectAll('circles')
-      .data(Object.keys(keyvalue).sort())
+      // .data(Object.keys(keyvalue).sort())
+      .data(combinedDemandSupply.map((entry) => entry.organisationName).sort())
       .enter()
       .append('circle')
       .attr('class', 'legend')
@@ -343,12 +345,22 @@ export class ChoroplethService {
         return legend.dots.centerY(i);
       })
       .attr('r', legend.dots.radius)
-      .style('fill', (d: string) => keyvalue[d] as string);
+      .style('fill', (d: string) => {
+        const index = combinedDemandSupply.findIndex(
+          (entry) => entry.organisationName === d
+        );
+        if (index === -1) {
+          return '';
+        }
+        return combinedDemandSupply[index].organisationColor!;
+      });
+    // .style('fill', (d: string) => keyvalue[d] as string);
 
     this.svg
       .select('g.legend-group')
       .selectAll('labels')
-      .data(Object.keys(keyvalue).sort())
+      // .data(Object.keys(keyvalue).sort())
+      .data(combinedDemandSupply.map((entry) => entry.organisationName).sort())
       .enter()
       .append('text')
       .attr('class', 'legend')
@@ -356,9 +368,10 @@ export class ChoroplethService {
       .attr('y', function (_, i) {
         return legend.text.centerY(i);
       })
-      .text(function (d) {
-        return Object.keys(keyvalue).find((key) => key === d) as string;
-      })
+      // .text(function (d) {
+      //   return Object.keys(keyvalue).find((key) => key === d) as string;
+      // })
+      .text((d) => d)
       .attr('text-anchor', 'left')
       .style('alignment-baseline', 'middle')
       .style('cursor', 'pointer')
@@ -385,6 +398,69 @@ export class ChoroplethService {
           text += `Aantal cliënten: ${totalDemandClients}`;
         }
         return text;
+      });
+
+    this.svg
+      .select('g.legend-group')
+      .selectAll('labels')
+      // .data(Object.keys(keyvalue).sort())
+      .data(combinedDemandSupply.map((entry) => entry.organisationName).sort())
+      .enter()
+      .append('rect')
+      .attr('x', legend.progressBars.startX)
+      .attr('y', (_, i) => {
+        return legend.progressBars.centerY(i);
+      })
+      .attr('width', 100)
+      .attr('height', legend.progressBars.height)
+      .style('fill', 'hsla(32, 100%, 59%, .1)')
+      .style('border', 'solid 1px');
+
+    this.svg
+      .select('g.legend-group')
+      .selectAll('labels')
+      // .data(Object.keys(keyvalue).sort())
+      .data(combinedDemandSupply.map((entry) => entry.organisationName).sort())
+      .enter()
+      .append('rect')
+      .attr('x', legend.progressBars.startX)
+      .attr('y', (_, i) => {
+        return legend.progressBars.centerY(i);
+      })
+      // .attr('width', 50)
+      .attr('width', (d) => {
+        const index = combinedDemandSupply.findIndex(
+          (entry) => entry.organisationName === d
+        );
+        if (index === -1) {
+          return 0;
+        }
+        const totalDemandHours = combinedDemandSupply[index].totalDemandHours;
+        const totalSupplyHours = combinedDemandSupply[index].totalSupplyHours;
+        if (totalDemandHours === null || totalSupplyHours === null) {
+          return 0;
+        }
+        return (totalDemandHours / totalSupplyHours) * 100;
+      })
+      .attr('height', legend.progressBars.height)
+      // .style('fill', 'grey');
+      .style('fill', (d) => {
+        const index = combinedDemandSupply.findIndex(
+          (entry) => entry.organisationName === d
+        );
+        if (index === -1) {
+          return '';
+        }
+        const totalDemandHours = combinedDemandSupply[index].totalDemandHours;
+        const totalSupplyHours = combinedDemandSupply[index].totalSupplyHours;
+        const percentage = (totalDemandHours / totalSupplyHours) * 100;
+        if (percentage < 80) {
+          return 'blue';
+        }
+        if (percentage < 100) {
+          return 'green';
+        }
+        return 'red';
       });
 
     this.addLegendMouseOver();
