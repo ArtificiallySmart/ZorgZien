@@ -11,11 +11,17 @@ import { environment } from '../../../environments/environment';
 
 export interface ZipcodeData {
   zipcode: string;
-  demand: number | null;
-  amountOfClients: number | null;
-  amountOfHours: number | null;
+  totalAmountOfClients: number | null;
+  totalAmountOfHours: number | null;
   assignedTeamName: string | null;
   color: string | null;
+  activeTeams: ZipcodeTeam[];
+}
+
+export interface ZipcodeTeam {
+  teamName: string;
+  amountOfHours: number;
+  color: string;
 }
 
 @Injectable({
@@ -114,11 +120,11 @@ export class ZipcodeDataService {
     demandList.careDemand.forEach((entry) => {
       data.push({
         zipcode: entry.zipcode.toString(),
-        demand: entry.clients ?? 0,
-        amountOfClients: entry.clients ?? 0,
-        amountOfHours: entry.hours ?? 0,
+        totalAmountOfClients: entry.clients ?? 0,
+        totalAmountOfHours: entry.hours ?? 0,
         assignedTeamName: 'Niet toegewezen',
         color: null,
+        activeTeams: [],
       });
     });
     return data;
@@ -131,14 +137,28 @@ export class ZipcodeDataService {
     const data: ZipcodeData[] = [];
     supplyList.careSupply.forEach((entry) => {
       entry.areaZipcodes?.forEach((zipcode) => {
-        data.push({
-          zipcode: zipcode,
-          demand: null,
-          amountOfClients: null,
-          amountOfHours: null,
-          assignedTeamName: entry.name,
-          color: entry.color,
-        });
+        data.findIndex((el) => el.zipcode === zipcode) === -1
+          ? data.push({
+              zipcode: zipcode,
+              totalAmountOfClients: null,
+              totalAmountOfHours: null,
+              assignedTeamName: entry.name,
+              color: entry.color,
+              activeTeams: [
+                {
+                  teamName: entry.name,
+                  amountOfHours: entry.amount ?? 0,
+                  color: entry.color,
+                },
+              ],
+            })
+          : data
+              .find((el) => el.zipcode === zipcode)
+              ?.activeTeams.push({
+                teamName: entry.name,
+                amountOfHours: entry.amount ?? 0,
+                color: entry.color,
+              });
       });
     });
     return data;

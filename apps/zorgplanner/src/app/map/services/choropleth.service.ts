@@ -72,14 +72,14 @@ export class ChoroplethService {
     if (!data.length) return;
     const filteredMapFeatures = this.filterMapFeatures(data);
 
-    const minHours = d3.min(data, (d) => d.amountOfHours);
-    const maxHours = d3.max(data, (d) => d.amountOfHours);
+    const minHours = d3.min(data, (d) => d.totalAmountOfHours);
+    const maxHours = d3.max(data, (d) => d.totalAmountOfHours);
     const hourLogScale = d3.scaleLog().domain([minHours || 1, maxHours || 1]);
     const hourAlphaValue = (value: number) => {
       return value !== null ? hourLogScale(value) * 0.8 + 0.2 : 1;
     };
 
-    const maxClients = d3.max(data, (d) => d.amountOfClients);
+    const maxClients = d3.max(data, (d) => d.totalAmountOfClients);
     const clientLogScale = d3.scaleLog().domain([1, maxClients || 1]);
     const clientAlphaValue = (value: number) => {
       return value !== null ? clientLogScale(value) * 0.8 + 0.2 : 1;
@@ -99,7 +99,9 @@ export class ChoroplethService {
         if (index === -1) {
           return 'grey';
         }
-        const alpha = hourAlphaValue(data[index].amountOfHours!).toString();
+        const alpha = hourAlphaValue(
+          data[index].totalAmountOfHours!
+        ).toString();
 
         if (data[index].color === null) {
           return this.getUnassignedColor(+alpha);
@@ -114,7 +116,9 @@ export class ChoroplethService {
         if (index === -1) {
           return 'grey';
         }
-        const alpha = clientAlphaValue(data[index].amountOfClients!).toString();
+        const alpha = clientAlphaValue(
+          data[index].totalAmountOfClients!
+        ).toString();
 
         if (data[index].color === null) {
           return this.getUnassignedColor(+alpha);
@@ -130,9 +134,14 @@ export class ChoroplethService {
         if (index === -1) {
           return 'unassigned';
         }
-        return `${data[index].assignedTeamName
-          ?.replace(/ /g, '')
-          .toLowerCase()}`;
+
+        let classNames = '';
+
+        data[index].activeTeams.forEach((team) => {
+          classNames += `${team.teamName.replace(/ /g, '').toLowerCase()} `;
+        });
+
+        return classNames;
       })
       .append('title')
       .text((d) => {
@@ -142,8 +151,8 @@ export class ChoroplethService {
         if (index === -1) {
           return '';
         }
-        const clients = data[index].amountOfClients;
-        const hours = data[index].amountOfHours;
+        const clients = data[index].totalAmountOfClients;
+        const hours = data[index].totalAmountOfHours;
         const assignedTeamName = data[index].assignedTeamName;
         let text = `Postcode: ${data[index].zipcode}\n`;
         if (assignedTeamName !== null) {
