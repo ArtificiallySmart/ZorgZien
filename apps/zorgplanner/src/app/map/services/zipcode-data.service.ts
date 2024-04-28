@@ -50,6 +50,16 @@ export class ZipcodeDataService {
     return [];
   });
 
+  supplyTeams: Signal<{ [key: string]: string }> = computed(() => {
+    const teams: { [key: string]: string } = {};
+    const supplyList = this.careSupplyService.selectedCareSupplyList();
+    if (!supplyList) return {};
+    supplyList.careSupply.forEach((entry) => {
+      teams[entry.name] = entry.color;
+    });
+    return teams;
+  });
+
   currentZipcodeData: Signal<ZipcodeData[]> = computed(() => {
     return this.combineZipcodeData();
   });

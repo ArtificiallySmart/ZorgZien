@@ -39,7 +39,8 @@ export class ChoroplethService {
   constructor() {
     effect(() => {
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
-      this.createLegend(this.zipcodeDataService.currentZipcodeData());
+      // this.createLegend(this.zipcodeDataService.currentZipcodeData());
+      this.createLegend(this.zipcodeDataService.supplyTeams());
     });
 
     effect(() => {
@@ -295,26 +296,22 @@ export class ChoroplethService {
       });
   }
 
-  createLegend(zipcodeData: ZipcodeData[]) {
+  createLegend(supplyTeams: { [key: string]: string }) {
+    // Remove existing legend
     try {
       this.svg.selectAll('.legend-group').remove();
     } catch (error) {
       return;
     }
 
-    if (!zipcodeData.length) return;
-    const keyvalue: { [key: string]: string } = {};
+    // No data, no legend
+    if (!Object.keys(supplyTeams).length) return;
+
     const combinedDemandSupply = this.zipcodeDataService.combinedDemandSupply();
 
-    zipcodeData.forEach((entry) => {
-      if (entry.color === null) {
-        keyvalue[entry.assignedTeamName!] = this.getUnassignedColor(1, true);
-        return;
-      }
-      keyvalue[entry.assignedTeamName!] = utils.hslaToHsl(entry.color!);
-    });
-
+    // legend settings
     const legend = {
+      // dots with team colors
       dots: {
         centerX: 25,
         firstCenterY: 100,
@@ -325,6 +322,7 @@ export class ChoroplethService {
         },
       },
       spaceBetweenDotsAndText: 10,
+      // team names
       text: {
         get startX() {
           return (
@@ -339,11 +337,12 @@ export class ChoroplethService {
       },
     };
 
+    // Create colored legend dots
     this.svg
       .append('g')
       .attr('class', 'legend-group')
       .selectAll('circles')
-      .data(Object.keys(keyvalue).sort())
+      .data(Object.keys(supplyTeams).sort())
       .enter()
       .append('circle')
       .attr('class', 'legend')
@@ -352,12 +351,13 @@ export class ChoroplethService {
         return legend.dots.centerY(i);
       })
       .attr('r', legend.dots.radius)
-      .style('fill', (d: string) => keyvalue[d] as string);
+      .style('fill', (d: string) => supplyTeams[d] as string);
 
+    // Create legend text with info on hover
     this.svg
       .select('g.legend-group')
       .selectAll('labels')
-      .data(Object.keys(keyvalue).sort())
+      .data(Object.keys(supplyTeams).sort())
       .enter()
       .append('text')
       .attr('class', 'legend')
@@ -366,7 +366,7 @@ export class ChoroplethService {
         return legend.text.centerY(i);
       })
       .text(function (d) {
-        return Object.keys(keyvalue).find((key) => key === d) as string;
+        return Object.keys(supplyTeams).find((key) => key === d) as string;
       })
       .attr('text-anchor', 'left')
       .style('alignment-baseline', 'middle')
