@@ -10,6 +10,7 @@ import { ZipcodeData, ZipcodeDataService } from './zipcode-data.service';
 
 import * as utils from '../../shared/utils/hsl-hsla.util';
 import { Subject } from 'rxjs';
+import { ChoroplethLegendService } from './choropleth-legend.service';
 
 export interface ClickLocationData {
   x: number;
@@ -23,6 +24,7 @@ export interface ClickLocationData {
 export class ChoroplethService {
   private dataService = inject(DataService);
   private zipcodeDataService = inject(ZipcodeDataService);
+  private legendService = inject(ChoroplethLegendService);
 
   private centerGroningen: [number, number] = [6.4, 53.259];
 
@@ -39,8 +41,7 @@ export class ChoroplethService {
   constructor() {
     effect(() => {
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
-      // this.createLegend(this.zipcodeDataService.currentZipcodeData());
-      this.createLegend(this.zipcodeDataService.supplyTeams());
+      this.legendService.createLegend(this.zipcodeDataService.supplyTeams());
     });
 
     effect(() => {
@@ -93,39 +94,39 @@ export class ChoroplethService {
       .data(filteredMapFeatures)
       .join('path')
       .attr('d', path)
-      .attr('data-hours', (d) => {
+      .attr('fill', (d) => {
         const index = data.findIndex(
           (entry) => entry.zipcode === d.properties!['postcode4']
         );
-        if (index === -1) {
-          return 'grey';
-        }
-        const alpha = hourAlphaValue(
-          data[index].totalAmountOfHours!
-        ).toString();
+        const alpha =
+          this.demandType() === 'clients'
+            ? clientAlphaValue(data[index].totalAmountOfClients!).toString()
+            : hourAlphaValue(data[index].totalAmountOfHours!).toString();
 
         if (data[index].color === null) {
           return this.getUnassignedColor(+alpha);
         }
-        data[index].color = utils.hslToHsla(data[index].color!, +alpha);
-        return data[index].color;
+
+        const color = utils.hslToHsla(data[index].activeTeams[0].color, +alpha);
+        return color;
       })
-      .attr('data-clients', (d) => {
+      .attr('data-alpha', (d) => {
+        const index = data.findIndex(
+          (entry) => entry.zipcode === d.properties!['postcode4']
+        );
+        if (this.demandType() === 'clients') {
+          return clientAlphaValue(data[index].totalAmountOfClients!).toString();
+        }
+        return hourAlphaValue(data[index].totalAmountOfHours!).toString();
+      })
+      .attr('data-amt-teams', (d) => {
         const index = data.findIndex(
           (entry) => entry.zipcode === d.properties!['postcode4']
         );
         if (index === -1) {
-          return 'grey';
+          return '0';
         }
-        const alpha = clientAlphaValue(
-          data[index].totalAmountOfClients!
-        ).toString();
-
-        if (data[index].color === null) {
-          return this.getUnassignedColor(+alpha);
-        }
-        data[index].color = utils.hslToHsla(data[index].color!, +alpha);
-        return data[index].color;
+        return data[index].activeTeams.length.toString();
       })
       .attr('transform', this.transform?.toString() ?? null)
       .attr('class', (d) => {
@@ -133,10 +134,10 @@ export class ChoroplethService {
           (entry) => entry.zipcode === d.properties!['postcode4']
         );
         if (index === -1) {
-          return 'unassigned';
+          return 'colorme unassigned';
         }
 
-        let classNames = '';
+        let classNames = 'colorme ';
 
         data[index].activeTeams.forEach((team) => {
           classNames += `${team.teamName.replace(/ /g, '').toLowerCase()} `;
@@ -175,13 +176,13 @@ export class ChoroplethService {
   }
 
   fillZipcodeData() {
-    const svgElements = d3.selectAll('path');
+    const svgElements = d3.selectAll('.colorme');
     svgElements.each((_, i, nodes) => {
       const element = d3.select(nodes[i] as SVGElement);
-      const color = element.attr(`data-${this.demandType()}`);
-
-      if (!color) return;
-      element.attr('fill', color);
+      // const alpha = element.attr(`data-${this.demandType()}`);
+      // const zipcode = element.datum().properties!['postcode4'];
+      // if (!color) return;
+      // element.attr('fill', color);
       element.attr('stroke', 'grey');
     });
   }
@@ -194,53 +195,37 @@ export class ChoroplethService {
         d3.select(this).attr('stroke', '#000').raise();
       })
       .on('mouseout', function () {
-        d3.select(this).attr('stroke', 'grey').lower();
+        d3.select(this).attr('stroke', 'grey');
       });
   }
 
   addClick(data: ZipcodeData[]) {
     const svg = this.svg;
 
-    svg
-      // .selectAll('path')
-      .on('click', (event) => {
-        if (event.target.nodeName !== 'path') {
-          // this.clickLocation.update(() => {
-          //   return {
-          //     x: event.offsetX,
-          //     y: event.offsetY,
-          //     zipcodeData: {} as ZipcodeData,
-          //   };
-          // });
-          this.clickLocation$.next({
-            x: event.offsetX,
-            y: event.offsetY,
-            zipcodeData: {} as ZipcodeData,
-          });
-          return;
-        }
-        const index = data.findIndex(
-          (entry) =>
-            entry.zipcode == event.target.__data__.properties!['postcode4']
-        );
-        let zipcodeData: ZipcodeData = {} as ZipcodeData;
-        zipcodeData = {
-          ...data[index],
-          zipcode: event.target.__data__.properties!['postcode4'],
-        };
+    svg.on('click', (event) => {
+      if (event.target.nodeName !== 'path') {
         this.clickLocation$.next({
           x: event.offsetX,
           y: event.offsetY,
-          zipcodeData: zipcodeData,
+          zipcodeData: {} as ZipcodeData,
         });
-        // this.clickLocation.update(() => {
-        //   return {
-        //     x: event.offsetX,
-        //     y: event.offsetY,
-        //     zipcodeData: zipcodeData,
-        //   };
-        // });
+        return;
+      }
+      const index = data.findIndex(
+        (entry) =>
+          entry.zipcode == event.target.__data__.properties!['postcode4']
+      );
+      let zipcodeData: ZipcodeData = {} as ZipcodeData;
+      zipcodeData = {
+        ...data[index],
+        zipcode: event.target.__data__.properties!['postcode4'],
+      };
+      this.clickLocation$.next({
+        x: event.offsetX,
+        y: event.offsetY,
+        zipcodeData: zipcodeData,
       });
+    });
   }
 
   makeFeatures(geoData: TopoJSON.Topology<Objects<GeoJsonProperties>>) {
@@ -293,134 +278,6 @@ export class ChoroplethService {
       })
       .text(function (d) {
         return d.properties!['postcode4'];
-      });
-  }
-
-  createLegend(supplyTeams: { [key: string]: string }) {
-    // Remove existing legend
-    try {
-      this.svg.selectAll('.legend-group').remove();
-    } catch (error) {
-      return;
-    }
-
-    // No data, no legend
-    if (!Object.keys(supplyTeams).length) return;
-
-    const combinedDemandSupply = this.zipcodeDataService.combinedDemandSupply();
-
-    // legend settings
-    const legend = {
-      // dots with team colors
-      dots: {
-        centerX: 25,
-        firstCenterY: 100,
-        radius: 7,
-        spaceBetween: 25,
-        centerY: (i: number) => {
-          return legend.dots.firstCenterY + i * legend.dots.spaceBetween;
-        },
-      },
-      spaceBetweenDotsAndText: 10,
-      // team names
-      text: {
-        get startX() {
-          return (
-            legend.dots.centerX +
-            legend.dots.radius +
-            legend.spaceBetweenDotsAndText
-          );
-        },
-        centerY: (i: number) => {
-          return legend.dots.centerY(i);
-        },
-      },
-    };
-
-    // Create colored legend dots
-    this.svg
-      .append('g')
-      .attr('class', 'legend-group')
-      .selectAll('circles')
-      .data(Object.keys(supplyTeams).sort())
-      .enter()
-      .append('circle')
-      .attr('class', 'legend')
-      .attr('cx', legend.dots.centerX)
-      .attr('cy', (_, i) => {
-        return legend.dots.centerY(i);
-      })
-      .attr('r', legend.dots.radius)
-      .style('fill', (d: string) => supplyTeams[d] as string);
-
-    // Create legend text with info on hover
-    this.svg
-      .select('g.legend-group')
-      .selectAll('labels')
-      .data(Object.keys(supplyTeams).sort())
-      .enter()
-      .append('text')
-      .attr('class', 'legend')
-      .attr('x', legend.text.startX)
-      .attr('y', function (_, i) {
-        return legend.text.centerY(i);
-      })
-      .text(function (d) {
-        return Object.keys(supplyTeams).find((key) => key === d) as string;
-      })
-      .attr('text-anchor', 'left')
-      .style('alignment-baseline', 'middle')
-      .style('cursor', 'pointer')
-      .append('title')
-      .text((d) => {
-        const index = combinedDemandSupply.findIndex(
-          (entry) => entry.organisationName === d
-        );
-        if (index === -1) {
-          return '';
-        }
-        const totalDemandClients =
-          combinedDemandSupply[index].totalDemandClients;
-        const totalDemandHours = combinedDemandSupply[index].totalDemandHours;
-        const totalSupplyHours = combinedDemandSupply[index].totalSupplyHours;
-        let text = `Organisatie: ${d}\n`;
-        if (totalSupplyHours !== null) {
-          text += `Aantal uren aanbod: ${totalSupplyHours}\n`;
-        }
-        if (totalDemandHours !== null) {
-          text += `Aantal uren vraag: ${totalDemandHours}\n`;
-        }
-        if (totalDemandClients !== null) {
-          text += `Aantal cliënten: ${totalDemandClients}`;
-        }
-        return text;
-      });
-
-    this.addLegendMouseOver();
-
-    //this.addLegendClick();
-  }
-
-  // addLegendClick() {
-  //   const svg = this.svg;
-  //   svg.selectAll('.legend').on('click', function (_, d) {
-  //     console.log(d);
-  //     // const className = (d as string).replace(/ /g, '').toLowerCase();
-  //     // d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
-  //   });
-  // }
-
-  addLegendMouseOver() {
-    const svg = this.svg;
-    svg
-      .selectAll('.legend')
-      .on('mouseover', function (_, d) {
-        const className = (d as string).replace(/ /g, '').toLowerCase();
-        d3.selectAll(`.${className}`).attr('stroke', '#000').raise();
-      })
-      .on('mouseout', function (_, d) {
-        const className = (d as string).replace(/ /g, '').toLowerCase();
-        d3.selectAll(`.${className}`).attr('stroke', 'grey').lower();
       });
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, Signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { CareDemandService } from '../../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../../project/care-supply/services/care-supply.service';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
@@ -41,7 +41,7 @@ export class ZipcodeDataService {
     return [];
   });
 
-  supplyZipcodeData: Signal<ZipcodeData[]> = computed(() => {
+  supplyZipcodeData: signal<ZipcodeData[]> = computed(() => {
     if (this.careSupplyService.loaded()) {
       return this.convertSupplyList(
         this.careSupplyService.selectedCareSupplyList()
@@ -185,6 +185,7 @@ export class ZipcodeDataService {
       if (index !== -1) {
         list1[index].assignedTeamName = entry.assignedTeamName ?? null;
         list1[index].color = entry.color ?? null;
+        list1[index].activeTeams = entry.activeTeams;
       } else {
         list1.push(entry);
       }
