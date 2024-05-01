@@ -43,11 +43,6 @@ export class ChoroplethService {
       this.plotZipcodeData(this.zipcodeDataService.currentZipcodeData());
       this.legendService.createLegend(this.zipcodeDataService.supplyTeams());
     });
-
-    effect(() => {
-      this.demandType();
-      this.fillZipcodeData();
-    });
   }
 
   init() {
@@ -103,13 +98,14 @@ export class ChoroplethService {
             ? clientAlphaValue(data[index].totalAmountOfClients!).toString()
             : hourAlphaValue(data[index].totalAmountOfHours!).toString();
 
-        if (data[index].color === null) {
+        if (!data[index].activeTeams.length) {
           return this.getUnassignedColor(+alpha);
         }
 
         const color = utils.hslToHsla(data[index].activeTeams[0].color, +alpha);
         return color;
       })
+      .attr('stroke', 'grey')
       .attr('data-alpha', (d) => {
         const index = data.findIndex(
           (entry) => entry.zipcode === d.properties!['postcode4']
@@ -134,57 +130,45 @@ export class ChoroplethService {
           (entry) => entry.zipcode === d.properties!['postcode4']
         );
         if (index === -1) {
-          return 'colorme unassigned';
+          return 'unassigned';
         }
 
-        let classNames = 'colorme ';
+        let classNames = '';
 
         data[index].activeTeams.forEach((team) => {
           classNames += `${team.teamName.replace(/ /g, '').toLowerCase()} `;
         });
 
         return classNames;
-      })
-      .append('title')
-      .text((d) => {
-        const index = data.findIndex(
-          (entry) => entry.zipcode === d.properties!['postcode4']
-        );
-        if (index === -1) {
-          return '';
-        }
-        const clients = data[index].totalAmountOfClients;
-        const hours = data[index].totalAmountOfHours;
-        const assignedTeamName = data[index].assignedTeamName;
-        let text = `Postcode: ${data[index].zipcode}\n`;
-        if (assignedTeamName !== null) {
-          text += `Team: ${assignedTeamName}\n`;
-        }
-        if (clients !== null) {
-          text += `Aantal cliënten: ${clients}\n`;
-        }
-        if (hours !== null) {
-          text += `Aantal uren: ${hours}`;
-        }
-
-        return text;
       });
+    //TODO: Add title to the path
+    // .append('title')
+    // .text((d) => {
+    //   const index = data.findIndex(
+    //     (entry) => entry.zipcode === d.properties!['postcode4']
+    //   );
+    //   if (index === -1) {
+    //     return '';
+    //   }
+    //   const clients = data[index].totalAmountOfClients;
+    //   const hours = data[index].totalAmountOfHours;
+    //   const assignedTeamName = data[index].assignedTeamName;
+    //   let text = `Postcode: ${data[index].zipcode}\n`;
+    //   if (assignedTeamName !== null) {
+    //     text += `Team: ${assignedTeamName}\n`;
+    //   }
+    //   if (clients !== null) {
+    //     text += `Aantal cliënten: ${clients}\n`;
+    //   }
+    //   if (hours !== null) {
+    //     text += `Aantal uren: ${hours}`;
+    //   }
+
+    //   return text;
+    // });
 
     this.addMouseOver();
     this.addClick(data);
-    this.fillZipcodeData();
-  }
-
-  fillZipcodeData() {
-    const svgElements = d3.selectAll('.colorme');
-    svgElements.each((_, i, nodes) => {
-      const element = d3.select(nodes[i] as SVGElement);
-      // const alpha = element.attr(`data-${this.demandType()}`);
-      // const zipcode = element.datum().properties!['postcode4'];
-      // if (!color) return;
-      // element.attr('fill', color);
-      element.attr('stroke', 'grey');
-    });
   }
 
   addMouseOver() {

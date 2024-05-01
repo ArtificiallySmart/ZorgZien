@@ -67,16 +67,18 @@ export class MapComponent {
   }
 
   reassignZipcode(zipcodeData: ZipcodeData) {
-    const oldOrganisationName = zipcodeData.assignedTeamName;
-    const newOrganisationName = this.selectedOrganisationName;
-    if (oldOrganisationName === newOrganisationName || !zipcodeData.zipcode) {
-      return;
-    }
-    this.careSupplyService.changeZipcodeForOrganisation$.next({
-      zipcode: zipcodeData.zipcode,
-      oldOrganisationName,
-      newOrganisationName,
-    });
+    //TODO: Implement reassignZipcode
+    console.log(zipcodeData);
+    // const oldOrganisationName = zipcodeData.assignedTeamName;
+    // const newOrganisationName = this.selectedOrganisationName;
+    // if (oldOrganisationName === newOrganisationName || !zipcodeData.zipcode) {
+    //   return;
+    // }
+    // this.careSupplyService.changeZipcodeForOrganisation$.next({
+    //   zipcode: zipcodeData.zipcode,
+    //   oldOrganisationName,
+    //   newOrganisationName,
+    // });
   }
 
   togglePopover(clickLocation: ClickLocationData) {

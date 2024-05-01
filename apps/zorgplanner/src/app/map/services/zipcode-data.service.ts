@@ -1,4 +1,5 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, Signal, computed, inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { CareDemandService } from '../../project/care-demand/services/care-demand.service';
 import { CareSupplyService } from '../../project/care-supply/services/care-supply.service';
 import { CareDemandList } from '../../shared/interfaces/care-demand';
@@ -7,21 +8,26 @@ import {
   CombinedDemandSupply,
   ZipcodeEntry,
 } from '../../shared/interfaces/care-supply';
-import { environment } from '../../../environments/environment';
 
 export interface ZipcodeData {
   zipcode: string;
   totalAmountOfClients: number | null;
   totalAmountOfHours: number | null;
-  assignedTeamName: string | null;
-  color: string | null;
   activeTeams: ZipcodeTeam[];
+  demands: ZipcodeDemand[];
 }
 
 export interface ZipcodeTeam {
+  organisationName?: string;
   teamName: string;
   amountOfHours: number;
   color: string;
+}
+
+export interface ZipcodeDemand {
+  organisationName: string;
+  clients: number;
+  hours: number;
 }
 
 @Injectable({
@@ -41,7 +47,7 @@ export class ZipcodeDataService {
     return [];
   });
 
-  supplyZipcodeData: signal<ZipcodeData[]> = computed(() => {
+  supplyZipcodeData: Signal<ZipcodeData[]> = computed(() => {
     if (this.careSupplyService.loaded()) {
       return this.convertSupplyList(
         this.careSupplyService.selectedCareSupplyList()
@@ -128,14 +134,42 @@ export class ZipcodeDataService {
     }
     const data: ZipcodeData[] = [];
     demandList.careDemand.forEach((entry) => {
-      data.push({
-        zipcode: entry.zipcode.toString(),
-        totalAmountOfClients: entry.clients ?? 0,
-        totalAmountOfHours: entry.hours ?? 0,
-        assignedTeamName: 'Niet toegewezen',
-        color: null,
-        activeTeams: [],
-      });
+      const index = data.findIndex(
+        (el) => el.zipcode === entry.zipcode.toString()
+      );
+
+      if (index === -1) {
+        data.push({
+          zipcode: entry.zipcode.toString(),
+          totalAmountOfClients: entry.clients ?? 0,
+          totalAmountOfHours: entry.hours ?? 0,
+          activeTeams: [],
+          demands: [
+            {
+              organisationName: demandList.title,
+              clients: entry.clients ?? 0,
+              hours: entry.hours ?? 0,
+            },
+          ],
+        });
+      } else {
+        data[index].demands.push({
+          organisationName: demandList.title,
+          clients: entry.clients ?? 0,
+          hours: entry.hours ?? 0,
+        });
+        data[index].totalAmountOfClients! += entry.clients ?? 0;
+        data[index].totalAmountOfHours! += entry.hours ?? 0;
+      }
+
+      // data.push({
+      //   zipcode: entry.zipcode.toString(),
+      //   totalAmountOfClients: entry.clients ?? 0,
+      //   totalAmountOfHours: entry.hours ?? 0,
+      //   // assignedTeamName: 'Niet toegewezen',
+      //   // color: null,
+      //   activeTeams: [],
+      // });
     });
     return data;
   }
@@ -152,8 +186,6 @@ export class ZipcodeDataService {
               zipcode: zipcode,
               totalAmountOfClients: null,
               totalAmountOfHours: null,
-              assignedTeamName: entry.name,
-              color: entry.color,
               activeTeams: [
                 {
                   teamName: entry.name,
@@ -161,6 +193,7 @@ export class ZipcodeDataService {
                   color: entry.color,
                 },
               ],
+              demands: [],
             })
           : data
               .find((el) => el.zipcode === zipcode)
@@ -175,16 +208,12 @@ export class ZipcodeDataService {
   }
 
   combineZipcodeData() {
-    const list1 = this.demandZipcodeData().map((entry) => ({
-      ...entry,
-    }));
+    const list1 = this.demandZipcodeData().map((entry) => ({ ...entry }));
     const list2 = this.supplyZipcodeData().map((entry) => ({ ...entry }));
 
     list2.forEach((entry) => {
       const index = list1.findIndex((el) => el.zipcode === entry.zipcode);
       if (index !== -1) {
-        list1[index].assignedTeamName = entry.assignedTeamName ?? null;
-        list1[index].color = entry.color ?? null;
         list1[index].activeTeams = entry.activeTeams;
       } else {
         list1.push(entry);

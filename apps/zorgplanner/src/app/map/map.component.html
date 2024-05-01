@@ -12,13 +12,29 @@
 
                 <ng-template let-zipcodeData="zipcodeData" #popContent>
                     <p class="mb-0 fw-semibold">Zorgbehoefte:</p>
-                    <p class="mb-0">uur: {{zipcodeData.amountOfHours ?? 0}}</p>
-                    <p>clienten: {{zipcodeData.amountOfClients ?? 0}}</p>
+                    <p class="mb-0">uur: {{zipcodeData.totalAmountOfHours ?? 0}}</p>
+                    <p>clienten: {{zipcodeData.totalAmountOfClients ?? 0}}</p>
 
                     <ng-container *ngIf="zipcodeData.activeTeams.length">
-                        <p class="mb-0 fw-semibold">Organisatie: </p>
-                        <p *ngFor="let team of zipcodeData.activeTeams">{{team.teamName}}</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Organisatie</th>
+                                    <th scope="col">uren</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let team of zipcodeData.activeTeams">
+                                    <td>{{team.teamName}}</td>
+                                    <td>{{team.amountOfHours}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <!-- <p class="mb-0 fw-semibold">Organisatie: </p>
+                        <p *ngFor="let team of zipcodeData.activeTeams">{{team.teamName}}</p> -->
                     </ng-container>
+
                 </ng-template>
                 <ng-template let-zipcodeData="zipcodeData" #popTitle>
                     <div class="d-flex justify-content-between">
