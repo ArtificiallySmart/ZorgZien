@@ -1,5 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { Subject, catchError, map, merge, of } from 'rxjs';
+import { Subject, catchError, map, merge, of, tap } from 'rxjs';
 import {
   AddCareDemandList,
   CareDemandList,
@@ -13,7 +13,7 @@ import { connect } from 'ngxtension/connect';
 
 export interface CareDemandState {
   careDemandLists: CareDemandList[];
-  selectedCareDemandList: CareDemandList | null;
+  selectedCareDemandList: CareDemandList[];
   loaded: boolean;
   error: string | null;
 }
@@ -30,7 +30,7 @@ export class CareDemandService {
 
   initialState: CareDemandState = {
     careDemandLists: [],
-    selectedCareDemandList: null,
+    selectedCareDemandList: [],
     loaded: false,
     error: null,
   };
@@ -63,17 +63,22 @@ export class CareDemandService {
         catchError((error) => of({ error }))
       ),
       this.edit$.pipe(
-        map(({ id, data }) => ({
-          careDemandLists: this.careDemandLists().map((careDemandList) =>
+        map(({ id, data }) => {
+          const careDemandLists = this.careDemandLists().map((careDemandList) =>
             careDemandList.id === id
               ? { ...careDemandList, ...data }
               : careDemandList
-          ),
-          selectedCareDemandList:
-            this.selectedCareDemandList()?.id === id
-              ? { ...this.selectedCareDemandList(), ...data }
-              : this.selectedCareDemandList(),
-        })),
+          );
+
+          const selectedCareDemandList = this.selectedCareDemandList().map(
+            (careDemandList) =>
+              careDemandList.id === id
+                ? { ...careDemandList, ...data }
+                : careDemandList
+          );
+
+          return { careDemandLists, selectedCareDemandList };
+        }),
         catchError((error) => of({ error }))
       ),
       this.remove$.pipe(
@@ -97,10 +102,30 @@ export class CareDemandService {
         catchError((error) => of({ error }))
       ),
       this.selectCareDemandListId$.pipe(
-        map((id) => ({
-          selectedCareDemandList:
-            this.careDemandLists().find((list) => list.id == id) || null,
-        }))
+        map((id) => {
+          const index = this.selectedCareDemandList().findIndex(
+            (careDemandList) => careDemandList.id === id
+          );
+          if (index === -1) {
+            const careDemandList = this.careDemandLists().find(
+              (careDemandList) => careDemandList.id === id
+            );
+            return {
+              selectedCareDemandList: [
+                ...this.selectedCareDemandList(),
+                careDemandList,
+              ],
+            };
+          }
+          console.log(this.selectedCareDemandList(), index);
+
+          return {
+            selectedCareDemandList: this.selectedCareDemandList().filter(
+              (careDemandList) => careDemandList.id !== id
+            ),
+          };
+        }),
+        tap((state) => console.log(state))
       )
     );
 

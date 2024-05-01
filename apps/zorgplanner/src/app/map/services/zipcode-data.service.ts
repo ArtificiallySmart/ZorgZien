@@ -71,8 +71,7 @@ export class ZipcodeDataService {
   });
 
   combinedDemandSupply: Signal<CombinedDemandSupply[]> = computed(() => {
-    const demandListEntries =
-      this.careDemandService.selectedCareDemandList()?.careDemand;
+    const demandListEntries = this.careDemandService.selectedCareDemandList();
     const supplyListEntries =
       this.careSupplyService.selectedCareSupplyList()?.careSupply;
     if (!supplyListEntries) return [] as CombinedDemandSupply[];
@@ -80,10 +79,12 @@ export class ZipcodeDataService {
     const zipcodes: ZipcodeEntry[] = [];
     if (demandListEntries) {
       demandListEntries.forEach((entry) => {
-        zipcodes.push({
-          zipcode: entry.zipcode.toString(),
-          demandClients: entry.clients ?? 0,
-          demandHours: entry.hours ?? 0,
+        entry.careDemand.forEach((entry) => {
+          zipcodes.push({
+            zipcode: entry.zipcode.toString(),
+            demandClients: entry.clients ?? 0,
+            demandHours: entry.hours ?? 0,
+          });
         });
       });
     }
@@ -128,48 +129,50 @@ export class ZipcodeDataService {
     return combined;
   });
 
-  convertDemandList(demandList: CareDemandList | null) {
+  convertDemandList(demandList: CareDemandList[]) {
     if (demandList === null) {
       return [];
     }
     const data: ZipcodeData[] = [];
-    demandList.careDemand.forEach((entry) => {
-      const index = data.findIndex(
-        (el) => el.zipcode === entry.zipcode.toString()
-      );
+    demandList.forEach((demandList) => {
+      demandList.careDemand.forEach((entry) => {
+        const index = data.findIndex(
+          (el) => el.zipcode === entry.zipcode.toString()
+        );
 
-      if (index === -1) {
-        data.push({
-          zipcode: entry.zipcode.toString(),
-          totalAmountOfClients: entry.clients ?? 0,
-          totalAmountOfHours: entry.hours ?? 0,
-          activeTeams: [],
-          demands: [
-            {
-              organisationName: demandList.title,
-              clients: entry.clients ?? 0,
-              hours: entry.hours ?? 0,
-            },
-          ],
-        });
-      } else {
-        data[index].demands.push({
-          organisationName: demandList.title,
-          clients: entry.clients ?? 0,
-          hours: entry.hours ?? 0,
-        });
-        data[index].totalAmountOfClients! += entry.clients ?? 0;
-        data[index].totalAmountOfHours! += entry.hours ?? 0;
-      }
+        if (index === -1) {
+          data.push({
+            zipcode: entry.zipcode.toString(),
+            totalAmountOfClients: entry.clients ?? 0,
+            totalAmountOfHours: entry.hours ?? 0,
+            activeTeams: [],
+            demands: [
+              {
+                organisationName: demandList.title,
+                clients: entry.clients ?? 0,
+                hours: entry.hours ?? 0,
+              },
+            ],
+          });
+        } else {
+          data[index].demands.push({
+            organisationName: demandList.title,
+            clients: entry.clients ?? 0,
+            hours: entry.hours ?? 0,
+          });
+          data[index].totalAmountOfClients! += entry.clients ?? 0;
+          data[index].totalAmountOfHours! += entry.hours ?? 0;
+        }
 
-      // data.push({
-      //   zipcode: entry.zipcode.toString(),
-      //   totalAmountOfClients: entry.clients ?? 0,
-      //   totalAmountOfHours: entry.hours ?? 0,
-      //   // assignedTeamName: 'Niet toegewezen',
-      //   // color: null,
-      //   activeTeams: [],
-      // });
+        // data.push({
+        //   zipcode: entry.zipcode.toString(),
+        //   totalAmountOfClients: entry.clients ?? 0,
+        //   totalAmountOfHours: entry.hours ?? 0,
+        //   // assignedTeamName: 'Niet toegewezen',
+        //   // color: null,
+        //   activeTeams: [],
+        // });
+      });
     });
     return data;
   }

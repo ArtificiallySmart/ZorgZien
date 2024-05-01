@@ -59,9 +59,34 @@
                         <div>
 
                             <div class="form-group mb-3">
-                                <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
-                                    lijst:</label>
-                                <select class="form-select" id="exampleFormControlSelect1"
+
+
+                                <a class="sidebar-link has-arrow" aria-expanded="false" (click)="collapse.toggle()">
+                                    <label for="exampleFormControlSelect1" class="form-label">Selecteer een zorgbehoefte
+                                        lijst:</label>
+                                    <span class="dropdown-icon">
+                                        <tabler-icon name="chevron-down" class="chevron-icon"
+                                            [class.rotate]="!isCollapsed"></tabler-icon>
+                                    </span>
+                                </a>
+                                <ul class="first-level" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+
+                                    <div class="form-check" *ngFor="let list of careDemand()">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+                                            (change)="changeDemandSelection(list.id)">
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            {{list.title}}
+                                        </label>
+                                    </div>
+                                    <!-- <li class="sidebar-item" >
+                                        <a class="sidebar-link">
+                                            <span class="hide-menu"></span>
+                                        </a>
+                                    </li> -->
+
+                                </ul>
+
+                                <!-- <select class="form-select" id="exampleFormControlSelect1"
                                     [disabled]="(careDemand().length === 0) ? true : false"
                                     (change)="selectDemandList($event)">
 
@@ -80,7 +105,7 @@
                                         </option>
                                     </ng-template>
 
-                                </select>
+                                </select> -->
                             </div>
 
 

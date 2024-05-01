@@ -43,7 +43,7 @@ export class MapComponent {
   careDemand = this.careDemandService.careDemandLists;
   careSupply = this.careSupplyService.careSupplyLists;
   project = this.projectService.project;
-  isCollapsed = false;
+  isCollapsed = true;
 
   organisationNames = computed(() => {
     return this.careSupplyService
@@ -64,6 +64,10 @@ export class MapComponent {
           ? this.reassignZipcode(clickLocation.zipcodeData)
           : this.togglePopover(clickLocation);
       });
+  }
+
+  changeDemandSelection(id: string) {
+    this.careDemandService.selectCareDemandListId$.next(id);
   }
 
   reassignZipcode(zipcodeData: ZipcodeData) {
